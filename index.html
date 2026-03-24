@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0103)https://tess-workflows-files.storage.googleapis.com/be2878bf2c6ad1192beaf8c07bc475366c002a4b/index.html -->
+<html lang="pt-br"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tá na Mão! — Praticidade e Saúde</title>
 
-<!-- Fonte Premium do Google Fonts (Moderna e forte, parecida com a da logo) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./index_files/css2" rel="stylesheet">
 
 <style>
   :root {
-    --verde-base: #3C6E47; /* Tom de verde extraído da sua logo */
+    --verde-base: #3C6E47;
     --verde-escuro: #2D5235;
-    --dourado: #C9A86A; /* Dourado premium */
-    --dourado-hover: #b89758;
+    --dourado: #C9A86A;
     --fundo: #f4f6f4;
     --texto: #1a1a1a;
   }
@@ -23,24 +21,30 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Outfit', sans-serif;
+    font-family: "Outfit", sans-serif;
     background: var(--fundo);
     color: var(--texto);
   }
 
-  /* ── BARRA DE USUÁRIO LOGADO ── */
+  /* BARRA TOPO */
   #auth-bar {
     background: #111;
     color: var(--dourado);
     text-align: center;
-    padding: 8px;
+    padding: 9px 16px;
     font-size: 0.85em;
     font-weight: 600;
     display: none;
   }
-  #auth-bar a { color: #fff; cursor: pointer; text-decoration: underline; margin-left: 10px; font-weight: 400; }
+  #auth-bar a {
+    color: #fff;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 10px;
+    font-weight: 400;
+  }
 
-  /* ── HEADER ── */
+  /* HEADER */
   header {
     background: var(--verde-base);
     padding: 36px 20px 30px;
@@ -51,7 +55,7 @@
   header img.logo {
     width: 120px;
     height: 120px;
-    border-radius: 26px; /* Ajuste suave nos cantos, combinando com os detalhes pretos */
+    border-radius: 26px;
     display: block;
     margin: 0 auto 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
@@ -62,7 +66,6 @@
     color: var(--dourado);
     letter-spacing: 0.5px;
     margin-bottom: 4px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   }
   header .slogan {
     font-size: 1.05em;
@@ -93,14 +96,14 @@
     font-weight: 600;
   }
 
-  /* ── CONTAINER ── */
+  /* CONTAINER */
   .container {
     max-width: 820px;
     margin: auto;
     padding: 24px 16px;
   }
 
-  /* ── SEÇÕES ── */
+  /* SEÇÕES */
   .section {
     background: #fff;
     border-radius: 14px;
@@ -109,7 +112,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
   .section h2 {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 800;
     color: var(--dourado);
     background: var(--verde-base);
@@ -121,7 +124,7 @@
     letter-spacing: 0.5px;
   }
 
-  /* ── CARDÁPIO ── */
+  /* CARDÁPIO */
   .product {
     display: flex;
     justify-content: space-between;
@@ -132,14 +135,10 @@
   .product:last-child { border-bottom: none; }
   .product-info { flex: 1; }
   .product-info .p-nome { font-weight: 800; font-size: 1.05em; color: var(--verde-base); }
-  .product-info .p-desc { font-size: 0.8em; color: #666; margin-top: 4px; font-weight: 400; }
+  .product-info .p-desc { font-size: 0.8em; color: #666; margin-top: 4px; }
   .product-info .p-preco { font-size: 0.95em; font-weight: 800; color: #333; margin-top: 6px; }
 
-  .qty-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .qty-wrap { display: flex; align-items: center; gap: 10px; }
   .qty-wrap button {
     width: 32px; height: 32px;
     border-radius: 8px;
@@ -150,16 +149,12 @@
     font-weight: 600;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    font-family: "Outfit", sans-serif;
   }
-  .qty-wrap button:hover { background: #eee; }
-  .qty-wrap .qty-num {
-    min-width: 24px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 1em;
-  }
+  .qty-wrap button:hover { background: #e8e8e8; }
+  .qty-wrap .qty-num { min-width: 24px; text-align: center; font-weight: 800; font-size: 1em; }
 
-  /* ── COMO FUNCIONA ── */
+  /* COMO FUNCIONA */
   .steps { display: flex; gap: 12px; flex-wrap: wrap; }
   .step {
     flex: 1; min-width: 180px;
@@ -180,17 +175,15 @@
   .step p { font-size: 0.85em; color: #555; line-height: 1.4; }
   .step strong { font-size: 0.9em; display: block; margin-bottom: 4px; color: var(--verde-base); }
 
-  /* ── PAGAMENTO ── */
-  .pag-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
-  }
+  /* PAGAMENTO */
+  .pag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .pag-item {
     border: 2px solid #ddd; border-radius: 10px; padding: 14px;
     cursor: pointer; transition: all 0.2s; text-align: center;
   }
   .pag-item:hover { border-color: var(--dourado); background: #fdfaf3; }
   .pag-item.ativo { border-color: var(--verde-base); background: #f0f7f2; }
-  .pag-item .pag-nome { font-weight: 800; font-size: 0.95em; color: var(--verde-base);}
+  .pag-item .pag-nome { font-weight: 800; font-size: 0.95em; color: var(--verde-base); }
   .pag-item .pag-sub { font-size: 0.75em; color: #777; margin-top: 4px; }
   .tag-desc {
     background: var(--dourado); color: var(--verde-escuro);
@@ -198,7 +191,7 @@
     border-radius: 20px; margin-top: 6px; display: inline-block;
   }
 
-  /* ── RESUMO ── */
+  /* RESUMO */
   #resumo-lista { font-size: 0.9em; line-height: 1.9; color: #333; font-weight: 600; }
   #resumo-lista .r-vazio { color: #bbb; font-weight: 400; font-style: italic; }
   .resumo-total {
@@ -206,14 +199,18 @@
     padding-top: 12px; border-top: 2px dashed #eee;
   }
 
-  /* ── CTA FINAL ── */
+  /* CTA */
   .cta-section {
     background: linear-gradient(135deg, var(--verde-base), var(--verde-escuro));
     border-radius: 14px; padding: 32px 24px;
     text-align: center; margin-bottom: 16px;
-    box-shadow: 0 4px 15px rgba(60, 110, 71, 0.3);
+    box-shadow: 0 4px 15px rgba(60,110,71,0.3);
   }
-  .cta-section h2 { background: transparent; color: var(--dourado); margin-bottom: 8px; padding: 0;}
+  .cta-section h2 {
+    background: transparent; color: var(--dourado);
+    margin-bottom: 8px; padding: 0;
+    font-size: 1.3em;
+  }
   .cta-section p { color: white; font-size: 0.9em; margin-bottom: 22px; }
   .btn-pedir {
     display: inline-block;
@@ -223,85 +220,97 @@
     padding: 16px 40px; border-radius: 40px; border: none;
     cursor: pointer; transition: all 0.2s;
     width: 100%; max-width: 340px;
-    box-shadow: 0 4px 14px rgba(201, 168, 106, 0.4);
-    font-family: 'Outfit', sans-serif;
+    box-shadow: 0 4px 14px rgba(201,168,106,0.4);
+    font-family: "Outfit", sans-serif;
   }
-  .btn-pedir:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(201, 168, 106, 0.6); background: #d6b77c; }
+  .btn-pedir:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(201,168,106,0.6); }
 
-  /* ── MODAL ── */
+  /* MODAL */
   .overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 999; align-items: center; justify-content: center; padding: 10px;
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 999;
+    align-items: center; justify-content: center; padding: 10px;
   }
   .overlay.on { display: flex; }
   .modal {
     background: white; border-radius: 20px; padding: 30px 24px;
-    width: 100%; max-width: 440px; position: relative;
+    width: 100%; max-width: 460px; position: relative;
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    max-height: 90vh; overflow-y: auto;
   }
-  .modal h3 { color: var(--verde-base); font-size: 1.2em; margin-bottom: 16px; font-weight: 800;}
-  .modal .m-resumo { font-size: 0.85em; line-height: 1.8; margin-bottom: 10px; color: #444; }
+  .modal h3 { color: var(--verde-base); font-size: 1.2em; margin-bottom: 6px; font-weight: 800; }
+  .modal .m-subtitulo { font-size: 0.8em; color: #999; margin-bottom: 16px; }
+  .modal .m-resumo { font-size: 0.85em; line-height: 1.8; margin-bottom: 10px; color: #444; background: #f9f9f9; padding: 12px; border-radius: 8px; }
   .modal .m-total { font-size: 1.1em; font-weight: 800; color: var(--verde-base); margin-bottom: 20px; }
-  
-  /* GRID DE CADASTRO */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  .modal input {
-    width: 100%; padding: 12px 14px; border: 2px solid #eee;
-    border-radius: 10px; font-size: 0.9em; font-family: 'Outfit', sans-serif;
-    outline: none; transition: border 0.2s;
-  }
-  .modal input:focus { border-color: var(--dourado); }
-  .input-full { grid-column: span 2; }
 
-  #area-logado {
-    background: #fdfaf3;
-    border: 1px solid var(--dourado);
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    text-align: center;
+  /* CADASTRO */
+  .cadastro-label {
+    font-size: 0.75em; font-weight: 800; color: #999;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 8px; margin-top: 14px; display: block;
   }
-  #area-logado p { font-size: 0.9em; color: var(--verde-base); font-weight: 600;}
-  #area-logado a { font-size: 0.8em; color: #888; text-decoration: underline; cursor: pointer; display: block; margin-top: 8px;}
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .input-full { grid-column: span 2; }
+  .modal input, .modal select {
+    width: 100%; padding: 12px 14px;
+    border: 2px solid #eee; border-radius: 10px;
+    font-size: 0.9em; font-family: "Outfit", sans-serif;
+    outline: none; transition: border 0.2s; color: var(--texto);
+    background: white;
+  }
+  .modal input:focus, .modal select:focus { border-color: var(--dourado); }
+
+  /* AREA LOGADO */
+  #area-logado {
+    background: #f0f7f2;
+    border: 2px solid var(--verde-base);
+    padding: 16px; border-radius: 12px;
+    margin-bottom: 16px; text-align: center;
+  }
+  #area-logado .l-nome { font-weight: 800; font-size: 1.05em; color: var(--verde-base); }
+  #area-logado .l-tel { font-size: 0.85em; color: #666; margin-top: 4px; }
+  #area-logado a {
+    font-size: 0.78em; color: #aaa;
+    text-decoration: underline; cursor: pointer;
+    display: inline-block; margin-top: 10px;
+  }
 
   .btn-wpp {
     width: 100%; background: #25d366; color: white; border: none;
     padding: 16px; border-radius: 40px; font-size: 1em; font-weight: 800;
-    cursor: pointer; transition: background 0.2s; font-family: 'Outfit', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+    font-family: "Outfit", sans-serif; margin-top: 16px;
   }
   .btn-wpp:hover { background: #1ebe5d; }
   .btn-fechar {
-    position: absolute; top: 16px; right: 20px; background: none; border: none;
-    font-size: 1.4em; cursor: pointer; color: #aaa;
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; font-size: 1.4em;
+    cursor: pointer; color: #ccc;
   }
-  
+
   footer { text-align: center; padding: 20px; font-size: 0.8em; color: #aaa; }
 
   @media (max-width: 520px) {
     header h1 { font-size: 1.8em; }
-    .pag-grid { grid-template-columns: 1fr; }
+    .pag-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- BARRA USUÁRIO CONHECIDO -->
-<div id="auth-bar"></div>
+<!-- BARRA TOPO CLIENTE RECONHECIDO -->
+<div id="auth-bar" style="display: block;">Bem-vindo de volta, <strong>Guilherme</strong>! <a onclick="limparCadastro()">Sair</a></div>
 
 <!-- HEADER -->
 <header>
   <img src="TanaMao_Logo.jpg" class="logo" alt="Tá na Mão!">
-  
-  <div class="slogan">Praticidade & Saúde</div>
-  <p>Pratos prontos e congelados com sabor caseiro para resolver sua semana sem complicações.</p>
+  <div class="slogan">Praticidade &amp; Saúde</div>
+  <p>Pratos prontos e congelados com sabor caseiro para resolver sua semana.</p>
   <div class="badges">
     <span class="badge">✔ Sem conservantes</span>
     <span class="badge">✔ Produção caseira</span>
+    <span class="badge">✔ Entrega em 48h</span>
   </div>
 </header>
 
@@ -310,7 +319,7 @@
   <!-- CARDÁPIO -->
   <div class="section">
     <h2>Nosso Cardápio</h2>
-    
+
     <div class="product">
       <div class="product-info">
         <div class="p-nome">Panqueca</div>
@@ -318,18 +327,22 @@
         <div class="p-preco">R$ 18,00</div>
       </div>
       <div class="qty-wrap">
-        <button onclick="qty('p1',-1)">−</button><span class="qty-num" id="p1">0</span><button onclick="qty('p1',1)">+</button>
+        <button onclick="qty(&#39;p1&#39;,-1)">−</button>
+        <span class="qty-num" id="p1">0</span>
+        <button onclick="qty(&#39;p1&#39;,1)">+</button>
       </div>
     </div>
 
     <div class="product">
       <div class="product-info">
-        <div class="p-nome">Kibe Assado recheado</div>
+        <div class="p-nome">Kibe Assado Recheado</div>
         <div class="p-desc">Assado, suculento e rico em proteína.</div>
         <div class="p-preco">R$ 20,00</div>
       </div>
       <div class="qty-wrap">
-        <button onclick="qty('p2',-1)">−</button><span class="qty-num" id="p2">0</span><button onclick="qty('p2',1)">+</button>
+        <button onclick="qty(&#39;p2&#39;,-1)">−</button>
+        <span class="qty-num" id="p2">0</span>
+        <button onclick="qty(&#39;p2&#39;,1)">+</button>
       </div>
     </div>
 
@@ -340,18 +353,22 @@
         <div class="p-preco">R$ 17,00</div>
       </div>
       <div class="qty-wrap">
-        <button onclick="qty('p3',-1)">−</button><span class="qty-num" id="p3">0</span><button onclick="qty('p3',1)">+</button>
+        <button onclick="qty(&#39;p3&#39;,-1)">−</button>
+        <span class="qty-num" id="p3">0</span>
+        <button onclick="qty(&#39;p3&#39;,1)">+</button>
       </div>
     </div>
 
     <div class="product">
       <div class="product-info">
         <div class="p-nome">Bolo de Banana</div>
-        <div class="p-desc">Caseiro, sem açúcar. Ótimo para o café.</div>
+        <div class="p-desc">Caseiro, sem açúcar excessivo. Ótimo para o café.</div>
         <div class="p-preco">R$ 22,00</div>
       </div>
       <div class="qty-wrap">
-        <button onclick="qty('p4',-1)">−</button><span class="qty-num" id="p4">0</span><button onclick="qty('p4',1)">+</button>
+        <button onclick="qty(&#39;p4&#39;,-1)">−</button>
+        <span class="qty-num" id="p4">0</span>
+        <button onclick="qty(&#39;p4&#39;,1)">+</button>
       </div>
     </div>
 
@@ -362,19 +379,21 @@
         <div class="p-preco">R$ 35,00</div>
       </div>
       <div class="qty-wrap">
-        <button onclick="qty('p5',-1)">−</button><span class="qty-num" id="p5">0</span><button onclick="qty('p5',1)">+</button>
+        <button onclick="qty(&#39;p5&#39;,-1)">−</button>
+        <span class="qty-num" id="p5">0</span>
+        <button onclick="qty(&#39;p5&#39;,1)">+</button>
       </div>
     </div>
   </div>
 
   <!-- COMO FUNCIONA -->
   <div class="section">
-    <h2>Como funciona</h2>
+    <h2>Como Funciona</h2>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <strong>Escolha</strong>
-        <p>Selecione as marmitas.</p>
+        <p>Monte seu pedido pelo site.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
@@ -393,23 +412,27 @@
   <div class="section">
     <h2>Pagamento</h2>
     <div class="pag-grid">
-      <div class="pag-item" id="pag-pix" onclick="selecionarPag('pix')">
+      <div class="pag-item" id="pag-pix" onclick="selecionarPag(&#39;pix&#39;)">
         <div class="pag-nome">Pix</div>
+        <div class="pag-sub">Transferência instantânea</div>
         <span class="tag-desc">10% OFF</span>
       </div>
-      <div class="pag-item" id="pag-debito" onclick="selecionarPag('debito')">
+      <div class="pag-item" id="pag-debito" onclick="selecionarPag(&#39;debito&#39;)">
         <div class="pag-nome">Débito</div>
+        <div class="pag-sub">Cartão de débito</div>
         <span class="tag-desc">10% OFF</span>
       </div>
-      <div class="pag-item" id="pag-credito" onclick="selecionarPag('credito')">
+      <div class="pag-item" id="pag-credito" onclick="selecionarPag(&#39;credito&#39;)">
         <div class="pag-nome">Crédito</div>
+        <div class="pag-sub">Cartão de crédito</div>
       </div>
-      <div class="pag-item" id="pag-vale" onclick="selecionarPag('vale')">
+      <div class="pag-item" id="pag-vale" onclick="selecionarPag(&#39;vale&#39;)">
         <div class="pag-nome">Vale Alimentação</div>
+        <div class="pag-sub">VR / VA / Ticket</div>
       </div>
     </div>
-    <div style="font-size: 0.85em; color: #888; text-align: center; margin-top: 5px;">
-      Pedido confirmado após o pagamento. Horário de entrega a combinar.
+    <div style="font-size:0.82em;color:#999;text-align:center;margin-top:5px;">
+      Pedido confirmado após o pagamento. Entrega combinada via WhatsApp.
     </div>
   </div>
 
@@ -420,7 +443,7 @@
     <div class="resumo-total" id="resumo-total" style="display:none;"></div>
   </div>
 
-  <!-- CTA FINAL -->
+  <!-- CTA -->
   <div class="cta-section">
     <h2>Resolva sua semana agora</h2>
     <p>Comida com gosto de casa, entregue na sua rotina.</p>
@@ -435,68 +458,83 @@
 <div class="overlay" id="overlay">
   <div class="modal">
     <button class="btn-fechar" onclick="fecharModal()">✕</button>
-    <h3>📋 Confirmar e Enviar</h3>
-    
+    <h3>Confirmar Pedido</h3>
+    <div class="m-subtitulo" id="m-subtitulo"></div>
+
     <div class="m-resumo" id="m-resumo"></div>
     <div class="m-total" id="m-total"></div>
 
-    <!-- AREA LOGADO OU CADASTRO -->
+    <!-- SE JÁ É CLIENTE -->
     <div id="area-logado" style="display:none;">
-      <p>Pedido em nome de: <span id="txt-nome-logado"></span></p>
-      <a onclick="limparCadastro()">Não é você? Trocar os dados.</a>
+      <div class="l-nome" id="txt-nome-logado"></div>
+      <div class="l-tel" id="txt-tel-logado"></div>
+      <a onclick="limparCadastro()">Não é você? Trocar os dados</a>
     </div>
 
-    <div id="area-cadastro" class="form-grid">
-      <input type="text" id="m-nome" class="input-full" placeholder="Seu Nome Completo">
-      <input type="tel" id="m-tel" class="input-full" placeholder="WhatsApp (com DDD)">
-      <input type="number" id="m-idade" placeholder="Sua Idade">
-      <input type="text" id="m-prof" placeholder="Profissão">
+    <!-- CADASTRO NOVO CLIENTE -->
+    <div id="area-cadastro">
+      <!-- DADOS VISÍVEIS NO WHATSAPP -->
+      <span class="cadastro-label">Seus dados</span>
+      <div class="form-grid">
+        <input type="text" id="m-nome" class="input-full" placeholder="Nome completo">
+        <input type="tel" id="m-tel" class="input-full" placeholder="WhatsApp com DDD (ex: 21 98000-0000)">
+      </div>
+
+      <!-- DADOS INTERNOS (PERFIL) -->
+      <span class="cadastro-label">Perfil rápido (interno — ajuda a te atender melhor)</span>
+      <div class="form-grid">
+        <input type="number" id="m-idade" placeholder="Sua idade">
+        <input type="text" id="m-prof" placeholder="Profissão">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.88em;font-weight:600;color:#555;">
+          <input type="checkbox" id="m-casado" style="width:18px;height:18px;accent-color:var(--verde-base);"> Casado(a)
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.88em;font-weight:600;color:#555;">
+          <input type="checkbox" id="m-filhos" style="width:18px;height:18px;accent-color:var(--verde-base);"> Tem filhos
+        </div>
+      </div>
     </div>
 
-    <button class="btn-wpp" onclick="enviarWpp()">Pelo WhatsApp 📲</button>
+    <button class="btn-wpp" onclick="enviarWpp()">📲 Enviar pedido pelo WhatsApp</button>
   </div>
 </div>
 
 <script>
-  // SISTEMA DE CRM BÁSICO (MEMÓRIA)
-  let clienteAtual = JSON.parse(localStorage.getItem('tanamao_cliente')) || null;
+  // ── CRM LOCAL ──────────────────────────────────────────
+  let clienteAtual = JSON.parse(localStorage.getItem("tanamao_cliente")) || null;
 
   function checarLogin() {
-    const bar = document.getElementById('auth-bar');
+    const bar = document.getElementById("auth-bar");
     if (clienteAtual) {
-      bar.innerHTML = `Bem-vindo de volta, <strong>${clienteAtual.nome.split(' ')[0]}</strong>! 
-                       <a onclick="limparCadastro()">Sair</a>`;
-      bar.style.display = 'block';
+      bar.innerHTML = "Bem-vindo de volta, <strong>" + clienteAtual.nome.split(" ")[0] + "</strong>! <a onclick=\"limparCadastro()\">Sair</a>";
+      bar.style.display = "block";
     } else {
-      bar.style.display = 'none';
+      bar.style.display = "none";
     }
   }
 
   function limparCadastro() {
-    localStorage.removeItem('tanamao_cliente');
+    localStorage.removeItem("tanamao_cliente");
     clienteAtual = null;
     checarLogin();
-    document.getElementById('area-logado').style.display = 'none';
-    document.getElementById('area-cadastro').style.display = 'grid';
-    // Limpa campos
-    document.getElementById('m-nome').value = '';
-    document.getElementById('m-tel').value = '';
-    document.getElementById('m-idade').value = '';
-    document.getElementById('m-prof').value = '';
+    document.getElementById("area-logado").style.display = "none";
+    document.getElementById("area-cadastro").style.display = "block";
+    ["m-nome","m-tel","m-idade","m-prof"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("m-casado").checked = false;
+    document.getElementById("m-filhos").checked  = false;
   }
 
-  // INICIA CHECAGEM
   checarLogin();
 
+  // ── PRODUTOS ───────────────────────────────────────────
   const PRODS = [
-    { id:'p1', nome:'Panqueca', preco:18 },
-    { id:'p2', nome:'Kibe Assado', preco:20 },
-    { id:'p3', nome:'Suflê de Legumes', preco:17 },
-    { id:'p4', nome:'Bolo de Banana', preco:22 },
-    { id:'p5', nome:'Combo Degustação', preco:35 }
+    { id:"p1", nome:"Panqueca",              preco:18 },
+    { id:"p2", nome:"Kibe Assado Recheado",  preco:20 },
+    { id:"p3", nome:"Suflê de Legumes",      preco:17 },
+    { id:"p4", nome:"Bolo de Banana",        preco:22 },
+    { id:"p5", nome:"Combo Degustação",      preco:35 }
   ];
   const qtds = { p1:0, p2:0, p3:0, p4:0, p5:0 };
-  let pagSel = '';
+  let pagSel = "";
 
   function qty(id, d) {
     qtds[id] = Math.max(0, qtds[id] + d);
@@ -506,127 +544,124 @@
 
   function selecionarPag(tipo) {
     pagSel = tipo;
-    document.querySelectorAll('.pag-item').forEach(el => el.classList.remove('ativo'));
-    document.getElementById('pag-' + tipo).classList.add('ativo');
+    document.querySelectorAll(".pag-item").forEach(el => el.classList.remove("ativo"));
+    document.getElementById("pag-" + tipo).classList.add("ativo");
     atualizarResumo();
   }
 
   function calcTotal() {
     let sub = 0;
     PRODS.forEach(p => { sub += qtds[p.id] * p.preco; });
-    const desc = (pagSel === 'pix' || pagSel === 'debito') ? 0.1 : 0;
+    const desc = (pagSel === "pix" || pagSel === "debito") ? 0.1 : 0;
     return { sub, desc, total: sub * (1 - desc) };
   }
 
-  function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+  function fmt(v) { return "R$ " + v.toFixed(2).replace(".", ","); }
 
   function atualizarResumo() {
     const ativos = PRODS.filter(p => qtds[p.id] > 0);
-    const rl = document.getElementById('resumo-lista');
-    const rt = document.getElementById('resumo-total');
+    const rl = document.getElementById("resumo-lista");
+    const rt = document.getElementById("resumo-total");
 
     if (!ativos.length) {
-      rl.innerHTML = '<span class="r-vazio">Nenhum item selecionado ainda.</span>';
-      rt.style.display = 'none';
+      rl.innerHTML = "<span class=\"r-vazio\">Nenhum item selecionado ainda.</span>";
+      rt.style.display = "none";
       return;
     }
 
     const { sub, desc, total } = calcTotal();
-    let html = ativos.map(p => `<div>${p.nome} × ${qtds[p.id]} = ${fmt(qtds[p.id] * p.preco)}</div>`).join('');
-    
+    let html = ativos.map(p => "<div>" + p.nome + " × " + qtds[p.id] + " = " + fmt(qtds[p.id] * p.preco) + "</div>").join("");
     if (desc > 0) {
-      html += `<div style="color:#888;font-size:.85em;margin-top:5px;">Subtotal: ${fmt(sub)}</div>`;
-      html += `<div style="color:var(--verde-base);font-size:.85em;font-weight:800;">Desconto (10%): − ${fmt(sub * desc)}</div>`;
+      html += "<div style=\"color:#888;font-size:.85em;margin-top:5px;\">Subtotal: " + fmt(sub) + "</div>";
+      html += "<div style=\"color:var(--verde-base);font-size:.85em;font-weight:800;\">Desconto (10%): − " + fmt(sub * desc) + "</div>";
     }
     rl.innerHTML = html;
-    rt.style.display = 'block';
-    rt.textContent = 'Total a pagar: ' + fmt(total);
+    rt.style.display = "block";
+    rt.textContent = "Total a pagar: " + fmt(total);
   }
 
+  // ── MODAL ──────────────────────────────────────────────
   function abrirModal() {
     const ativos = PRODS.filter(p => qtds[p.id] > 0);
-    if (!ativos.length) { alert('Selecione pelo menos um item da marmita.'); return; }
-    if (!pagSel) { alert('Faltou selecionar a forma de pagamento.'); return; }
+    if (!ativos.length) { alert("Selecione pelo menos um item."); return; }
+    if (!pagSel)        { alert("Escolha a forma de pagamento."); return; }
 
     const { sub, desc, total } = calcTotal();
-    const nomesPag = { pix:'Pix', debito:'Débito', credito:'Crédito', vale:'Vale Alimentação' };
+    const nomesPag = { pix:"Pix (10% OFF)", debito:"Débito (10% OFF)", credito:"Crédito", vale:"Vale Alimentação" };
 
-    let r = ativos.map(p => `• ${p.nome} × ${qtds[p.id]}`).join('<br>');
-    r += `<br><br><strong>Pagamento via ${nomesPag[pagSel]}</strong>`;
-    
-    document.getElementById('m-resumo').innerHTML = r;
-    document.getElementById('m-total').textContent = 'Total: ' + fmt(total);
-    
-    // Logica visual de cadastro/logado
+    // Resumo do pedido no modal
+    let r = ativos.map(p => "• " + p.nome + " × " + qtds[p.id] + " = " + fmt(qtds[p.id] * p.preco)).join("<br>");
+    if (desc > 0) r += "<br><span style=\"color:var(--verde-base);font-weight:800;\">Desconto aplicado: −" + fmt(sub * desc) + "</span>";
+    r += "<br><strong>Pagamento: " + nomesPag[pagSel] + "</strong>";
+
+    document.getElementById("m-resumo").innerHTML = r;
+    document.getElementById("m-total").textContent  = "Total: " + fmt(total);
+
+    const primeiroNome = clienteAtual ? clienteAtual.nome.split(" ")[0] : "";
+    document.getElementById("m-subtitulo").textContent = clienteAtual
+      ? "Olá, " + primeiroNome + "! Confirme seu pedido abaixo."
+      : "Preencha seus dados para finalizar.";
+
     if (clienteAtual) {
-      document.getElementById('area-cadastro').style.display = 'none';
-      document.getElementById('area-logado').style.display = 'block';
-      document.getElementById('txt-nome-logado').textContent = clienteAtual.nome;
+      document.getElementById("txt-nome-logado").textContent = clienteAtual.nome;
+      document.getElementById("txt-tel-logado").textContent  = clienteAtual.tel;
+      document.getElementById("area-logado").style.display   = "block";
+      document.getElementById("area-cadastro").style.display = "none";
     } else {
-      document.getElementById('area-cadastro').style.display = 'grid';
-      document.getElementById('area-logado').style.display = 'none';
+      document.getElementById("area-logado").style.display   = "none";
+      document.getElementById("area-cadastro").style.display = "block";
     }
 
-    document.getElementById('overlay').classList.add('on');
+    document.getElementById("overlay").classList.add("on");
   }
 
-  function fecharModal() {
-    document.getElementById('overlay').classList.remove('on');
-  }
+  function fecharModal() { document.getElementById("overlay").classList.remove("on"); }
 
+  // ── ENVIO WHATSAPP ─────────────────────────────────────
   function enviarWpp() {
     let cliente = clienteAtual;
 
-    // Se não tiver salvo, pega os dados digitados
     if (!cliente) {
-      const nome = document.getElementById('m-nome').value.trim();
-      const tel = document.getElementById('m-tel').value.trim();
-      const idade = document.getElementById('m-idade').value.trim();
-      const prof = document.getElementById('m-prof').value.trim();
+      const nome   = document.getElementById("m-nome").value.trim();
+      const tel    = document.getElementById("m-tel").value.trim();
+      const idade  = document.getElementById("m-idade").value.trim();
+      const prof   = document.getElementById("m-prof").value.trim();
+      const casado = document.getElementById("m-casado").checked;
+      const filhos = document.getElementById("m-filhos").checked;
 
-      if (!nome || !tel || !idade || !prof) {
-        alert('Por favor, preencha todos os campos do seu cadastro rápido!');
-        return;
-      }
-      
-      // Salva na memória do celular do usuario
-      cliente = { nome, tel, idade, prof };
-      localStorage.setItem('tanamao_cliente', JSON.stringify(cliente));
-      clienteAtual = cliente; // Atualiza a variável global
+      if (!nome || !tel) { alert("Preencha pelo menos nome e WhatsApp para finalizar."); return; }
+
+      // Salva TUDO no perfil interno
+      cliente = { nome, tel, idade, prof, casado, filhos };
+      localStorage.setItem("tanamao_cliente", JSON.stringify(cliente));
+      clienteAtual = cliente;
       checarLogin();
     }
 
     const ativos = PRODS.filter(p => qtds[p.id] > 0);
     const { sub, desc, total } = calcTotal();
-    const nomesPag = { pix:'Pix', debito:'Débito', credito:'Crédito', vale:'Vale Alimentação' };
+    const nomesPag = { pix:"Pix (10% OFF)", debito:"Débito (10% OFF)", credito:"Crédito", vale:"Vale Alimentação" };
 
-    // Construção da Mensagem
-    let msg = `*Novo Pedido — Tá na Mão!* 🚀\n\n`;
-    msg += `*Cliente:* ${cliente.nome}\n`;
-    msg += `*Idade/Profissão:* ${cliente.idade} anos, ${cliente.prof}\n`;
-    msg += `*Telefone:* ${cliente.tel}\n\n`;
-    
-    msg += `*📦 Itens escolhidos:*\n`;
+    // ── MENSAGEM DO CLIENTE (só o que ele precisa ver) ──
+    let msg = "*Pedido — Tá na Mão!* 🥘\n\n";
+    msg += "*" + cliente.nome + "* | " + cliente.tel + "\n\n";
+    msg += "*Itens:*\n";
     ativos.forEach(p => {
-      msg += `• ${qtds[p.id]}x ${p.nome} = ${fmt(qtds[p.id]*p.preco)}\n`;
+      msg += "• " + qtds[p.id] + "x " + p.nome + " = " + fmt(qtds[p.id] * p.preco) + "\n";
     });
-    
     if (desc > 0) {
-      msg += `\nSubtotal: ${fmt(sub)}\nDesconto: − ${fmt(sub*desc)}\n`;
+      msg += "\nSubtotal: " + fmt(sub) + "\nDesconto: −" + fmt(sub * desc) + "\n";
     }
-    
-    msg += `\n*✅ TOTAL A PAGAR: ${fmt(total)}*\n`;
-    msg += `*💳 Forma de Pagamento:* ${nomesPag[pagSel]}\n\n`;
-    msg += `Aguardo instruções para confirmar o pagamento e entrega! 🙏`;
+    msg += "\n*Total: " + fmt(total) + "*";
+    msg += "\n*Pagamento:* " + nomesPag[pagSel];
+    msg += "\n\nAguardo confirmação para combinar a entrega! 🙏";
 
-    window.open('https://wa.me/5521980868730?text=' + encodeURIComponent(msg), '_blank');
+    window.open("https://wa.me/5521980868730?text=" + encodeURIComponent(msg), "_blank");
   }
 
-  window.addEventListener('click', e => {
-    if (e.target === document.getElementById('overlay')) fecharModal();
+  window.addEventListener("click", e => {
+    if (e.target === document.getElementById("overlay")) fecharModal();
   });
 </script>
 
-</body>
-</html>
-
+</body></html>
