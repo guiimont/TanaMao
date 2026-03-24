@@ -1,172 +1,638 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0103)https://tess-workflows-files.storage.googleapis.com/fd1f91ad082765145bc4902dce0ebf1683b35de9/index.html -->
+<html lang="pt-br"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tá na Mão!</title>
-
+<title>Tá na Mão! — Comida de verdade</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f4f6f4;
-  color: #222;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f2f4f2;
+    color: #1a1a1a;
+  }
 
-header {
-  text-align: center;
-  padding: 20px 10px;
-}
+  /* ── HEADER ── */
+  header {
+    background: #2e7d32;
+    padding: 36px 20px 30px;
+    text-align: center;
+    color: white;
+  }
+  header img.logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 22px;
+    display: block;
+    margin: 0 auto 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  }
+  header h1 {
+    font-size: 2em;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  header .slogan {
+    font-size: 1em;
+    opacity: 0.88;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  header p {
+    font-size: 0.88em;
+    opacity: 0.78;
+    max-width: 440px;
+    margin: 0 auto 16px;
+    line-height: 1.5;
+  }
+  .badges {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    font-size: 0.75em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
 
-.logo {
-    width: 120px;
-}
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 820px;
+    margin: auto;
+    padding: 24px 16px;
+  }
 
+  /* ── SEÇÕES ── */
+  .section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  .section h2 {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: #2e7d32;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
 
-.slogan {
-  color: #2e7d32;
-  font-weight: bold;
-}
+  /* ── CARDÁPIO ── */
+  .product {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .product:last-child { border-bottom: none; }
+  .product-info { flex: 1; }
+  .product-info .p-nome { font-weight: 600; font-size: 0.95em; }
+  .product-info .p-desc { font-size: 0.78em; color: #888; margin-top: 2px; }
+  .product-info .p-preco { font-size: 0.88em; font-weight: 700; color: #2e7d32; margin-top: 3px; }
 
-.section {
-  background: #fff;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-}
+  .qty-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .qty-wrap button {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    font-size: 1.1em;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .qty-wrap button:hover { background: #1b5e20; }
+  .qty-wrap .qty-num {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95em;
+  }
 
-.product {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
+  /* ── COMO FUNCIONA ── */
+  .steps {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .step {
+    flex: 1;
+    min-width: 180px;
+    background: #f1f8e9;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    background: #2e7d32;
+    color: white;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 0.9em;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+  }
+  .step p { font-size: 0.85em; color: #444; line-height: 1.4; }
+  .step strong { font-size: 0.88em; display: block; margin-bottom: 4px; }
 
-input {
-  width: 60px;
-}
+  /* ── PAGAMENTO ── */
+  .pag-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .pag-item {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    position: relative;
+  }
+  .pag-item:hover { border-color: #66bb6a; background: #f9fdf9; }
+  .pag-item.ativo { border-color: #2e7d32; background: #f1f8e9; }
+  .pag-item .pag-nome { font-weight: 700; font-size: 0.88em; }
+  .pag-item .pag-sub { font-size: 0.73em; color: #888; margin-top: 2px; }
+  .tag-desc {
+    background: #2e7d32; color: white;
+    font-size: 0.65em; padding: 2px 7px;
+    border-radius: 20px; margin-top: 5px;
+    display: inline-block;
+  }
+  .aviso {
+    background: #fff8e1;
+    border-left: 3px solid #f9a825;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.82em;
+    color: #5d4037;
+  }
 
-.total {
-  font-weight: bold;
-  color: #2e7d32;
-  margin-top: 10px;
-}
+  /* ── RESUMO ── */
+  #resumo-lista { font-size: 0.88em; line-height: 1.9; color: #333; }
+  #resumo-lista .r-vazio { color: #bbb; font-style: italic; }
+  .resumo-total {
+    margin-top: 12px;
+    font-size: 1.05em;
+    font-weight: 800;
+    color: #2e7d32;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
 
-button {
-  width: 100%;
-  padding: 16px;
-  background: #2e7d32;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
+  /* ── ENTREGA ── */
+  .entrega-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .entrega-box {
+    flex: 1;
+    min-width: 200px;
+    background: #f1f8e9;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.85em;
+    line-height: 1.5;
+  }
+  .entrega-box strong { display: block; color: #2e7d32; margin-bottom: 4px; font-size: 0.9em; }
 
-button:hover {
-  background: #256628;
-}
+  /* ── CTA FINAL ── */
+  .cta-section {
+    background: #2e7d32;
+    border-radius: 14px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .cta-section h2 {
+    color: white;
+    font-size: 1.2em;
+    margin-bottom: 8px;
+  }
+  .cta-section p {
+    color: rgba(255,255,255,0.82);
+    font-size: 0.88em;
+    margin-bottom: 22px;
+  }
+  .btn-pedir {
+    display: inline-block;
+    background: white;
+    color: #2e7d32;
+    font-weight: 800;
+    font-size: 1em;
+    padding: 14px 36px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 100%;
+    max-width: 320px;
+  }
+  .btn-pedir:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+  }
+
+  /* ── MODAL ── */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.52);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.on { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 92%;
+    max-width: 440px;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+  }
+  .modal h3 { color: #2e7d32; font-size: 1.1em; margin-bottom: 16px; }
+  .modal .m-resumo { font-size: 0.85em; line-height: 1.8; margin-bottom: 8px; color: #333; }
+  .modal .m-total { font-size: 1em; font-weight: 800; color: #2e7d32; margin-bottom: 18px; }
+  .modal input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.88em;
+    margin-bottom: 10px;
+    outline: none;
+  }
+  .modal input:focus { border-color: #2e7d32; }
+  .btn-wpp {
+    width: 100%;
+    background: #25d366;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 40px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-wpp:hover { background: #1ebe5d; }
+  .btn-fechar {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.3em;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+    width: auto;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px 16px;
+    font-size: 0.75em;
+    color: #bbb;
+  }
+
+  @media (max-width: 520px) {
+    header h1 { font-size: 1.6em; }
+    .pag-grid { grid-template-columns: 1fr 1fr; }
+    .steps { flex-direction: column; }
+  }
 </style>
 </head>
-
 <body>
+
+<!-- HEADER -->
+<header>
+  <img src="TanaMao_Logo.jpg" class="logo" alt="Tá na Mão!">
+  
+  <div class="slogan">Comida de verdade. Prática e saudável.</div>
+  <p>Pratos prontos e congelados com sabor caseiro para resolver sua alimentação da semana.</p>
+  <div class="badges">
+    <span class="badge">✔ Sem conservantes</span>
+    <span class="badge">✔ Produção caseira</span>
+    <span class="badge">✔ Praticidade no dia a dia</span>
+  </div>
+</header>
 
 <div class="container">
 
-<header>
-  <img src="TanaMao_Logo.jpg" class="logo" alt="Logo Tá na Mão!">
-  
-  <div class="slogan">Comida de verdade. Prática e saudável.</div>
-  
-</header>
+  <!-- CARDÁPIO -->
+  <div class="section">
+    <h2>🍽 Cardápio</h2>
 
+    <div class="product">
+      <div class="product-info">
+        <div class="p-nome">Panqueca</div>
+        <div class="p-desc">Recheada, leve e equilibrada. Nutritiva e prática.</div>
+        <div class="p-preco">R$ 18,00</div>
+      </div>
+      <div class="qty-wrap">
+        <button onclick="qty(&#39;p1&#39;,-1)">−</button>
+        <span class="qty-num" id="p1">0</span>
+        <button onclick="qty(&#39;p1&#39;,1)">+</button>
+      </div>
+    </div>
 
-<div class="section">
-<h2>Cardápio</h2>
+    <div class="product">
+      <div class="product-info">
+        <div class="p-nome">Kibe</div>
+        <div class="p-desc">Assado, com recheio e rico em proteína.</div>
+        <div class="p-preco">R$ 20,00</div>
+      </div>
+      <div class="qty-wrap">
+        <button onclick="qty(&#39;p2&#39;,-1)">−</button>
+        <span class="qty-num" id="p2">0</span>
+        <button onclick="qty(&#39;p2&#39;,1)">+</button>
+      </div>
+    </div>
 
-<div class="product">Panqueca (R$18) <input type="number" id="p1" min="0" onchange="calc()"></div>
-<div class="product">Kibe (R$20) <input type="number" id="p2" min="0" onchange="calc()"></div>
-<div class="product">Suflê (R$17) <input type="number" id="p3" min="0" onchange="calc()"></div>
-<div class="product">Bolo (R$22) <input type="number" id="p4" min="0" onchange="calc()"></div>
-<div class="product">Combo (R$35) <input type="number" id="p5" min="0" onchange="calc()"></div>
+    <div class="product">
+      <div class="product-info">
+        <div class="p-nome">Suflê de Legumes</div>
+        <div class="p-desc">Leve, saudável e perfeito para o dia a dia.</div>
+        <div class="p-preco">R$ 17,00</div>
+      </div>
+      <div class="qty-wrap">
+        <button onclick="qty(&#39;p3&#39;,-1)">−</button>
+        <span class="qty-num" id="p3">0</span>
+        <button onclick="qty(&#39;p3&#39;,1)">+</button>
+      </div>
+    </div>
+
+    <div class="product">
+      <div class="product-info">
+        <div class="p-nome">Bolo de Banana</div>
+        <div class="p-desc">Caseiro, sem excesso de açúcar. Ótimo para o café.</div>
+        <div class="p-preco">R$ 22,00</div>
+      </div>
+      <div class="qty-wrap">
+        <button onclick="qty(&#39;p4&#39;,-1)">−</button>
+        <span class="qty-num" id="p4">0</span>
+        <button onclick="qty(&#39;p4&#39;,1)">+</button>
+      </div>
+    </div>
+
+    <div class="product">
+      <div class="product-info">
+        <div class="p-nome">Combo Degustação</div>
+        <div class="p-desc">Mini porções para experimentar o cardápio completo.</div>
+        <div class="p-preco">R$ 35,00</div>
+      </div>
+      <div class="qty-wrap">
+        <button onclick="qty(&#39;p5&#39;,-1)">−</button>
+        <span class="qty-num" id="p5">0</span>
+        <button onclick="qty(&#39;p5&#39;,1)">+</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <div class="section">
+    <h2>⚡ Como funciona</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <strong>Escolha os produtos</strong>
+        <p>Selecione os itens e quantidades desejados.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <strong>Receba congelado</strong>
+        <p>Entregamos em até 48h direto na sua porta.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <strong>Aqueça e consuma</strong>
+        <p>Na hora que quiser, sem stress e sem desperdício.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGAMENTO -->
+  <div class="section">
+    <h2>💳 Pagamento</h2>
+    <div class="pag-grid">
+      <div class="pag-item" id="pag-pix" onclick="selecionarPag(&#39;pix&#39;)">
+        <div class="pag-nome">Pix</div>
+        <div class="pag-sub">Transferência instantânea</div>
+        <span class="tag-desc">10% OFF</span>
+      </div>
+      <div class="pag-item" id="pag-debito" onclick="selecionarPag(&#39;debito&#39;)">
+        <div class="pag-nome">Débito</div>
+        <div class="pag-sub">Cartão de débito</div>
+        <span class="tag-desc">10% OFF</span>
+      </div>
+      <div class="pag-item" id="pag-credito" onclick="selecionarPag(&#39;credito&#39;)">
+        <div class="pag-nome">Crédito</div>
+        <div class="pag-sub">Cartão de crédito</div>
+      </div>
+      <div class="pag-item" id="pag-vale" onclick="selecionarPag(&#39;vale&#39;)">
+        <div class="pag-nome">Vale</div>
+        <div class="pag-sub">Alimentação / Refeição</div>
+      </div>
+    </div>
+    <div class="aviso">⚠️ <strong>Pedido reservado imediatamente e confirmado após o pagamento.</strong></div>
+  </div>
+
+  <!-- RESUMO -->
+  <div class="section">
+    <h2>🛒 Seu Pedido</h2>
+    <div id="resumo-lista"><span class="r-vazio">Nenhum item selecionado ainda.</span></div>
+    <div class="resumo-total" id="resumo-total" style="display:none;"></div>
+  </div>
+
+  <!-- ENTREGA -->
+  <div class="section">
+    <h2>🚚 Entrega</h2>
+    <div class="entrega-grid">
+      <div class="entrega-box">
+        <strong>⏱ Prazo</strong>
+        Entrega em até 48 horas após a confirmação do pagamento.
+      </div>
+      <div class="entrega-box">
+        <strong>📅 Horário</strong>
+        Combinado diretamente após a confirmação do pedido.
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA FINAL -->
+  <div class="cta-section">
+    <h2>Resolva sua alimentação da semana agora.</h2>
+    <p>Comida saudável, prática e com gosto de casa — entregue onde você estiver.</p>
+    <button class="btn-pedir" onclick="abrirModal()">Fazer pedido →</button>
+  </div>
 
 </div>
 
-<div class="section">
-<h2>Pagamento</h2>
+<footer>Tá na Mão! © 2025 · Comida de verdade, feita com cuidado.</footer>
 
-<select id="pagamento" onchange="calc()">
-  <option value="">Escolher</option>
-  <option value="pix">Pix (10% OFF)</option>
-  <option value="debito">Débito (10% OFF)</option>
-  <option value="credito">Crédito</option>
-  <option value="vale">Vale</option>
-</select>
-
-<p>✅ Pedido reservado e confirmado após pagamento</p>
-
-</div>
-
-<div class="section">
-<h2>Resumo</h2>
-<div id="resumo">Nenhum item</div>
-<div class="total" id="total"></div>
-</div>
-
-<div class="section">
-<button onclick="enviar()">Fazer pedido</button>
-</div>
-
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="btn-fechar" onclick="fecharModal()">✕</button>
+    <h3>📋 Confirmar Pedido</h3>
+    <div class="m-resumo" id="m-resumo"></div>
+    <div class="m-total" id="m-total"></div>
+    <input type="text" id="m-nome" placeholder="Seu nome completo">
+    <input type="tel" id="m-tel" placeholder="Seu telefone / WhatsApp">
+    <button class="btn-wpp" onclick="enviarWpp()">📲 Enviar pedido pelo WhatsApp</button>
+  </div>
 </div>
 
 <script>
-const precos = [18,20,17,22,35];
+  const PRODS = [
+    { id:'p1', nome:'Panqueca',         preco:18 },
+    { id:'p2', nome:'Kibe',             preco:20 },
+    { id:'p3', nome:'Suflê de Legumes', preco:17 },
+    { id:'p4', nome:'Bolo de Banana',   preco:22 },
+    { id:'p5', nome:'Combo Degustação', preco:35 }
+  ];
+  const qtds = { p1:0, p2:0, p3:0, p4:0, p5:0 };
+  let pagSel = '';
 
-function calc(){
-  let total = 0;
-  let resumo = "";
+  function qty(id, d) {
+    qtds[id] = Math.max(0, qtds[id] + d);
+    document.getElementById(id).textContent = qtds[id];
+    atualizarResumo();
+  }
 
-  for(let i=1;i<=5;i++){
-    let q = document.getElementById("p"+i).value || 0;
-    if(q>0){
-      let nome = ["Panqueca","Kibe","Suflê","Bolo","Combo"][i-1];
-      let valor = q * precos[i-1];
-      total += valor;
-      resumo += `${nome} x${q} = R$${valor}\n`;
+  function selecionarPag(tipo) {
+    pagSel = tipo;
+    document.querySelectorAll('.pag-item').forEach(el => el.classList.remove('ativo'));
+    document.getElementById('pag-' + tipo).classList.add('ativo');
+    atualizarResumo();
+  }
+
+  function calcTotal() {
+    let sub = 0;
+    PRODS.forEach(p => { sub += qtds[p.id] * p.preco; });
+    const desc = (pagSel === 'pix' || pagSel === 'debito') ? 0.1 : 0;
+    return { sub, desc, total: sub * (1 - desc) };
+  }
+
+  function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+
+  function atualizarResumo() {
+    const ativos = PRODS.filter(p => qtds[p.id] > 0);
+    const rl = document.getElementById('resumo-lista');
+    const rt = document.getElementById('resumo-total');
+
+    if (!ativos.length) {
+      rl.innerHTML = '<span class="r-vazio">Nenhum item selecionado ainda.</span>';
+      rt.style.display = 'none';
+      return;
     }
+
+    const { sub, desc, total } = calcTotal();
+    let html = ativos.map(p =>
+      `<div>${p.nome} × ${qtds[p.id]} = ${fmt(qtds[p.id] * p.preco)}</div>`
+    ).join('');
+    if (desc > 0) {
+      html += `<div style="color:#888;font-size:.85em;">Subtotal: ${fmt(sub)}</div>`;
+      html += `<div style="color:#2e7d32;font-size:.85em;">Desconto (10%): − ${fmt(sub * desc)}</div>`;
+    }
+    rl.innerHTML = html;
+    rt.style.display = 'block';
+    rt.textContent = 'Total: ' + fmt(total);
   }
 
-  let pag = document.getElementById("pagamento").value;
-  if(pag=="pix" || pag=="debito"){
-    total *= 0.9;
+  function abrirModal() {
+    const ativos = PRODS.filter(p => qtds[p.id] > 0);
+    if (!ativos.length) { alert('Selecione pelo menos um item.'); return; }
+    if (!pagSel) { alert('Selecione uma forma de pagamento.'); return; }
+
+    const { sub, desc, total } = calcTotal();
+    const nomesPag = { pix:'Pix (10% OFF)', debito:'Débito (10% OFF)', credito:'Crédito', vale:'Vale Alimentação/Refeição' };
+
+    let r = ativos.map(p => `• ${p.nome} × ${qtds[p.id]} = ${fmt(qtds[p.id]*p.preco)}`).join('<br>');
+    r += `<br><br><strong>Pagamento:</strong> ${nomesPag[pagSel]}`;
+    if (desc > 0) {
+      r += `<br><span style="color:#888;">Subtotal: ${fmt(sub)}</span>`;
+      r += `<br><span style="color:#2e7d32;">Desconto: − ${fmt(sub*desc)}</span>`;
+    }
+
+    document.getElementById('m-resumo').innerHTML = r;
+    document.getElementById('m-total').textContent = 'Total: ' + fmt(total);
+    document.getElementById('overlay').classList.add('on');
   }
 
-  document.getElementById("resumo").innerText = resumo || "Nenhum item";
-  document.getElementById("total").innerText = total>0 ? "Total: R$"+total.toFixed(2) : "";
-}
-
-function enviar(){
-  let resumo = document.getElementById("resumo").innerText;
-  let total = document.getElementById("total").innerText;
-  let pag = document.getElementById("pagamento").value;
-
-  if(resumo=="Nenhum item"){
-    alert("Escolha pelo menos um item");
-    return;
+  function fecharModal() {
+    document.getElementById('overlay').classList.remove('on');
   }
 
-  let msg = `Pedido - Tá na Mão!\n\n${resumo}\n${total}\nPagamento: ${pag}`;
+  function enviarWpp() {
+    const nome = document.getElementById('m-nome').value.trim();
+    const tel  = document.getElementById('m-tel').value.trim();
+    if (!nome || !tel) { alert('Preencha seu nome e telefone.'); return; }
 
-  let url = "https://wa.me/5521980868730?text=" + encodeURIComponent(msg);
+    const ativos = PRODS.filter(p => qtds[p.id] > 0);
+    const { sub, desc, total } = calcTotal();
+    const nomesPag = { pix:'Pix (10% OFF)', debito:'Débito (10% OFF)', credito:'Crédito', vale:'Vale Alimentação/Refeição' };
 
-  window.open(url, "_blank");
-}
+    let msg = `*Pedido — Tá na Mão!*
+
+`;
+    msg += `*Cliente:* ${nome}
+*Telefone:* ${tel}
+
+`;
+    msg += `*Itens:*
+`;
+    ativos.forEach(p => {
+      msg += `• ${p.nome} × ${qtds[p.id]} = ${fmt(qtds[p.id]*p.preco)}
+`;
+    });
+    if (desc > 0) {
+      msg += `
+Subtotal: ${fmt(sub)}
+Desconto (10%): − ${fmt(sub*desc)}
+`;
+    }
+    msg += `
+*Total: ${fmt(total)}*
+`;
+    msg += `*Pagamento:* ${nomesPag[pagSel]}
+
+`;
+    msg += `Aguardo confirmação para combinar a entrega. 🙏`;
+
+    window.open('https://wa.me/5521980868730?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  window.addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) fecharModal();
+  });
 </script>
 
-</body>
-</html>
+
+</body></html>
