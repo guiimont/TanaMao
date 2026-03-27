@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tá na Mão! â Praticidade e Saíºde</title>
+<title>Tá na Mão!  Praticidade e Saúde</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
@@ -150,12 +150,12 @@
 
 <header>
   <img src="TanaMao_Logo.jpg" class="logo" alt="Tá na Mão!">
-  <div class="slogan">Praticidade & Saíºde</div>
+  <div class="slogan">Praticidade & Saúde</div>
   <p>Pratos prontos e congelados com sabor caseiro para resolver sua semana sem complicações.</p>
   <div class="badges">
-    <span class="badge">â Sem conservantes</span>
-    <span class="badge">â Produção caseira</span>
-    <span class="badge">â Entrega em 48h</span>
+    <span class="badge">Sem conservantes</span>
+    <span class="badge">Produção caseira</span>
+    
   </div>
 </header>
 
@@ -257,8 +257,8 @@
   <div class="cta-section">
     <h2>Resolva sua semana agora</h2>
     <p>Comida com gosto de casa, entregue na sua rotina.</p>
-    <button class="btn-pedir" onclick="abrirModal()">Finalizar Pedido â</button>
-  </div>
+    <button class="btn-pedir" onclick="abrirModal()">Finalizar Pedido</button>
+</div>
 
 </div>
 
@@ -300,9 +300,8 @@
 
     <div class="erro-msg" id="erro-msg"></div>
 
-    <button class="btn-pagar" id="btn-pagar" onclick="irParaCheckout()">
-      ð Pagar com segurança
-    </button>
+    <button class="btn-pagar" id="btn-pagar" onclick="irParaCheckout()">Pagar com segurança</button>
+
   </div>
 </div>
 
@@ -377,7 +376,7 @@
           <div class="p-preco">R$ ${Number(p.price).toFixed(2).replace(".", ",")}</div>
         </div>
         <div class="qty-wrap">
-          <button onclick="qty('${p.id}',-1)">â</button>
+          <button onclick="qty('${p.id}',-1)">-</button>
           <span class="qty-num" id="${p.id}">0</span>
           <button onclick="qty('${p.id}',1)">+</button>
         </div>
