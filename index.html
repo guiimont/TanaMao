@@ -319,7 +319,7 @@
   function checarLogin() {
     const bar = document.getElementById("auth-bar");
     if (clienteAtual) {
-       bar.innerHTML = `Olá de novo, <strong>${clienteAtual.nome.split(" ")}</strong>! <a onclick="limparCadastro()">Sair</a>`;
+        bar.innerHTML = `Olá de novo, <strong>${clienteAtual.nome.split(" ")[0]}! <a onclick="limparCadastro()">Sair</a>`;
     } else {
       bar.style.display = "none";
     }
