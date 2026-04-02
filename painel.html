@@ -1,230 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Operacional - Tá na Mão!</title>
-  <style>
-    :root {
-      --verde: #3C6E47;
-      --verde-escuro: #2D5235;
-      --dourado: #C9A86A;
-      --fundo: #f4f6f4;
-      --texto: #1a1a1a;
-      --borda: #e6e6e6;
-      --vermelho: #b93b3b;
-      --amarelo: #d4a700;
-      --azul: #2b6cb0;
-      --cinza: #666;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: var(--fundo); color: var(--texto); }
-    header { background: var(--verde); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--dourado); }
-    header h1 { color: var(--dourado); margin-bottom: 6px; }
-    header p { opacity: 0.9; font-size: 14px; }
-    .topbar { max-width: 1400px; margin: 18px auto 0; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .btn-refresh { background: var(--verde); color: white; border: none; border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: 700; }
-    .status-info { font-size: 13px; color: var(--cinza); }
-    .board { max-width: 1400px; margin: 18px auto; padding: 0 16px 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .column { background: white; border: 1px solid var(--borda); border-radius: 16px; min-height: 500px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
-    .column-header { padding: 14px 16px; border-bottom: 1px solid var(--borda); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-    .column-body { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
-    .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; color: white; }
-    .red { background: var(--vermelho); }
-    .yellow { background: var(--amarelo); color: #222; }
-    .green { background: var(--verde); }
-    .blue { background: var(--azul); }
-    .card { border: 1px solid var(--borda); border-radius: 12px; padding: 12px; background: #fff; }
-    .card h3 { font-size: 15px; margin-bottom: 6px; color: var(--verde-escuro); }
-    .meta { font-size: 12px; color: var(--cinza); margin-bottom: 8px; }
-    .items { font-size: 13px; line-height: 1.55; margin-bottom: 8px; }
-    .address, .price { font-size: 13px; margin-bottom: 8px; }
-    .actions { display: flex; flex-direction: column; gap: 8px; }
-    .btn { border: none; border-radius: 10px; padding: 10px; cursor: pointer; font-weight: 700; }
-    .btn-primary { background: var(--verde); color: white; }
-    .btn-secondary { background: var(--dourado); color: #222; }
-    .btn-tertiary { background: var(--azul); color: white; }
-    .empty { font-size: 13px; color: var(--cinza); font-style: italic; }
-    .login-wrap { max-width: 420px; margin: 60px auto; background: white; border-radius: 18px; padding: 24px; box-shadow: 0 8px 28px rgba(0,0,0,0.08); border: 1px solid var(--borda); }
-    .login-wrap h2 { margin-bottom: 10px; color: var(--verde); }
-    .login-wrap p { font-size: 14px; color: var(--cinza); margin-bottom: 16px; }
-    .login-wrap input { width: 100%; padding: 14px; border: 1px solid var(--borda); border-radius: 12px; margin-bottom: 12px; }
-    .login-wrap button { width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--verde); color: white; font-weight: 800; cursor: pointer; }
-    .erro { color: var(--vermelho); font-size: 13px; margin-top: 8px; }
-    @media (max-width: 1100px) { .board { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 700px) { .board { grid-template-columns: 1fr; } .topbar { flex-direction: column; align-items: flex-start; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Tá na Mão</title>
+
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f4; }
+.topbar { background:#2D5235; color:#fff; padding:14px; text-align:center; font-weight:bold; }
+.container { padding:16px; }
+
+.login { display:flex; flex-direction:column; gap:10px; max-width:300px; margin:60px auto; }
+button { padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
+
+.board { display:flex; gap:12px; overflow-x:auto; }
+.column { background:#fff; border-radius:10px; padding:10px; min-width:260px; }
+.card { background:#fafafa; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; }
+
+.actions button { margin-top:6px; width:100%; }
+
+.whats { background:#25D366; color:#fff; }
+.next { background:#C9A86A; }
+.print { background:#333; color:#fff; }
+</style>
 </head>
+
 <body>
-  <div id="login-screen" class="login-wrap">
-    <h2>Painel Operacional</h2>
-    <p>Acesso da produção e logística. Digite a senha para continuar.</p>
-    <input type="password" id="senha" placeholder="Senha do painel" />
-    <button onclick="entrarPainel()">Entrar</button>
-    <div class="erro" id="erro-login"></div>
-  </div>
 
-  <div id="painel-screen" style="display:none;">
-    <header>
-      <h1>Tá na Mão! • Painel Operacional</h1>
-      <p>Pedidos organizados para produção e entrega</p>
-    </header>
+<div id="login" class="login">
+<h2>Painel</h2>
+<button onclick="entrar('producao')">Produção</button>
+<button onclick="entrar('gestor')">Gestor</button>
+</div>
 
-    <div class="topbar">
-      <div class="status-info" id="status-info">Carregando pedidos...</div>
-      <button class="btn-refresh" onclick="carregarPedidos()">Atualizar agora</button>
-    </div>
+<div id="app" style="display:none">
+<div class="topbar">Painel Tá na Mão</div>
+<div class="container">
 
-    <div class="board">
-      <div class="column">
-        <div class="column-header">Entrou (Pago) <span class="badge red" id="count-paid">0</span></div>
-        <div class="column-body" id="col-paid"></div>
-      </div>
-      <div class="column">
-        <div class="column-header">Em Produção <span class="badge yellow" id="count-preparing">0</span></div>
-        <div class="column-body" id="col-preparing"></div>
-      </div>
-      <div class="column">
-        <div class="column-header">Pronto <span class="badge green" id="count-ready">0</span></div>
-        <div class="column-body" id="col-ready"></div>
-      </div>
-      <div class="column">
-        <div class="column-header">Saiu para Entrega <span class="badge blue" id="count-delivery">0</span></div>
-        <div class="column-body" id="col-delivery"></div>
-      </div>
-    </div>
-  </div>
+<input id="busca" placeholder="Buscar cliente..." oninput="render()" style="padding:10px;width:100%;margin-bottom:10px">
 
-  <script>
-    const BACKEND_URL = "https://tanamao-backend.onrender.com/api/operations";
-    const SENHA_FIXA = "tanamao2025";
-    let pedidos = [];
+<div class="board" id="board"></div>
 
-    function entrarPainel() {
-      const senha = document.getElementById('senha').value.trim();
-      const erro = document.getElementById('erro-login');
-      if (senha !== SENHA_FIXA) {
-        erro.textContent = 'Senha incorreta.';
-        return;
-      }
-      sessionStorage.setItem('tanamao_painel_auth', 'ok');
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('painel-screen').style.display = 'block';
-      carregarPedidos();
-    }
+</div>
+</div>
 
-    function verificarSessao() {
-      if (sessionStorage.getItem('tanamao_painel_auth') === 'ok') {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('painel-screen').style.display = 'block';
-        carregarPedidos();
-      }
-    }
+<script>
 
-    async function carregarPedidos() {
-      document.getElementById('status-info').textContent = 'Atualizando pedidos...';
-      try {
-        const res = await fetch(BACKEND_URL + '/orders');
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || 'Erro ao carregar pedidos.');
-        pedidos = data.orders || [];
-        renderizar();
-        document.getElementById('status-info').textContent = 'Painel atualizado com sucesso.';
-      } catch (e) {
-        document.getElementById('status-info').textContent = 'Erro ao carregar pedidos.';
-        console.error(e);
-      }
-    }
+const API = "https://tanamao-backend.onrender.com/api/operations";
 
-    function traduzirPagamento(status) {
-      const map = { pending: 'Pendente', approved: 'Pago', rejected: 'Recusado', cancelled: 'Cancelado' };
-      return map[status] || status || '—';
-    }
+let perfil = null;
+let pedidos = [];
 
-    function formatarItens(items) {
-      if (!Array.isArray(items) || !items.length) return 'Sem itens';
-      return items.map(item => `• ${item.title || item.name || item.id} x${item.quantity}`).join('<br>');
-    }
+function entrar(p){
+  perfil = p;
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  carregar();
+}
 
-    function formatarPreco(total) {
-      const valor = Number(total || 0);
-      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
+async function carregar(){
+  const res = await fetch(API);
+  pedidos = await res.json();
+  render();
+}
 
-    function criarCard(order) {
-      const div = document.createElement('div');
-      div.className = 'card';
+function formatTime(date){
+  const diff = (Date.now() - new Date(date))/60000;
+  return Math.floor(diff) + " min";
+}
 
-      let botoes = '';
-      if (order.delivery_status === 'pending' && order.payment_status === 'approved') {
-        botoes = `<button class="btn btn-primary" onclick="atualizarStatus('${order.id}','preparing')">Começar produção</button>`;
-      } else if (order.delivery_status === 'preparing') {
-        botoes = `<button class="btn btn-secondary" onclick="atualizarStatus('${order.id}','ready')">Marcar como pronto</button>`;
-      } else if (order.delivery_status === 'ready') {
-        botoes = `<button class="btn btn-tertiary" onclick="atualizarStatus('${order.id}','out_for_delivery')">Saiu para entrega</button>`;
-      } else if (order.delivery_status === 'out_for_delivery') {
-        botoes = `<button class="btn btn-primary" onclick="atualizarStatus('${order.id}','delivered')">Marcar como entregue</button>`;
-      }
+function whatsapp(p){
+  const msg = `Olá ${p.customer_name}, seu pedido já está em andamento!`;
+  const num = p.customer_phone.replace(/\D/g,"");
+  window.open(`https://wa.me/55${num}?text=${encodeURIComponent(msg)}`);
+}
 
-      div.innerHTML = `
-        <h3>${order.customer_name || 'Cliente sem nome'}</h3>
-        <div class="meta">Pedido: ${order.external_reference || '—'}</div>
-        <div class="meta">Pagamento: ${traduzirPagamento(order.payment_status)}</div>
-        <div class="items">${formatarItens(order.items_json)}</div>
-        <div class="address"><strong>Entrega:</strong><br>${order.delivery_address || 'Endereço não informado'}</div>
-        <div class="price"><strong>Total:</strong> ${formatarPreco(order.total)}</div>
-        <div class="actions">${botoes}</div>
-      `;
-      return div;
-    }
+function update(id, status){
+  fetch(API+"/"+id,{
+    method:"PATCH",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({delivery_status:status})
+  }).then(()=>carregar());
+}
 
-    function renderizarColuna(elementId, lista) {
-      const col = document.getElementById(elementId);
-      col.innerHTML = '';
-      if (!lista.length) {
-        col.innerHTML = '<div class="empty">Nenhum pedido nesta etapa.</div>';
-        return;
-      }
-      lista.forEach(order => col.appendChild(criarCard(order)));
-    }
+function render(){
 
-    function renderizar() {
-      const pagos = pedidos.filter(p => p.payment_status === 'approved' && (p.delivery_status === 'pending' || !p.delivery_status));
-      const preparando = pedidos.filter(p => p.delivery_status === 'preparing');
-      const prontos = pedidos.filter(p => p.delivery_status === 'ready');
-      const entrega = pedidos.filter(p => p.delivery_status === 'out_for_delivery');
+  const busca = document.getElementById("busca").value.toLowerCase();
 
-      renderizarColuna('col-paid', pagos);
-      renderizarColuna('col-preparing', preparando);
-      renderizarColuna('col-ready', prontos);
-      renderizarColuna('col-delivery', entrega);
+  const colunas = {
+    pending: "Entrou",
+    preparing: "Produção",
+    ready: "Pronto",
+    out_for_delivery: "Entrega"
+  };
 
-      document.getElementById('count-paid').textContent = pagos.length;
-      document.getElementById('count-preparing').textContent = preparando.length;
-      document.getElementById('count-ready').textContent = prontos.length;
-      document.getElementById('count-delivery').textContent = entrega.length;
-    }
+  const board = document.getElementById("board");
+  board.innerHTML = "";
 
-    async function atualizarStatus(id, delivery_status) {
-      try {
-        const res = await fetch(BACKEND_URL + '/orders/' + id + '/status', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ delivery_status })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || 'Erro ao atualizar status.');
-        await carregarPedidos();
-      } catch (e) {
-        alert('Não foi possível atualizar o status do pedido.');
-        console.error(e);
-      }
-    }
+  Object.entries(colunas).forEach(([key, title]) =>{
 
-    verificarSessao();
-    setInterval(() => {
-      if (document.getElementById('painel-screen').style.display !== 'none') carregarPedidos();
-    }, 30000);
-  </script>
+    const col = document.createElement("div");
+    col.className="column";
+    col.innerHTML = `<h3>${title}</h3>`;
+
+    pedidos
+      .filter(p => p.delivery_status === key)
+      .filter(p => p.customer_name.toLowerCase().includes(busca))
+      .forEach(p =>{
+
+        const card = document.createElement("div");
+        card.className="card";
+
+        card.innerHTML = `
+          <strong>${p.customer_name}</strong><br>
+          ${p.delivery_address || ""}<br>
+          ⏱ ${formatTime(p.created_at)}
+          <div class="actions">
+            <button class="whats" onclick='whatsapp(${JSON.stringify(p)})'>WhatsApp</button>
+            ${perfil==="gestor" ? `<button class="print" onclick="window.print()">Imprimir</button>`:""}
+            <button class="next" onclick="next('${p.id}','${key}')">Avançar</button>
+          </div>
+        `;
+
+        col.appendChild(card);
+      });
+
+    board.appendChild(col);
+
+  });
+
+}
+
+function next(id, current){
+  const flow = ["pending","preparing","ready","out_for_delivery","delivered"];
+  const next = flow[flow.indexOf(current)+1];
+  if(next) update(id,next);
+}
+
+setInterval(carregar, 5000);
+
+</script>
+
 </body>
 </html>
+
