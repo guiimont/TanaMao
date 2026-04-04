@@ -163,14 +163,29 @@
 
       let botoes = '';
       if (order.delivery_status === 'pending' && order.payment_status === 'approved') {
-        botoes = `<button class="btn btn-primary" onclick="atualizarStatus('${order.id}','preparing')">Começar produção</button>`;
+        botoes = `<button class="btn btn-primary" onclick="atualizarStatus('${order.id}','preparing')">Começar produção</button>
+        <button class="btn" style="background:#eee;" onclick="editarObs('${order.id}', '${order.obs || ''}')">
+         Obs
+        </button>
+      `;
       } else if (order.delivery_status === 'preparing') {
-        botoes = `<button class="btn btn-secondary" onclick="atualizarStatus('${order.id}','ready')">Marcar como pronto</button>`;
+        botoes = `<button class="btn btn-secondary" onclick="atualizarStatus('${order.id}','ready')">Marcar como pronto</button>
+        <button class="btn" style="background:#eee;" onclick="editarObs('${order.id}', '${order.obs || ''}')">
+         Obs
+        </button>
+      `;
       } else if (order.delivery_status === 'ready') {
-        botoes = `<button class="btn btn-tertiary" onclick="atualizarStatus('${order.id}','out_for_delivery')">Saiu para entrega</button>`;
+        botoes = `<button class="btn btn-tertiary" onclick="atualizarStatus('${order.id}','out_for_delivery')">Saiu para entrega</button>
+        <button class="btn" style="background:#eee;" onclick="editarObs('${order.id}', '${order.obs || ''}')">
+         Obs
+        </button>
+      `;
       } else if (order.delivery_status === 'out_for_delivery') {
         botoes = `
           <button class="btn btn-primary" onclick="atualizarStatus('${order.id}','delivered')">Marcar como entregue</button>
+          <button class="btn" style="background:#eee;" onclick="editarObs('${order.id}', '${order.obs || ''}')">
+         Obs
+        </button>
           <button class="btn" style="background:#25D366;color:#fff;" onclick='abrirWhats(${JSON.stringify(order)})'>
         WhatsApp
       </button>
@@ -183,6 +198,7 @@
         <div class="meta">Pagamento: ${traduzirPagamento(order.payment_status)}</div>
         <div class="meta" style="${cor}">⏱ ${tempoDecorrido(order.created_at)}</div>
         <div class="items">${formatarItens(order.items_json)}</div>
+        <div class="meta"><strong>Obs:</strong> ${order.obs || '—'}</div>
         <div class="address"><strong>Entrega:</strong><br>${order.delivery_address || 'Endereço não informado'}</div>
         <div class="price"><strong>Total:</strong> ${formatarPreco(order.total)}</div>
         <div class="actions">${botoes}</div>
@@ -247,6 +263,16 @@
         alert('Não foi possível atualizar o status do pedido.');
         console.error(e);
       }
+        function editarObs(id, atual) {
+        const nova = prompt("Observação da produção:", atual || "");
+        if (nova === null) return;
+
+          fetch(BACKEND_URL + '/orders/' + id + '/status', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ obs: nova })
+          }).then(() => carregarPedidos());
+        }
     }
 
     verificarSessao();
