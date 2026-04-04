@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Cardápio</title>
+
+<style>
+body{font-family:Arial;background:#f4f6f4;margin:0}
+header{background:#3C6E47;color:#fff;padding:16px;text-align:center}
+.container{padding:16px;max-width:900px;margin:auto}
+
+.card{
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  border:1px solid #ddd;
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn-save{background:#3C6E47;color:#fff}
+.btn-delete{background:#b93b3b;color:#fff}
+.btn-new{background:#C9A86A}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Gestão de Cardápio</h2>
+</header>
+
+<div class="container">
+
+<button class="btn-new" onclick="novo()">+ Novo Produto</button>
+
+<div id="lista"></div>
+
+</div>
+
+<script>
+
+const API = "https://tanamao-backend.onrender.com/api/operations";
+
+async function carregar(){
+  const res = await fetch(API + "/products");
+  const data = await res.json();
+
+  const el = document.getElementById("lista");
+  el.innerHTML = "";
+
+  data.products.forEach(p => {
+    el.innerHTML += `
+      <div class="card">
+        <input value="${p.name}" id="name-${p.id}">
+        <textarea id="desc-${p.id}">${p.description || ""}</textarea>
+        <input value="${p.price}" id="price-${p.id}">
+        <input value="${p.image_url || ""}" id="img-${p.id}">
+
+        <button class="btn-save" onclick="salvar('${p.id}')">Salvar</button>
+        <button class="btn-delete" onclick="deletar('${p.id}')">Excluir</button>
+      </div>
+    `;
+  });
+}
+
+async function salvar(id){
+  const name = document.getElementById("name-"+id).value;
+  const description = document.getElementById("desc-"+id).value;
+  const price = document.getElementById("price-"+id).value;
+  const image_url = document.getElementById("img-"+id).value;
+
+  await fetch(API+"/products/"+id,{
+    method:"PATCH",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ name, description, price, image_url })
+  });
+
+  alert("Salvo!");
+}
+
+async function deletar(id){
+  if(!confirm("Excluir produto?")) return;
+
+  await fetch(API+"/products/"+id,{ method:"DELETE" });
+  carregar();
+}
+
+async function novo(){
+  const name = prompt("Nome do produto:");
+  if(!name) return;
+
+  await fetch(API+"/products",{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ name, price:0 })
+  });
+
+  carregar();
+}
+
+carregar();
+
+</script>
+
+</body>
+</html>
+
