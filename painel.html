@@ -135,6 +135,8 @@ async function carregar(){
         <input value="${p.name}" id="name-${p.id}">
         <textarea id="desc-${p.id}">${p.description||""}</textarea>
         <input value="${p.price}" id="price-${p.id}">
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100px;border-radius:8px;margin-bottom:8px;">` : ""}
+
         <input value="${p.image_url||""}" id="img-${p.id}">
 
         <button class="btn-save" onclick="salvar('${p.id}')">Salvar</button>
