@@ -91,6 +91,35 @@ button{
 
 <div class="container">
 
+  <button class="btn-new" onclick="toggleForm()">+ Novo Produto</button>
+
+  <div id="form-box" class="form-card" style="display:none;">
+    <h3>Novo Produto</h3>
+
+    <div class="field">
+      <input id="novo-nome" placeholder="Nome do produto">
+    </div>
+
+    <div class="field">
+      <textarea id="novo-desc" placeholder="Descrição"></textarea>
+    </div>
+
+    <div class="field">
+      <input id="novo-preco" placeholder="Preço (ex: 19.90)">
+    </div>
+
+    <div class="field">
+      <input type="file" id="novo-img-file" accept="image/png, image/jpeg">
+    </div>
+
+    <button class="btn-save" onclick="criarProduto()">Salvar</button>
+  </div>
+
+  <div id="lista"></div>
+
+</div>
+
+
   <!-- NOVO PRODUTO -->
   <div class="form-card">
     <h3>Novo Produto</h3>
@@ -122,6 +151,21 @@ button{
 <script>
 
 const API = "https://tanamao-backend.onrender.com/api/operations";
+
+function toggleForm(){
+  const el = document.getElementById("form-box");
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+  
 
 // ================= CARREGAR =================
 async function carregar(){
@@ -157,11 +201,17 @@ async function criarProduto(){
   const name = document.getElementById("novo-nome").value;
   const description = document.getElementById("novo-desc").value;
   const price = document.getElementById("novo-preco").value;
-  const image_url = document.getElementById("novo-img").value;
+  const file = document.getElementById("novo-img-file").files[0];
 
   if (!name) {
     alert("Nome obrigatório");
     return;
+  }
+
+  let image_url = "";
+
+  if (file) {
+    image_url = await fileToBase64(file); // ✅ converte imagem
   }
 
   try {
@@ -178,10 +228,19 @@ async function criarProduto(){
 
     const data = await res.json();
 
-    if (!res.ok || !data.ok) {
+    if (!data.ok) {
       alert(data.message || "Erro ao criar produto");
       return;
     }
+
+    document.getElementById("form-box").style.display = "none";
+    carregar();
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro de conexão");
+  }
+}
 
     // limpar
     document.getElementById("novo-nome").value = "";
