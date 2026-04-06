@@ -201,7 +201,7 @@ async function criarProduto(){
   const name = document.getElementById("novo-nome").value;
   const description = document.getElementById("novo-desc").value;
   const price = document.getElementById("novo-preco").value;
-  const file = document.getElementById("novo-img-file").files[0];
+  const file = document.getElementById("novo-img").files[0]; // ✅ CORRIGIDO
 
   if (!name) {
     alert("Nome obrigatório");
@@ -211,35 +211,37 @@ async function criarProduto(){
   let image_url = "";
 
   if (file) {
-    image_url = await fileToBase64(file); // ✅ converte imagem
-  }
-
-  try {
-    const res = await fetch(API + "/products", {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        description,
-        price: Number(price) || 0,
-        image_url
-      })
+    image_url = await new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
     });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert(data.message || "Erro ao criar produto");
-      return;
-    }
-
-    document.getElementById("form-box").style.display = "none";
-    carregar();
-
-  } catch (e) {
-    console.error(e);
-    alert("Erro de conexão");
   }
+
+  console.log("Imagem enviada:", image_url);
+
+  const res = await fetch(API + "/products",{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name,
+      description,
+      price:Number(price)||0,
+      image_url
+    })
+  });
+
+  const data = await res.json();
+
+  console.log("Resposta backend:", data);
+
+  if (!data.ok) {
+    alert("Erro ao salvar");
+    return;
+  }
+
+  carregar(); 
 }
 
     // limpar
