@@ -1,126 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Painel Operacional - Tá na Mão!</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Cardápio</title>
 
 <style>
-:root {
-  --verde:#3C6E47; --dourado:#C9A86A;
-  --fundo:#f4f6f4;
+body{font-family:Arial;background:#f4f6f4;margin:0}
+
+header{
+  background:#3C6E47;
+  color:#fff;
+  padding:16px;
+  text-align:center;
 }
 
-body{font-family:Arial;background:var(--fundo);margin:0}
-
-/* LOGIN */
-.login {
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
 }
 
-.login input{
+.btn-new{
+  background:#C9A86A;
+  margin-bottom:16px;
+}
+
+/* FORM */
+.form-card{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  margin-bottom:20px;
+  display:none;
+}
+
+.field{margin-bottom:12px;}
+
+input, textarea{
+  width:100%;
   padding:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
 }
 
-.login button{
-  padding:12px;
+button{
+  padding:10px;
   border:none;
   border-radius:8px;
-  background:var(--verde);
-  color:#fff;
+  cursor:pointer;
   font-weight:bold;
 }
 
-/* PAINEL */
-header{
-  background:var(--verde);
-  color:#fff;
-  padding:20px;
-  text-align:center;
-}
-
-.board{
-  max-width:1400px;
-  margin:20px auto;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:16px;
-  padding:0 16px
-}
-
-.column{
-  background:#fff;
-  border-radius:16px;
-  padding:10px;
-}
-
-.column-header{
-  text-align:center;
-  font-weight:800;
-  padding:10px;
-  border-bottom:1px solid #eee;
-}
+.btn-save{background:#3C6E47;color:#fff;width:100%;}
+.btn-delete{background:#b93b3b;color:#fff;margin-top:6px;}
 
 .card{
-  border:1px solid #eee;
+  background:#fff;
+  padding:14px;
   border-radius:10px;
-  padding:10px;
-  margin-bottom:10px
-}
-
-.btn{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer
-}
-
-.topbar{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  margin:10px
+  border:1px solid #ddd;
+  margin-bottom:12px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login" class="login">
-  <img src="TanaMao_Logo.jpg" style="height:80px;border-radius:20px;margin-bottom:20px;">
-  <input type="password" id="senha" placeholder="Senha">
-  <button onclick="login()">Entrar</button>
-</div>
-
-<!-- PAINEL -->
-<div id="painel" style="display:none;">
-
-<header style="display:flex;align-items:center;justify-content:center;gap:12px;">
-  <img src="TanaMao_Logo.jpg" style="height:40px;width:40px;border-radius:12px;">
-  <h2>Painel Operacional</h2>
+<header>
+<h2>Gestão de Cardápio</h2>
 </header>
 
-<div class="topbar">
-<button class="btn" onclick="carregarPedidos()">Atualizar</button>
-<button class="btn" onclick="editarLimite()">Definir limite</button>
-<button class="btn" onclick="abrirCardapio()">Editar Cardápio</button>
+<div class="container">
+
+<button class="btn-new" onclick="toggleForm()">+ Novo Produto</button>
+
+<div id="form-box" class="form-card">
+
+  <div class="field">
+    <input id="novo-nome" placeholder="Nome do produto">
+  </div>
+
+  <div class="field">
+    <textarea id="novo-desc" placeholder="Descrição"></textarea>
+  </div>
+
+  <div class="field">
+    <input id="novo-preco" placeholder="Preço">
+  </div>
+
+  <div class="field">
+    <input type="file" id="novo-img" accept="image/png, image/jpeg">
+  </div>
+
+  <button class="btn-save" onclick="criarProduto()">Salvar</button>
 </div>
 
-<div class="board">
-<div class="column"><div class="column-header">Entrou</div><div id="col-paid"></div></div>
-<div class="column"><div class="column-header">Produção</div><div id="col-preparing"></div></div>
-<div class="column"><div class="column-header">Pronto</div><div id="col-ready"></div></div>
-<div class="column"><div class="column-header">Entrega</div><div id="col-delivery"></div></div>
-</div>
+<div id="lista"></div>
 
 </div>
 
@@ -128,94 +105,99 @@ header{
 
 const API = "https://tanamao-backend.onrender.com/api";
 
-let pedidos = [];
-let LIMITE = 100;
+// ================= UI =================
+function toggleForm(){
+  const el = document.getElementById("form-box");
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
 
-// ================= LOGIN =================
-async function login(){
-  const senha = document.getElementById("senha").value;
+// ================= FILE =================
+function toBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
+}
 
-  const res = await fetch(API + "/login",{
+// ================= LOAD =================
+async function carregar(){
+  const res = await fetch(API + "/products");
+  const data = await res.json();
+
+  const el = document.getElementById("lista");
+  el.innerHTML = "";
+
+  (data.products || []).forEach(p=>{
+    el.innerHTML += `
+      <div class="card">
+        <input value="${p.name}" id="name-${p.id}">
+        <textarea id="desc-${p.id}">${p.description||""}</textarea>
+        <input value="${p.price}" id="price-${p.id}">
+        <input value="${p.image_url||""}" id="img-${p.id}">
+
+        <button class="btn-save" onclick="salvar('${p.id}')">Salvar</button>
+        <button class="btn-delete" onclick="deletar('${p.id}')">Excluir</button>
+      </div>
+    `;
+  });
+}
+
+// ================= CREATE =================
+async function criarProduto(){
+  const name = document.getElementById("novo-nome").value;
+  const description = document.getElementById("novo-desc").value;
+  const price = document.getElementById("novo-preco").value;
+  const file = document.getElementById("novo-img").files[0];
+
+  if(!name){ alert("Nome obrigatório"); return; }
+
+  let image_url = "";
+  if(file) image_url = await toBase64(file);
+
+  const res = await fetch(API + "/products",{
     method:"POST",
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({senha})
+    body:JSON.stringify({ name, description, price:Number(price)||0, image_url })
   });
 
   const data = await res.json();
 
   if(!data.ok){
-    alert("Senha incorreta");
+    alert(data.message || "Erro ao criar");
     return;
   }
 
-  document.getElementById("login").style.display="none";
-  document.getElementById("painel").style.display="block";
-
-  carregarPedidos();
+  document.getElementById("form-box").style.display="none";
+  carregar();
 }
 
-// ================= PEDIDOS =================
-async function carregarPedidos(){
-  const res = await fetch(API + "/orders");
-  const data = await res.json();
-  pedidos = data.orders || [];
-  renderizar();
-}
+// ================= UPDATE =================
+async function salvar(id){
+  const name = document.getElementById("name-"+id).value;
+  const description = document.getElementById("desc-"+id).value;
+  const price = document.getElementById("price-"+id).value;
+  const image_url = document.getElementById("img-"+id).value;
 
-// ================= FUNÇÕES =================
-function editarLimite(){
-  const novo = prompt("Novo limite:", LIMITE);
-  if(novo) LIMITE = Number(novo);
-}
-
-function abrirCardapio(){
-  window.location.href = "https://tanamaofit.com.br/cardapio.html";
-}
-
-function atualizar(id,status){
-  fetch(API+"/orders/"+id+"/status",{
+  await fetch(API+"/products/"+id,{
     method:"PATCH",
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({delivery_status:status})
-  }).then(()=>carregarPedidos());
+    body:JSON.stringify({ name, description, price, image_url })
+  });
+
+  alert("Salvo!");
 }
 
-// ================= CARD =================
-function card(p){
-  const div=document.createElement("div");
-  div.className="card";
+// ================= DELETE =================
+async function deletar(id){
+  if(!confirm("Excluir?")) return;
 
-  let btn="";
-
-  if(p.delivery_status==="pending")
-    btn=`<button class="btn" onclick="atualizar('${p.id}','preparing')">Produção</button>`;
-  else if(p.delivery_status==="preparing")
-    btn=`<button class="btn" onclick="atualizar('${p.id}','ready')">Pronto</button>`;
-  else if(p.delivery_status==="ready")
-    btn=`<button class="btn" onclick="atualizar('${p.id}','out_for_delivery')">Entrega</button>`;
-
-  div.innerHTML=`
-    <b>${p.customer_name}</b><br>
-    ${p.items_json.map(i=>i.title+" x"+i.quantity).join("<br>")}
-    ${btn}
-  `;
-
-  return div;
+  await fetch(API+"/products/"+id,{method:"DELETE"});
+  carregar();
 }
 
-// ================= RENDER =================
-function renderizar(){
-  render("col-paid", pedidos.filter(p=>p.delivery_status==="pending"||!p.delivery_status));
-  render("col-preparing", pedidos.filter(p=>p.delivery_status==="preparing"));
-  render("col-ready", pedidos.filter(p=>p.delivery_status==="ready"));
-  render("col-delivery", pedidos.filter(p=>p.delivery_status==="out_for_delivery"));
-}
-
-function render(id,list){
-  const el=document.getElementById(id);
-  el.innerHTML="";
-  list.forEach(p=>el.appendChild(card(p)));
-}
+carregar();
 
 </script>
 
