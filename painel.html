@@ -3,65 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestão de Cardápio</title>
+<title>Painel Operacional</title>
 
 <style>
-body{font-family:Arial;background:#f4f6f4;margin:0}
+:root{
+--verde:#3C6E47;
+--dourado:#C9A86A;
+--fundo:#f4f6f4;
+}
+
+body{font-family:Arial;background:var(--fundo);margin:0}
 
 header{
-  background:#3C6E47;
-  color:#fff;
-  padding:16px;
-  text-align:center;
+background:var(--verde);
+color:#fff;
+padding:16px;
+text-align:center;
 }
 
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:20px;
+.topbar{
+display:flex;
+gap:10px;
+padding:16px;
+justify-content:center;
 }
 
-.btn-new{
-  background:#C9A86A;
-  margin-bottom:16px;
+.btn{
+background:var(--dourado);
+border:none;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
 }
 
-/* FORM */
-.form-card{
-  background:#fff;
-  padding:20px;
-  border-radius:14px;
-  border:1px solid #ddd;
-  margin-bottom:20px;
-  display:none;
+.board{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+padding:16px;
 }
 
-.field{margin-bottom:12px;}
-
-input, textarea{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ddd;
+.column{
+background:#fff;
+border-radius:12px;
+padding:10px;
+min-height:400px;
 }
 
-button{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
+.column-header{
+font-weight:bold;
+margin-bottom:10px;
+color:var(--verde);
 }
-
-.btn-save{background:#3C6E47;color:#fff;width:100%;}
-.btn-delete{background:#b93b3b;color:#fff;margin-top:6px;}
 
 .card{
-  background:#fff;
-  padding:14px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  margin-bottom:12px;
+background:#f9f9f9;
+padding:10px;
+border-radius:8px;
+margin-bottom:8px;
+font-size:14px;
+}
+
+.card button{
+margin-top:6px;
+width:100%;
 }
 </style>
 </head>
@@ -69,160 +75,127 @@ button{
 <body>
 
 <header>
-<h2>Gestão de Cardápio</h2>
+<h2>Painel Operacional</h2>
 </header>
 
-<div class="container">
-
-<button class="btn-new" onclick="toggleForm()">+ Novo Produto</button>
-
-<div id="form-box" class="form-card">
-
-  <div class="field">
-    <input id="novo-nome" placeholder="Nome do produto">
-  </div>
-
-  <div class="field">
-    <textarea id="novo-desc" placeholder="Descrição"></textarea>
-  </div>
-
-  <div class="field">
-    <input id="novo-preco" placeholder="Preço">
-  </div>
-
-  <div class="field">
-    <input type="file" id="novo-img" accept="image/png, image/jpeg">
-  </div>
-
-  <button class="btn-save" onclick="criarProduto()">Salvar</button>
+<div class="topbar">
+<button class="btn" onclick="carregarPedidos()">Atualizar</button>
+<button class="btn" onclick="editarLimite()">Definir limite</button>
+<button class="btn" onclick="abrirCardapio()">Editar Cardápio</button>
 </div>
 
-<div id="lista"></div>
+<div class="board">
+<div class="column">
+<div class="column-header">Entrou</div>
+<div id="col-paid"></div>
+</div>
 
+<div class="column">
+<div class="column-header">Produção</div>
+<div id="col-preparing"></div>
+</div>
+
+<div class="column">
+<div class="column-header">Pronto</div>
+<div id="col-ready"></div>
+</div>
+
+<div class="column">
+<div class="column-header">Entrega</div>
+<div id="col-delivery"></div>
+</div>
 </div>
 
 <script>
 
 const API = "https://tanamao-backend.onrender.com/api";
 
-// ================= UI =================
-function toggleForm(){
-  const el = document.getElementById("form-box");
-  el.style.display = el.style.display === "none" ? "block" : "none";
+let pedidos = [];
+let LIMITE = 100;
+
+// ================= PEDIDOS =================
+async function carregarPedidos(){
+const res = await fetch(API + "/operations/orders");
+const data = await res.json();
+pedidos = data.orders || [];
+renderizar();
 }
 
-// ================= FILE =================
-function toBase64(file){
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-  });
+// ================= RENDER =================
+function renderizar(){
+renderCol("col-paid", pedidos.filter(p => p.payment_status==="approved" && (p.delivery_status==="pending" || !p.delivery_status)));
+renderCol("col-preparing", pedidos.filter(p => p.delivery_status==="preparing"));
+renderCol("col-ready", pedidos.filter(p => p.delivery_status==="ready"));
+renderCol("col-delivery", pedidos.filter(p => p.delivery_status==="out_for_delivery"));
 }
 
-// ================= LOAD =================
-async function carregar(){
-  const res = await fetch(API + "/products");
-  const data = await res.json();
+function renderCol(id, lista){
+const el = document.getElementById(id);
+el.innerHTML = "";
 
-  const el = document.getElementById("lista");
-  el.innerHTML = "";
-
-  (data.products || []).forEach(p=>{
-    el.innerHTML += `
-      <div class="card">
-        <input value="${p.name}" id="name-${p.id}">
-        <textarea id="desc-${p.id}">${p.description||""}</textarea>
-        <input value="${p.price}" id="price-${p.id}">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100px;border-radius:8px;margin-bottom:8px;">` : ""}
-
-        <input value="${p.image_url||""}" id="img-${p.id}">
-
-        <button class="btn-save" onclick="salvar('${p.id}')">Salvar</button>
-        <button class="btn-delete" onclick="deletar('${p.id}')">Excluir</button>
-      </div>
-    `;
-  });
+if(!lista.length){
+el.innerHTML = "<div class='card'>Vazio</div>";
+return;
 }
 
-// ================= CREATE =================
-async function criarProduto(){
-  const name = document.getElementById("novo-nome").value;
-  const description = document.getElementById("novo-desc").value;
-  const price = document.getElementById("novo-preco").value;
-  const file = document.getElementById("novo-img-file").files[0];
+lista.forEach(p=>{
+el.innerHTML += `
+<div class="card">
+<strong>${p.customer_name || "Cliente"}</strong><br>
+Total: R$ ${Number(p.total||0).toFixed(2)}<br>
 
-  if (!name) {
-    alert("Nome obrigatório");
-    return;
-  }
+    ${botao(p)}
+  </div>
+`;
 
-  let image_url = "";
+});
+}
 
-  if (file) {
-    image_url = await new Promise((resolve, reject)=>{
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-  }
-
-  console.log("Imagem enviada:", image_url); // 👈 DEBUG
-
-  const res = await fetch("https://tanamao-backend.onrender.com/api/products",{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name,
-      description,
-      price:Number(price)||0,
-      image_url
-    })
-  });
-
-  const data = await res.json();
-
-  console.log("Resposta backend:", data); // 👈 DEBUG
-
-  if (!data.ok) {
-    alert("Erro ao salvar");
-    return;
-  }
-
-  carregarProdutos();
+// ================= BOTÕES =================
+function botao(p){
+if(p.delivery_status==="pending"){
+return <button onclick="atualizar('${p.id}','preparing')">Produção</button>;
+}
+if(p.delivery_status==="preparing"){
+return <button onclick="atualizar('${p.id}','ready')">Pronto</button>;
+}
+if(p.delivery_status==="ready"){
+return <button onclick="atualizar('${p.id}','out_for_delivery')">Entrega</button>;
+}
+if(p.delivery_status==="out_for_delivery"){
+return <button onclick="atualizar('${p.id}','delivered')">Finalizar</button>;
+}
+return "";
 }
 
 // ================= UPDATE =================
-async function salvar(id){
-  const name = document.getElementById("name-"+id).value;
-  const description = document.getElementById("desc-"+id).value;
-  const price = document.getElementById("price-"+id).value;
-  const image_url = document.getElementById("img-"+id).value;
+async function atualizar(id,status){
+await fetch(API+"/operations/orders/"+id+"/status",{
+method:"PATCH",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({delivery_status:status})
+});
 
-  await fetch(API+"/products/"+id,{
-    method:"PUT",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ name, description, price, image_url })
-  });
-
-  alert("Salvo!");
+carregarPedidos();
 }
 
-// ================= DELETE =================
-async function deletar(id){
-  if(!confirm("Excluir?")) return;
-
-  await fetch(API+"/products/"+id,{method:"DELETE"});
-  carregar();
+// ================= EXTRA =================
+function editarLimite(){
+const novo = prompt("Novo limite:", LIMITE);
+if(novo) LIMITE = Number(novo);
 }
 
-carregar();
+function abrirCardapio(){
+window.location.href = "https://www.tanamaofit.com.br/cardapio.html";
+}
+
+// AUTO REFRESH
+setInterval(carregarPedidos,30000);
+
+carregarPedidos();
 
 </script>
 
 </body>
 </html>
-
-
+:::
