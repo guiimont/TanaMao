@@ -1,642 +1,1167 @@
 <!DOCTYPE html>
-<!-- saved from url=(0103)https://tess-workflows-files.storage.googleapis.com/8b5be9b6268a2de8d4849802151bfbd0a48ac104/index.html -->
-<html lang="pt-br"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tá na Mão! | Alimentação Inteligente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde: #3c6e47;
+      --verde-escuro: #2d5235;
+      --dourado: #c9a86a;
+      --fundo: #f8f7f3;
+      --texto: #243126;
+      --muted: #6f7b72;
+      --borda: #e9e5dc;
+      --branco: #ffffff;
+      --erro-bg: #fff0f0;
+      --erro-borda: #f5c6c6;
+      --erro-texto: #c0392b;
+      --sombra: 0 12px 30px rgba(0,0,0,0.08);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+    }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tá na Mão! — Praticidade e Saúde</title>
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-<link href="./Tá na Mão! — Praticidade e Saúde_files/css2" rel="stylesheet">
-<style>
-  :root {
-    --verde: #3C6E47;
-    --verde-escuro: #2D5235;
-    --dourado: #C9A86A;
-    --fundo: #f4f6f4;
-    --texto: #1a1a1a;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: "Outfit", sans-serif; background: var(--fundo); color: var(--texto); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  #auth-bar {
-    background: #111; color: var(--dourado);
-    text-align: center; padding: 9px 16px;
-    font-size: 0.85em; font-weight: 600; display: none;
-  }
-  #auth-bar a { color: #fff; cursor: pointer; text-decoration: underline; margin-left: 10px; font-weight: 400; }
+    body {
+      font-family: "Outfit", sans-serif;
+      background: linear-gradient(180deg, #f8f7f3 0%, #f2efe8 100%);
+      color: var(--texto);
+    }
 
-  header {
-    background: var(--verde);
-    padding: 40px 20px 32px;
-    text-align: center;
-    border-bottom: 4px solid var(--dourado);
-  }
-  header img.logo {
-    width: 130px; height: 130px; border-radius: 28px;
-    display: block; margin: 0 auto 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-  }
-  header h1 { font-size: 2.4em; font-weight: 800; color: var(--dourado); letter-spacing: 0.5px; margin-bottom: 6px; }
-  header .slogan { font-size: 1.05em; font-weight: 600; color: #fff; margin-bottom: 12px; }
-  header p { font-size: 0.9em; color: rgba(255,255,255,0.85); max-width: 440px; margin: 0 auto 18px; line-height: 1.6; }
-  .badges { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .badge { background: rgba(0,0,0,0.2); border: 1px solid var(--dourado); color: var(--dourado); font-size: 0.75em; padding: 5px 13px; border-radius: 20px; font-weight: 600; }
+    .wrap {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
 
-  .container { max-width: 820px; margin: auto; padding: 24px 16px; }
+    .hero {
+      background: var(--branco);
+      border: 1px solid rgba(201,168,106,0.18);
+      border-radius: 28px;
+      box-shadow: var(--sombra);
+      padding: 28px 22px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
 
-  .section { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  .section-title { font-size: 1.05em; font-weight: 800; color: var(--dourado); background: var(--verde); display: inline-block; padding: 6px 14px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .hero .tag {
+      display: inline-block;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      color: var(--verde);
+      background: rgba(60,110,71,0.08);
+      border: 1px solid rgba(60,110,71,0.12);
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
 
-  /* SKELETON LOADING */
-  .skeleton { background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
-  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-  .sk-product { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #eee; gap: 12px; }
-  .sk-left { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-  .sk-nome { height: 18px; width: 60%; }
-  .sk-desc { height: 13px; width: 80%; }
-  .sk-preco { height: 16px; width: 30%; }
-  .sk-right { width: 110px; height: 34px; flex-shrink: 0; }
+    .hero h1 {
+      font-size: 2rem;
+      line-height: 1.1;
+      color: var(--verde-escuro);
+      margin-bottom: 10px;
+    }
 
-  /* PRODUTOS */
-  .product { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #eee; }
-  .product:last-child { border-bottom: none; }
-  .product-info { flex: 1; padding-right: 12px; }
-  .p-nome { font-weight: 800; font-size: 1em; color: var(--verde); }
-  .p-desc { font-size: 0.8em; color: #777; margin-top: 3px; }
-  .p-preco { font-size: 0.95em; font-weight: 800; color: #333; margin-top: 6px; }
-  .qty-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .qty-wrap button { width: 34px; height: 34px; border-radius: 8px; background: var(--fundo); color: var(--texto); border: 2px solid #ddd; font-size: 1.2em; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: "Outfit", sans-serif; transition: all 0.15s; }
-  .qty-wrap button:hover { background: #e0e0e0; border-color: #bbb; }
-  .qty-num { min-width: 26px; text-align: center; font-weight: 800; font-size: 1em; }
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 680px;
+      margin: 0 auto;
+    }
 
-  .erro-cardapio { text-align: center; padding: 24px; color: #c0392b; font-size: 0.9em; }
-  .btn-retry { background: var(--verde); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: "Outfit", sans-serif; font-weight: 700; margin-top: 10px; }
+    .section {
+      background: var(--branco);
+      border: 1px solid var(--borda);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 6px 22px rgba(0,0,0,0.04);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
 
-  /* COMO FUNCIONA */
-  .steps { display: flex; gap: 12px; flex-wrap: wrap; }
-  .step { flex: 1; min-width: 160px; background: var(--fundo); border: 1px solid #eaeaea; border-radius: 10px; padding: 18px; text-align: center; }
-  .step-num { width: 36px; height: 36px; background: var(--dourado); color: var(--verde-escuro); border-radius: 50%; font-weight: 800; font-size: 1em; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-  .step strong { font-size: 0.9em; display: block; margin-bottom: 4px; color: var(--verde); }
-  .step p { font-size: 0.82em; color: #666; line-height: 1.4; }
+    .section-title {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #9e927f;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
 
-  /* PAGAMENTO */
-  .pag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .pag-item { border: 2px solid #ddd; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .pag-item:hover { border-color: var(--dourado); background: #fdfaf3; }
-  .pag-item.ativo { border-color: var(--verde); background: #f0f7f2; }
-  .pag-nome { font-weight: 800; font-size: 0.95em; color: var(--verde); }
-  .pag-sub { font-size: 0.75em; color: #888; margin-top: 3px; }
-  .tag-desc { background: var(--dourado); color: var(--verde-escuro); font-size: 0.7em; padding: 3px 9px; font-weight: 800; border-radius: 20px; margin-top: 6px; display: inline-block; }
-  .pag-aviso { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 4px; }
+    .intro-info {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
 
-  /* RESUMO */
-  #resumo-lista { font-size: 0.9em; line-height: 1.9; color: #333; font-weight: 600; }
-  .r-vazio { color: #ccc; font-weight: 400; font-style: italic; }
-  .resumo-total { margin-top: 12px; font-size: 1.2em; font-weight: 800; color: var(--verde); padding-top: 12px; border-top: 2px dashed #eee; }
+    .intro-card {
+      background: #fcfbf8;
+      border: 1px solid var(--borda);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+    }
 
-  /* CTA */
-  .cta-section { background: linear-gradient(135deg, var(--verde), var(--verde-escuro)); border-radius: 14px; padding: 36px 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(60,110,71,0.3); }
-  .cta-section h2 { color: var(--dourado); margin-bottom: 8px; font-size: 1.35em; }
-  .cta-section p { color: rgba(255,255,255,0.88); font-size: 0.9em; margin-bottom: 24px; }
-  .btn-pedir { display: inline-block; background: var(--dourado); color: var(--verde-escuro); font-weight: 800; font-size: 1.15em; padding: 18px 44px; border-radius: 50px; border: none; cursor: pointer; width: 100%; max-width: 360px; font-family: "Outfit", sans-serif; box-shadow: 0 6px 18px rgba(201,168,106,0.45); transition: all 0.2s; }
-  .btn-pedir:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(201,168,106,0.6); }
+    .intro-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--verde-escuro);
+      margin-bottom: 6px;
+    }
 
-  /* MODAL */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 999; align-items: center; justify-content: center; padding: 12px; }
-  .overlay.on { display: flex; }
-  .modal { background: #fff; border-radius: 20px; padding: 32px 26px; width: 100%; max-width: 460px; position: relative; box-shadow: 0 16px 50px rgba(0,0,0,0.3); max-height: 92vh; overflow-y: auto; }
-  .modal h3 { color: var(--verde); font-size: 1.2em; font-weight: 800; margin-bottom: 4px; }
-  .m-subtitulo { font-size: 0.82em; color: #aaa; margin-bottom: 16px; }
-  .m-resumo { background: #f9f9f9; border-radius: 10px; padding: 14px; font-size: 0.85em; line-height: 1.8; color: #444; margin-bottom: 10px; }
-  .m-total { font-size: 1.1em; font-weight: 800; color: var(--verde); margin-bottom: 20px; }
+    .intro-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
 
-  .form-label { font-size: 0.72em; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; margin-top: 14px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .input-full { grid-column: span 2; }
-  .modal input { width: 100%; padding: 12px 14px; border: 2px solid #eee; border-radius: 10px; font-size: 0.9em; font-family: "Outfit", sans-serif; outline: none; transition: border 0.2s; color: var(--texto); background: #fff; }
-  .modal input:focus { border-color: var(--dourado); }
-  .check-row { display: flex; align-items: center; gap: 8px; font-size: 0.88em; font-weight: 600; color: #555; padding: 10px 14px; border: 2px solid #eee; border-radius: 10px; }
-  .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--verde); cursor: pointer; }
+    #produtos-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-  #area-logado { background: #f0f7f2; border: 2px solid var(--verde); padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; }
-  .l-nome { font-weight: 800; font-size: 1.05em; color: var(--verde); }
-  .l-tel { font-size: 0.85em; color: #666; margin-top: 4px; }
-  #area-logado a { font-size: 0.78em; color: #aaa; text-decoration: underline; cursor: pointer; display: inline-block; margin-top: 10px; }
+    .product {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: 0.2s ease;
+    }
 
-  .btn-pagar { width: 100%; background: var(--dourado); color: var(--verde-escuro); border: none; padding: 17px; border-radius: 50px; font-size: 1.05em; font-weight: 800; cursor: pointer; font-family: "Outfit", sans-serif; margin-top: 18px; transition: all 0.2s; box-shadow: 0 4px 14px rgba(201,168,106,0.4); display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-pagar:hover { background: #d6b77c; transform: translateY(-2px); }
-  .btn-pagar:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .product:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+    }
 
-  .btn-fechar { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 1.4em; cursor: pointer; color: #ccc; line-height: 1; }
-  .btn-fechar:hover { color: #999; }
+    .product-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
 
-  .erro-msg { background: #fff0f0; border: 1px solid #f5c6c6; color: #c0392b; border-radius: 8px; padding: 10px 14px; font-size: 0.85em; margin-top: 12px; display: none; text-align: center; }
+    .product img {
+      width: 76px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid #eee;
+      flex-shrink: 0;
+      background: #f5f5f5;
+    }
 
-  .spinner { width: 18px; height: 18px; border: 3px solid rgba(45,82,53,0.25); border-top-color: var(--verde-escuro); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+    .product-info {
+      min-width: 0;
+    }
 
-  footer { text-align: center; padding: 24px 16px; font-size: 0.78em; color: #bbb; }
+    .p-nome {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--verde-escuro);
+      margin-bottom: 3px;
+    }
 
-  @media (max-width: 520px) {
-    header h1 { font-size: 1.9em; }
-    .steps { flex-direction: column; }
-    .pag-grid { grid-template-columns: 1fr 1fr; }
-  }
-</style>
-<style id="_goober"> @keyframes go2264125279{from{transform:scale(0) rotate(45deg);opacity:0;}to{transform:scale(1) rotate(45deg);opacity:1;}}@keyframes go3020080000{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}@keyframes go463499852{from{transform:scale(0) rotate(90deg);opacity:0;}to{transform:scale(1) rotate(90deg);opacity:1;}}@keyframes go1268368563{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}@keyframes go1310225428{from{transform:scale(0) rotate(45deg);opacity:0;}to{transform:scale(1) rotate(45deg);opacity:1;}}@keyframes go651618207{0%{height:0;width:0;opacity:0;}40%{height:0;width:6px;opacity:1;}100%{opacity:1;height:10px;}}@keyframes go901347462{from{transform:scale(0.6);opacity:0.4;}to{transform:scale(1);opacity:1;}}.go4109123758{z-index:9999;}.go4109123758 > *{pointer-events:auto;}</style></head>
+    .p-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+
+    .p-preco {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--dourado);
+    }
+
+    .qty-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .qty-wrap button {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: var(--verde);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .qty-wrap button:hover {
+      background: var(--verde-escuro);
+      transform: scale(1.03);
+    }
+
+    .qty-num {
+      min-width: 24px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--verde-escuro);
+    }
+
+    .pagamentos {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pag-item {
+      border: 2px solid #ece8de;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pag-item:hover {
+      border-color: var(--dourado);
+      transform: translateY(-1px);
+    }
+
+    .pag-item.ativo {
+      border-color: var(--verde);
+      background: #f4faf5;
+      box-shadow: inset 0 0 0 1px rgba(60,110,71,0.08);
+    }
+
+    .pag-item strong {
+      display: block;
+      color: var(--verde-escuro);
+      margin-bottom: 4px;
+      font-size: 0.96rem;
+    }
+
+    .pag-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    #resumo-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .r-vazio {
+      color: #999;
+      font-style: italic;
+    }
+
+    .resumo-total {
+      margin-top: 14px;
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--verde);
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde));
+      color: #fff;
+      border-radius: 24px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(45,82,53,0.18);
+    }
+
+    .cta-section h2 {
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+    }
+
+    .cta-section p {
+      color: rgba(255,255,255,0.88);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+
+    .btn-pedir {
+      background: var(--dourado);
+      color: var(--verde-escuro);
+      border: none;
+      padding: 16px 28px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: "Outfit", sans-serif;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 18px rgba(201,168,106,0.35);
+    }
+
+    .btn-pedir:hover {
+      background: #d7b777;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 0.8rem;
+      color: #a09a90;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 18, 0.56);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .overlay.on {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 640px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px 18px 20px;
+      position: relative;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .modal h3 {
+      font-size: 1.5rem;
+      color: var(--verde-escuro);
+      margin-bottom: 4px;
+    }
+
+    .m-subtitulo {
+      font-size: 0.86rem;
+      color: #8d8d8d;
+      margin-bottom: 16px;
+    }
+
+    .m-resumo {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: #444;
+      margin-bottom: 10px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .m-total {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--verde);
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .input-full {
+      grid-column: span 2;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: "Outfit", sans-serif;
+      outline: none;
+      transition: border 0.2s;
+      color: var(--texto);
+      background: #fff;
+    }
+
+    .modal input:focus {
+      border-color: var(--dourado);
+    }
+
+    #area-logado {
+      background: #f0f7f2;
+      border: 2px solid var(--verde);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .l-nome {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--verde);
+    }
+
+    .l-tel {
+      font-size: 0.88rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    #area-logado a {
+      font-size: 0.8rem;
+      color: #888;
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .btn-pagar {
+      width: 100%;
+      background: var(--dourado);
+      color: var(--verde-escuro);
+      border: none;
+      padding: 17px;
+      border-radius: 999px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: "Outfit", sans-serif;
+      margin-top: 18px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(201,168,106,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-pagar:hover {
+      background: #d6b77c;
+      transform: translateY(-2px);
+    }
+
+    .btn-pagar:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-fechar {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #ccc;
+      line-height: 1;
+    }
+
+    .btn-fechar:hover {
+      color: #999;
+    }
+
+    .erro-msg {
+      background: var(--erro-bg);
+      border: 1px solid var(--erro-borda);
+      color: var(--erro-texto);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-top: 12px;
+      display: none;
+      text-align: center;
+    }
+
+    .erro-cardapio {
+      background: #fff;
+      border: 1px dashed #ddd;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: #888;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(45,82,53,0.25);
+      border-top-color: var(--verde-escuro);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 760px) {
+      .hero h1 {
+        font-size: 1.7rem;
+      }
+
+      .intro-info {
+        grid-template-columns: 1fr;
+      }
+
+      .pagamentos {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .input-full {
+        grid-column: span 1;
+      }
+
+      .product {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .product-left {
+        width: 100%;
+      }
+
+      .qty-wrap {
+        align-self: flex-end;
+      }
+    }
+  </style>
+</head>
 <body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="tag">Tá na Mão! • Alimentação Inteligente</div>
+      <h1>Monte seu pedido com praticidade</h1>
+      <p>
+        Escolha seus produtos, selecione a forma de pagamento e finalize em poucos passos.
+        Seu carrinho fica salvo mesmo se a página recarregar.
+      </p>
+    </section>
 
-<div id="auth-bar" style="display: block;">Olá de novo, <strong>Guilherme</strong>! <a id="logout">Sair</a></div>
+    <div class="section">
+      <span class="section-title">Como funciona</span>
+      <div class="intro-info">
+        <div class="intro-card">
+          <strong>1. Escolha seus itens</strong>
+          <span>Adicione as refeições e monte seu pedido no seu ritmo.</span>
+        </div>
+        <div class="intro-card">
+          <strong>2. Selecione o pagamento</strong>
+          <span>Pix e débito possuem 10% de desconto aplicado automaticamente.</span>
+        </div>
+        <div class="intro-card">
+          <strong>3. Finalize com segurança</strong>
+          <span>Proteção contra múltiplos cliques para evitar cobranças duplicadas.</span>
+        </div>
+      </div>
+    </div>
 
-<header>
-  <img src="TanaMao_Logo.jpg" class="logo" alt="Tá na Mão!">
-  <div class="slogan">Praticidade &amp; Saúde</div>
-  <p>Pratos prontos e congelados com sabor caseiro para resolver sua semana sem complicações.</p>
-  <div class="badges">
-    <span class="badge">Sem conservantes</span>
-    <span class="badge">Produção caseira</span>
-  </div>
-</header>
-
-<div class="container">
-
-  <!-- CARDÁPIO DINÂMICO -->
-  <div class="section" id="section-cardapio">
-    <span class="section-title">Nosso Cardápio</span>
-    <div id="produtos-container">
+    <div class="section">
+      <span class="section-title">Cardápio</span>
+      <div id="produtos-container">
         <div class="erro-cardapio">
-          <p>Não foi possível carregar o cardápio.<br>Verifique sua conexão.</p>
-          <button class="btn-retry" onclick="carregarProdutos()">Tentar novamente</button>
-        </div></div>
-  </div>
-
-  <!-- COMO FUNCIONA -->
-  <div class="section">
-    <span class="section-title">Como Funciona</span>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <strong>Escolha</strong>
-        <p>Monte seu pedido direto pelo site.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <strong>Pague</strong>
-        <p>Checkout seguro com Pix ou cartão.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <strong>Receba</strong>
-        <p>Entregamos congelado com entrega programada.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <strong>Aqueça</strong>
-        <p>Tá na Mão! Pronto em minutos.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAGAMENTO -->
-  <div class="section">
-    <span class="section-title">Forma de Pagamento</span>
-    <div class="pag-grid">
-      <div class="pag-item" id="pag-pix" onclick="selecionarPag(&#39;pix&#39;)">
-        <div class="pag-nome">Pix</div>
-        <div class="pag-sub">Transferência instantânea</div>
-        <span class="tag-desc">10% OFF</span>
-      </div>
-      <div class="pag-item" id="pag-debito" onclick="selecionarPag(&#39;debito&#39;)">
-        <div class="pag-nome">Débito</div>
-        <div class="pag-sub">Cartão de débito</div>
-        <span class="tag-desc">10% OFF</span>
-      </div>
-      <div class="pag-item" id="pag-credito" onclick="selecionarPag(&#39;credito&#39;)">
-        <div class="pag-nome">Crédito</div>
-        <div class="pag-sub">Cartão de crédito</div>
-      </div>
-      <div class="pag-item" id="pag-vale" onclick="selecionarPag(&#39;vale&#39;)">
-        <div class="pag-nome">Vale Alimentação</div>
-        <div class="pag-sub">VR / VA / Ticket</div>
-      </div>
-    </div>
-    <div class="pag-aviso">Pedido confirmado automaticamente após o pagamento aprovado.</div>
-  </div>
-
-  <!-- RESUMO -->
-  <div class="section">
-    <span class="section-title">Seu Pedido</span>
-    <div id="resumo-lista"><span class="r-vazio">Nenhum item selecionado ainda.</span></div>
-    <div class="resumo-total" id="resumo-total" style="display:none;"></div>
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-section">
-    <h2>Resolva sua semana agora</h2>
-    <button class="btn-pedir" onclick="abrirModal()">Finalizar Pedido</button>
-  </div>
-
-</div>
-
-<footer>Tá na Mão! © 2025 · Alimentação Inteligente.</footer>
-
-<!-- MODAL -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <button class="btn-fechar" onclick="fecharModal()" aria-label="Fechar">×</button>
-    <h3>Confirmar Pedido</h3>
-    <div class="m-subtitulo" id="m-subtitulo"></div>
-    <div class="m-resumo" id="m-resumo"></div>
-    <div class="m-total" id="m-total"></div>
-
-    <!-- Área exibida quando o cliente já está salvo no localStorage -->
-    <div id="area-logado" style="display:none;">
-      <div class="l-nome" id="txt-nome-logado"></div>
-      <div class="l-tel" id="txt-tel-logado"></div>
-      <a onclick="limparCadastro()">Não é você? Trocar os dados</a>
-    </div>
-
-    <!-- Formulário de cadastro -->
-    <div id="area-cadastro">
-      <span class="form-label">Seus dados</span>
-      <div class="form-grid">
-        <input type="text" id="m-nome" class="input-full" placeholder="Nome completo">
-        <input type="tel" id="m-tel" class="input-full" placeholder="WhatsApp com DDD — ex: 21 98000-0000">
-      </div>
-
-      <span class="form-label">Endereço de entrega</span>
-      <div class="form-grid">
-        <input type="text" id="m-cep" placeholder="CEP" onblur="buscarCep()">
-        <input type="text" id="m-estado" placeholder="UF">
-        <input type="text" id="m-rua" placeholder="Rua" class="input-full">
-        <input type="text" id="m-numero" placeholder="Número">
-        <input type="text" id="m-complemento" placeholder="Complemento">
-        <input type="text" id="m-bairro" placeholder="Bairro">
-        <input type="text" id="m-cidade" placeholder="Cidade" class="input-full">
-      </div>
-
-      <span class="form-label">Perfil rápido — ajuda a te atender melhor</span>
-      <div class="form-grid">
-        <input type="number" id="m-idade" placeholder="Sua idade">
-        <input type="text" id="m-prof" placeholder="Profissão">
-        <div class="check-row">
-          <input type="checkbox" id="m-casado"> Casado(a)
-        </div>
-        <div class="check-row">
-          <input type="checkbox" id="m-filhos"> Tem filhos
+          <p>Carregando cardápio...</p>
         </div>
       </div>
     </div>
 
-    <div class="erro-msg" id="erro-msg"></div>
+    <div class="section">
+      <span class="section-title">Forma de Pagamento</span>
+      <div class="pagamentos">
+        <div class="pag-item" id="pag-pix" onclick="selecionarPag('pix')">
+          <strong>Pix (10% OFF)</strong>
+          <span>Pagamento instantâneo com desconto automático.</span>
+        </div>
+        <div class="pag-item" id="pag-debito" onclick="selecionarPag('debito')">
+          <strong>Débito (10% OFF)</strong>
+          <span>Finalize com desconto direto no total.</span>
+        </div>
+        <div class="pag-item" id="pag-credito" onclick="selecionarPag('credito')">
+          <strong>Crédito</strong>
+          <span>Pague com cartão de crédito sem desconto.</span>
+        </div>
+        <div class="pag-item" id="pag-vale" onclick="selecionarPag('vale')">
+          <strong>Vale Alimentação</strong>
+          <span>Use seu benefício para concluir o pedido.</span>
+        </div>
+      </div>
+    </div>
 
-    <button class="btn-pagar" id="btn-pagar" onclick="irParaCheckout()">🔒 Pagar com segurança</button>
+    <div class="section">
+      <span class="section-title">Seu Pedido</span>
+      <div id="resumo-lista">
+        <span class="r-vazio">Nenhum item selecionado ainda.</span>
+      </div>
+      <div class="resumo-total" id="resumo-total" style="display:none;"></div>
+    </div>
 
+    <div class="cta-section">
+      <h2>Resolva sua semana agora</h2>
+      <p>Revise seu pedido e finalize com rapidez.</p>
+      <button class="btn-pedir" onclick="abrirModal()">Finalizar Pedido</button>
+    </div>
   </div>
-</div>
 
-<script>
-  // ── CONFIG ──────────────────────────────────────────────────────────────────
-  const BACKEND_URL = "https://tanamao-backend.onrender.com";
+  <footer>Tá na Mão! © 2026 · Alimentação Inteligente.</footer>
 
-  // ── ESTADO ──────────────────────────────────────────────────────────────────
-  let PRODS  = [];
-  let qtds   = {};
-  let pagSel = "";
-  let clienteAtual = null;
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <button class="btn-fechar" onclick="fecharModal()" aria-label="Fechar">×</button>
+      <h3>Confirmar Pedido</h3>
+      <div class="m-subtitulo" id="m-subtitulo"></div>
+      <div class="m-resumo" id="m-resumo"></div>
+      <div class="m-total" id="m-total"></div>
 
-  try {
-    clienteAtual = JSON.parse(localStorage.getItem("tanamao_cliente")) || null;
-  } catch {
-    clienteAtual = null;
-  }
+      <div id="area-logado" style="display:none;">
+        <div class="l-nome" id="txt-nome-logado"></div>
+        <div class="l-tel" id="txt-tel-logado"></div>
+        <a onclick="limparCadastro()">Não é você? Trocar os dados</a>
+      </div>
 
-  // ── AUTH BAR ─────────────────────────────────────────────────────────────────
-  function checarLogin() {
-    const bar = document.getElementById("auth-bar");
-    if (clienteAtual) {
+      <div id="area-cadastro">
+        <span class="form-label">Seus dados</span>
+        <div class="form-grid">
+          <input type="text" id="m-nome" class="input-full" placeholder="Nome completo">
+          <input type="tel" id="m-tel" class="input-full" placeholder="WhatsApp com DDD — ex: 21 98000-0000">
+        </div>
+
+        <span class="form-label">Endereço de entrega</span>
+        <div class="form-grid">
+          <input type="text" id="m-cep" placeholder="CEP" onblur="buscarCep()">
+          <input type="text" id="m-estado" placeholder="UF">
+          <input type="text" id="m-rua" placeholder="Rua" class="input-full">
+          <input type="text" id="m-numero" placeholder="Número">
+          <input type="text" id="m-complemento" placeholder="Complemento">
+          <input type="text" id="m-bairro" placeholder="Bairro">
+          <input type="text" id="m-cidade" placeholder="Cidade">
+        </div>
+      </div>
+
+      <div class="erro-msg" id="erro-msg"></div>
+      <button class="btn-pagar" id="btn-pagar" onclick="finalizarPedido()">Ir para pagamento</button>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://SEU-BACKEND-AQUI.com";
+    const STORAGE_CART = "tanamao_cart_v1";
+    const STORAGE_PAYMENT = "tanamao_payment_v1";
+    const STORAGE_CLIENT = "tanamao_cliente";
+    const STORAGE_CHECKOUT_LOCK = "tanamao_checkout_lock_v1";
+
+    let PRODS = [];
+    let qtds = {};
+    let pagSel = null;
+    let clienteAtual = null;
+    let isSubmittingCheckout = false;
+
+    function fmt(v) {
+      return "R$ " + Number(v || 0).toFixed(2).replace(".", ",");
+    }
+
+    function getVal(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function mostrarErro(msg) {
+      const bar = document.getElementById("erro-msg");
+      if (!bar) return;
       bar.style.display = "block";
-      bar.innerHTML = `Olá de novo, <strong>${clienteAtual.nome.split(" ")[0]}</strong>! <a id="logout">Sair</a>`;
-      const logoutEl = document.getElementById("logout");
-      if (logoutEl) logoutEl.onclick = limparCadastro;
-    } else {
+      bar.textContent = msg;
+    }
+
+    function ocultarErro() {
+      const bar = document.getElementById("erro-msg");
+      if (!bar) return;
       bar.style.display = "none";
-      bar.innerHTML = "";
-    }
-  }
-
-  function limparCadastro() {
-    localStorage.removeItem("tanamao_cliente");
-    clienteAtual = null;
-    checarLogin();
-    document.getElementById("area-logado").style.display   = "none";
-    document.getElementById("area-cadastro").style.display = "block";
-
-    const campos = ["m-nome","m-tel","m-cep","m-rua","m-numero","m-complemento","m-bairro","m-cidade","m-estado","m-idade","m-prof"];
-    campos.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-
-    ["m-casado","m-filhos"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.checked = false;
-    });
-  }
-
-  checarLogin();
-
-  // ── CARREGAR PRODUTOS DO BACKEND ─────────────────────────────────────────────
-  async function carregarProdutos() {
-  try {
-    const res = await fetch(BACKEND_URL + "/api/products");
-
-    if (!res.ok) throw new Error("erro http");
-
-    const data = await res.json();
-
-    console.log("API:", data); // 👈 DEBUG
-
-    if (!data.ok) throw new Error("api erro");
-
-    PRODS = data.products || [];
-
-    if (!PRODS.length) {
-      document.getElementById("produtos-container").innerHTML =
-        '<div class="erro-cardapio"><p>Cardápio vazio.</p></div>';
-      return;
+      bar.textContent = "";
     }
 
-    PRODS.forEach(p => qtds[p.id] = 0);
-
-    renderProdutos();
-
-  } catch (e) {
-    console.error("ERRO:", e);
-
-    document.getElementById("produtos-container").innerHTML = `
-      <div class="erro-cardapio">
-        <p>Erro ao carregar cardápio.</p>
-      </div>`;
-  }
-}
-
-
-  function renderProdutos() {
-  const container = document.getElementById("produtos-container");
-
-  if (!PRODS.length) {
-    container.innerHTML = '<div class="erro-cardapio"><p>Cardápio em atualização. Volte em breve!</p></div>';
-    return;
-  }
-
-  container.innerHTML = PRODS.map(p => `
-    <div class="product">
-
-      <div style="display:flex; gap:12px; align-items:center; flex:1;">
-
-        ${p.image_url ? `
-          <img src="${p.image_url}" 
-               style="width:70px;height:70px;object-fit:cover;border-radius:10px;">
-        ` : ""}
-
-        <div class="product-info">
-          <div class="p-nome">${p.name}</div>
-          <div class="p-desc">${p.description || ""}</div>
-          <div class="p-preco">R$ ${Number(p.price).toFixed(2).replace(".", ",")}</div>
-        </div>
-
-      </div>
-
-      <div class="qty-wrap">
-        <button onclick="qty('${p.id}',-1)">-</button>
-        <span class="qty-num" id="${p.id}">0</span>
-        <button onclick="qty('${p.id}',1)">+</button>
-      </div>
-
-    </div>
-  `).join("");
-}
-
-  // ── QUANTIDADE ───────────────────────────────────────────────────────────────
-  function qty(id, d) {
-    qtds[id] = Math.max(0, (qtds[id] || 0) + d);
-    const el = document.getElementById(id);
-    if (el) el.textContent = qtds[id];
-    atualizarResumo();
-  }
-
-  // ── SELEÇÃO DE PAGAMENTO ─────────────────────────────────────────────────────
-  function selecionarPag(tipo) {
-    pagSel = tipo;
-    document.querySelectorAll(".pag-item").forEach(el => el.classList.remove("ativo"));
-    document.getElementById("pag-" + tipo).classList.add("ativo");
-    atualizarResumo();
-  }
-
-  // ── CÁLCULO ──────────────────────────────────────────────────────────────────
-  function calcTotal() {
-    let sub = 0;
-    PRODS.forEach(p => { sub += (qtds[p.id] || 0) * Number(p.price); });
-    const descRate = (pagSel === "pix" || pagSel === "debito") ? 0.1 : 0;
-    const discount = Number((sub * descRate).toFixed(2));
-    const total    = Number((sub - discount).toFixed(2));
-    return { sub, descRate, discount, total };
-  }
-
-  function fmt(v) { return "R$ " + v.toFixed(2).replace(".", ","); }
-
-  // ── RESUMO ───────────────────────────────────────────────────────────────────
-  function atualizarResumo() {
-    const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
-    const rl = document.getElementById("resumo-lista");
-    const rt = document.getElementById("resumo-total");
-
-    if (!ativos.length) {
-      rl.innerHTML = '<span class="r-vazio">Nenhum item selecionado ainda.</span>';
-      rt.style.display = "none";
-      return;
+    function resetBtn() {
+      const btn = document.getElementById("btn-pagar");
+      if (!btn) return;
+      btn.disabled = false;
+      btn.innerHTML = "Ir para pagamento";
+      isSubmittingCheckout = false;
+      sessionStorage.removeItem(STORAGE_CHECKOUT_LOCK);
     }
 
-    const { sub, descRate, discount, total } = calcTotal();
-
-    let html = ativos.map(p =>
-      `<div>${p.name} &times; ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price))}</div>`
-    ).join("");
-
-    if (descRate > 0) {
-      html += `<div style="color:#888;font-size:.85em;margin-top:4px;">Subtotal: ${fmt(sub)}</div>`;
-      html += `<div style="color:var(--verde);font-size:.85em;font-weight:800;">Desconto (10%): &minus; ${fmt(discount)}</div>`;
+    function setBtnLoading() {
+      const btn = document.getElementById("btn-pagar");
+      if (!btn) return;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Gerando pagamento...';
+      isSubmittingCheckout = true;
+      sessionStorage.setItem(STORAGE_CHECKOUT_LOCK, "1");
     }
 
-    rl.innerHTML = html;
-    rt.style.display = "block";
-    rt.textContent = "Total a pagar: " + fmt(total);
-  }
-
-  // ── MODAL ────────────────────────────────────────────────────────────────────
-  function abrirModal() {
-    const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
-    if (!ativos.length) { alert("Selecione pelo menos um item."); return; }
-    if (!pagSel)        { alert("Escolha a forma de pagamento."); return; }
-
-    const { sub, descRate, discount, total } = calcTotal();
-    const nomesPag = {
-      pix:     "Pix (10% OFF)",
-      debito:  "Débito (10% OFF)",
-      credito: "Crédito",
-      vale:    "Vale Alimentação"
-    };
-
-    let r = ativos.map(p =>
-      `&#8226; ${p.name} &times; ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price))}`
-    ).join("<br>");
-
-    if (descRate > 0) {
-      r += `<br><span style="color:var(--verde);font-weight:800;">Desconto: &minus; ${fmt(discount)}</span>`;
-    }
-    r += `<br><strong>Pagamento: ${nomesPag[pagSel]}</strong>`;
-
-    document.getElementById("m-resumo").innerHTML = r;
-    document.getElementById("m-total").textContent = "Total: " + fmt(total);
-    document.getElementById("m-subtitulo").textContent = clienteAtual
-      ? `Olá, ${clienteAtual.nome.split(" ")[0]}! Confirme e finalize.`
-      : "Preencha seus dados para finalizar.";
-
-    if (clienteAtual) {
-      document.getElementById("txt-nome-logado").textContent = clienteAtual.nome;
-      document.getElementById("txt-tel-logado").textContent  = clienteAtual.tel;
-      document.getElementById("area-logado").style.display   = "block";
-      document.getElementById("area-cadastro").style.display = "none";
-    } else {
-      document.getElementById("area-logado").style.display   = "none";
-      document.getElementById("area-cadastro").style.display = "block";
+    function restoreBtnIfNeeded() {
+      const lock = sessionStorage.getItem(STORAGE_CHECKOUT_LOCK);
+      if (lock === "1") {
+        const btn = document.getElementById("btn-pagar");
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner"></span> Gerando pagamento...';
+          isSubmittingCheckout = true;
+        }
+      }
     }
 
-    ocultarErro();
-    resetBtn();
-    document.getElementById("overlay").classList.add("on");
-  }
+    function salvarCarrinho() {
+      const payload = {};
+      Object.keys(qtds).forEach(id => {
+        if ((qtds[id] || 0) > 0) payload[id] = qtds[id];
+      });
+      localStorage.setItem(STORAGE_CART, JSON.stringify(payload));
+    }
 
-  function fecharModal() {
-    document.getElementById("overlay").classList.remove("on");
-  }
+    function carregarCarrinho() {
+      try {
+        const raw = localStorage.getItem(STORAGE_CART);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
 
-  function mostrarErro(msg) {
-    const el = document.getElementById("erro-msg");
-    el.textContent = msg;
-    el.style.display = "block";
-  }
+    function salvarPagamento() {
+      if (pagSel) localStorage.setItem(STORAGE_PAYMENT, pagSel);
+    }
 
-  function ocultarErro() {
-    const el = document.getElementById("erro-msg");
-    el.style.display = "none";
-    el.textContent = "";
-  }
+    function carregarPagamento() {
+      return localStorage.getItem(STORAGE_PAYMENT);
+    }
 
-  function resetBtn() {
-    const btn = document.getElementById("btn-pagar");
-    btn.disabled = false;
-    btn.innerHTML = "&#128274; Pagar com segurança";
-  }
+    function salvarCliente(cliente) {
+      localStorage.setItem(STORAGE_CLIENT, JSON.stringify(cliente));
+      clienteAtual = cliente;
+    }
 
-  // ── CHECKOUT ─────────────────────────────────────────────────────────────────
-  function getVal(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : "";
-  }
+    function carregarCliente() {
+      try {
+        const raw = localStorage.getItem(STORAGE_CLIENT);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
 
-  async function irParaCheckout() {
-    ocultarErro();
-    let cliente = clienteAtual;
+    function checarLogin() {
+      clienteAtual = carregarCliente();
+      const areaLogado = document.getElementById("area-logado");
+      const areaCadastro = document.getElementById("area-cadastro");
+      const nome = document.getElementById("txt-nome-logado");
+      const tel = document.getElementById("txt-tel-logado");
 
-    if (!cliente) {
-      const nome        = getVal("m-nome");
-      const tel         = getVal("m-tel");
-      const cep         = getVal("m-cep");
-      const rua         = getVal("m-rua");
-      const numero      = getVal("m-numero");
-      const complemento = getVal("m-complemento");
-      const bairro      = getVal("m-bairro");
-      const cidade      = getVal("m-cidade");
-      const estado      = getVal("m-estado");
+      if (!areaLogado || !areaCadastro) return;
 
-      if (!nome || !tel || !cep || !rua || !numero || !bairro || !cidade || !estado) {
-        mostrarErro("Preencha seu nome, WhatsApp e endereço completo para continuar.");
+      if (clienteAtual) {
+        areaLogado.style.display = "block";
+        areaCadastro.style.display = "none";
+        if (nome) nome.textContent = clienteAtual.nome || "";
+        if (tel) tel.textContent = clienteAtual.tel || "";
+      } else {
+        areaLogado.style.display = "none";
+        areaCadastro.style.display = "block";
+      }
+    }
+
+    function limparCadastro() {
+      localStorage.removeItem(STORAGE_CLIENT);
+      clienteAtual = null;
+      checarLogin();
+
+      const campos = [
+        "m-nome","m-tel","m-cep","m-rua","m-numero","m-complemento","m-bairro","m-cidade","m-estado"
+      ];
+
+      campos.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+    }
+
+    function getProductImageSrc(p) {
+      if (!p || !p.image_url) return "";
+      return p.image_url;
+    }
+
+    async function carregarProdutos() {
+      try {
+        const res = await fetch(BACKEND_URL + "/api/products", { method: "GET" });
+        if (!res.ok) throw new Error("erro http");
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.message || "api erro");
+
+        PRODS = Array.isArray(data.products) ? data.products : [];
+
+        if (!PRODS.length) {
+          document.getElementById("produtos-container").innerHTML =
+            '<div class="erro-cardapio"><p>Cardápio vazio.</p></div>';
+          return;
+        }
+
+        const cartSalvo = carregarCarrinho();
+
+        PRODS.forEach(p => {
+          qtds[p.id] = Number(cartSalvo[p.id] || 0);
+        });
+
+        renderProdutos();
+
+        const pagamentoSalvo = carregarPagamento();
+        if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
+          selecionarPag(pagamentoSalvo, false);
+        } else {
+          atualizarResumo();
+        }
+      } catch (e) {
+        console.error("ERRO:", e);
+        document.getElementById("produtos-container").innerHTML = `
+          <div class="erro-cardapio">
+            <p>Erro ao carregar cardápio.</p>
+          </div>`;
+      }
+    }
+
+    function renderProdutos() {
+      const container = document.getElementById("produtos-container");
+
+      if (!PRODS.length) {
+        container.innerHTML = '<div class="erro-cardapio"><p>Cardápio em atualização. Volte em breve!</p></div>';
         return;
       }
 
-      cliente = { nome, tel, endereco: { cep, rua, numero, complemento, bairro, cidade, estado } };
-      localStorage.setItem("tanamao_cliente", JSON.stringify(cliente));
-      clienteAtual = cliente;
-      checarLogin();
+      container.innerHTML = PRODS.map(p => {
+        const imageSrc = getProductImageSrc(p);
+
+        return `
+          <div class="product">
+            <div class="product-left">
+              ${imageSrc ? `<img src="${imageSrc}" alt="${(p.name || "Produto").replace(/"/g, """)}">` : ""}
+              <div class="product-info">
+                <div class="p-nome">${p.name || ""}</div>
+                <div class="p-desc">${p.description || ""}</div>
+                <div class="p-preco">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
+              </div>
+            </div>
+            <div class="qty-wrap">
+              <button type="button" onclick="qty('${p.id}', -1)">-</button>
+              <span class="qty-num" id="qtd-${p.id}">${qtds[p.id] || 0}</span>
+              <button type="button" onclick="qty('${p.id}', 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
 
-    const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+    function qty(id, d) {
+      qtds[id] = Math.max(0, (qtds[id] || 0) + d);
+      const el = document.getElementById("qtd-" + id);
+      if (el) el.textContent = qtds[id];
+      salvarCarrinho();
+      atualizarResumo();
+    }
 
-    const payload = {
-      items: ativos.map(p => ({ id: p.id, quantity: qtds[p.id] })),
-      paymentMethod: pagSel,
-      customer: {
-        nome:     cliente.nome,
-        telefone: cliente.tel || "",
-        endereco: cliente.endereco || {}
-      },
-      source: "site"
-    };
+    function selecionarPag(tipo, persist = true) {
+      pagSel = tipo;
+      document.querySelectorAll(".pag-item").forEach(el => el.classList.remove("ativo"));
+      const item = document.getElementById("pag-" + tipo);
+      if (item) item.classList.add("ativo");
+      if (persist) salvarPagamento();
+      atualizarResumo();
+    }
 
-    const btn = document.getElementById("btn-pagar");
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner"></span> Gerando pagamento...`;
-
-    try {
-      const response = await fetch(BACKEND_URL + "/api/checkout/create-preference", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(payload)
+    function calcTotal() {
+      let sub = 0;
+      PRODS.forEach(p => {
+        sub += (qtds[p.id] || 0) * Number(p.price || 0);
       });
 
-      const data = await response.json();
+      const descRate = (pagSel === "pix" || pagSel === "debito") ? 0.1 : 0;
+      const discount = Number((sub * descRate).toFixed(2));
+      const total = Number((sub - discount).toFixed(2));
 
-      if (!response.ok || !data.ok) {
-        mostrarErro(data.message || "Erro ao gerar pagamento. Tente novamente.");
-        resetBtn();
+      return { sub, descRate, discount, total };
+    }
+
+    function atualizarResumo() {
+      const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+      const rl = document.getElementById("resumo-lista");
+      const rt = document.getElementById("resumo-total");
+
+      if (!ativos.length) {
+        rl.innerHTML = '<span class="r-vazio">Nenhum item selecionado ainda.</span>';
+        rt.style.display = "none";
         return;
       }
 
-      window.location.href = data.checkoutUrl;
+      const { sub, descRate, discount, total } = calcTotal();
 
-    } catch (err) {
-      console.error(err);
-      mostrarErro("Não foi possível conectar ao servidor. Verifique sua conexão.");
-      resetBtn();
-    }
-  }
+      let html = ativos.map(p =>
+        `<div>${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}</div>`
+      ).join("");
 
-  // Fecha modal ao clicar fora
-  window.addEventListener("click", e => {
-    if (e.target === document.getElementById("overlay")) fecharModal();
-  });
-
-  // ── BUSCA CEP AUTOMÁTICA VIA VIACEP ──────────────────────────────────────────
-  async function buscarCep() {
-    const cep = getVal("m-cep").replace(/[^0-9]/g, "");
-    if (cep.length !== 8) return;
-    try {
-      const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await res.json();
-      if (!data.erro) {
-        document.getElementById("m-rua").value    = data.logradouro || "";
-        document.getElementById("m-bairro").value = data.bairro     || "";
-        document.getElementById("m-cidade").value = data.localidade || "";
-        document.getElementById("m-estado").value = data.uf         || "";
-        document.getElementById("m-numero").focus();
+      if (descRate > 0) {
+        html += `<div style="color:#888;font-size:.88em;margin-top:4px;">Subtotal: ${fmt(sub)}</div>`;
+        html += `<div style="color:var(--verde);font-size:.9em;font-weight:800;">Desconto (10%): − ${fmt(discount)}</div>`;
       }
-    } catch (e) {
-      console.error("Erro ao buscar CEP", e);
-    }
-  }
 
-  // ── INIT ──────────────────────────────────────────────────────────────────────
-  carregarProdutos();
-</script>
+      rl.innerHTML = html;
+      rt.style.display = "block";
+      rt.textContent = "Total a pagar: " + fmt(total);
+    }
+
+    function abrirModal() {
+      const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+
+      if (!ativos.length) {
+        alert("Selecione pelo menos um item.");
+        return;
+      }
+
+      if (!pagSel) {
+        alert("Escolha a forma de pagamento.");
+        return;
+      }
+
+      const { descRate, discount, total } = calcTotal();
+
+      const nomesPag = {
+        pix: "Pix (10% OFF)",
+        debito: "Débito (10% OFF)",
+        credito: "Crédito",
+        vale: "Vale Alimentação"
+      };
+
+      let r = ativos.map(p =>
+        `• ${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}`
+      ).join("<br>");
+
+      if (descRate > 0) {
+        r += `<br><span style="color:var(--verde);font-weight:800;">Desconto: − ${fmt(discount)}</span>`;
+      }
+
+      r += `<br><strong>Pagamento: ${nomesPag[pagSel]}</strong>`;
+
+      document.getElementById("m-resumo").innerHTML = r;
+      document.getElementById("m-total").textContent = "Total: " + fmt(total);
+      document.getElementById("m-subtitulo").textContent = clienteAtual
+        ? `Olá, ${(clienteAtual.nome || "").split(" ")[0]}! Confirme e finalize.`
+        : "Preencha seus dados para finalizar.";
+
+      checarLogin();
+      ocultarErro();
+      resetBtn();
+      restoreBtnIfNeeded();
+      document.getElementById("overlay").classList.add("on");
+    }
+
+    function fecharModal() {
+      document.getElementById("overlay").classList.remove("on");
+      ocultarErro();
+    }
+
+    function validarCliente(cliente) {
+      if (!cliente.nome || cliente.nome.length < 3) {
+        return "Informe o nome completo.";
+      }
+
+      if (!cliente.tel || cliente.tel.replace(/\D/g, "").length < 10) {
+        return "Informe um WhatsApp válido com DDD.";
+      }
+
+      const end = cliente.endereco || {};
+
+      if (!end.cep || end.cep.replace(/\D/g, "").length !== 8) {
+        return "Informe um CEP válido.";
+      }
+
+      if (!end.rua) return "Informe a rua.";
+      if (!end.numero) return "Informe o número.";
+      if (!end.bairro) return "Informe o bairro.";
+      if (!end.cidade) return "Informe a cidade.";
+      if (!end.estado) return "Informe o estado.";
+
+      return null;
+    }
+
+    function montarClienteDoFormulario() {
+      return {
+        nome: getVal("m-nome"),
+        tel: getVal("m-tel"),
+        endereco: {
+          cep: getVal("m-cep"),
+          rua: getVal("m-rua"),
+          numero: getVal("m-numero"),
+          complemento: getVal("m-complemento"),
+          bairro: getVal("m-bairro"),
+          cidade: getVal("m-cidade"),
+          estado: getVal("m-estado")
+        }
+      };
+    }
+
+    async function finalizarPedido() {
+      if (isSubmittingCheckout) return;
+
+      ocultarErro();
+
+      let cliente = clienteAtual;
+
+      if (!cliente) {
+        cliente = montarClienteDoFormulario();
+        const erro = validarCliente(cliente);
+        if (erro) {
+          mostrarErro(erro);
+          return;
+        }
+
+        salvarCliente(cliente);
+        checarLogin();
+      }
+
+      const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+
+      if (!ativos.length) {
+        mostrarErro("Seu carrinho está vazio.");
+        return;
+      }
+
+      if (!pagSel) {
+        mostrarErro("Escolha a forma de pagamento.");
+        return;
+      }
+
+      const payload = {
+        items: ativos.map(p => ({
+          id: p.id,
+          quantity: qtds[p.id]
+        })),
+        paymentMethod: pagSel,
+        customer: {
+          nome: cliente.nome,
+          telefone: cliente.tel || "",
+          endereco: cliente.endereco || {}
+        },
+        source: "site"
+      };
+
+      setBtnLoading();
+
+      try {
+        const response = await fetch(BACKEND_URL + "/api/checkout/create-preference", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok || !data.checkoutUrl) {
+          mostrarErro(data.message || "Erro ao gerar pagamento. Tente novamente.");
+          resetBtn();
+          return;
+        }
+
+        window.location.href = data.checkoutUrl;
+      } catch (err) {
+        console.error(err);
+        mostrarErro("Não foi possível conectar ao servidor. Verifique sua conexão.");
+        resetBtn();
+      }
+    }
+
+    async function buscarCep() {
+      const cep = getVal("m-cep").replace(/[^0-9]/g, "");
+      if (cep.length !== 8) return;
+
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+
+        if (!data.erro) {
+          document.getElementById("m-rua").value = data.logradouro || "";
+          document.getElementById("m-bairro").value = data.bairro || "";
+          document.getElementById("m-cidade").value = data.localidade || "";
+          document.getElementById("m-estado").value = data.uf || "";
+          document.getElementById("m-numero").focus();
+        }
+      } catch (e) {
+        console.error("Erro ao buscar CEP", e);
+      }
+    }
+
+    window.addEventListener("click", e => {
+      if (e.target === document.getElementById("overlay")) fecharModal();
+    });
+
+    window.addEventListener("beforeunload", () => {
+      salvarCarrinho();
+      salvarPagamento();
+    });
+
+    checarLogin();
+    carregarProdutos();
+  </script>
+</body>
+</html>
+
