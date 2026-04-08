@@ -6,157 +6,72 @@
 <title>Gestão de Cardápio</title>
 
 <style>
-body{
-  font-family:Arial;
-  background:#f4f6f4;
-  margin:0;
-}
+  body{ font-family:Arial; background:#f4f6f4; margin:0; }
+  header{ background:#3C6E47; color:#fff; padding:16px; text-align:center; }
+  .container{ max-width:900px; margin:auto; padding:24px 16px; }
+  
+  .form-card{
+    background:#fff; padding:24px; border-radius:16px;
+    border:1px solid #e5e5e5; box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom:24px;
+  }
+  .form-card h3{ margin-bottom:16px; color:#3C6E47; }
+  .field{ margin-bottom:14px; }
+  input, textarea{ width:100%; padding:14px; border-radius:10px; border:1px solid #ddd; font-size:14px; box-sizing: border-box; }
+  
+  button{ padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
+  .btn-new{ background:#3C6E47; color:#fff; margin-bottom: 20px; width: 100%; font-size: 16px; }
+  .btn-save{ width:100%; background:#3C6E47; color:#fff; }
+  .btn-delete{ background:#b93b3b; color:#fff; margin-top:6px; width: 100%; }
 
-header{
-  background:#3C6E47;
-  color:#fff;
-  padding:16px;
-  text-align:center;
-}
-
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:24px 16px;
-}
-
-/* CARD FORM */
-.form-card{
-  background:#fff;
-  padding:24px;
-  border-radius:16px;
-  border:1px solid #e5e5e5;
-  box-shadow:0 4px 12px rgba(0,0,0,0.05);
-  margin-bottom:24px;
-}
-
-.form-card h3{
-  margin-bottom:16px;
-  color:#3C6E47;
-}
-
-.field{
-  margin-bottom:14px;
-}
-
-input, textarea{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:14px;
-}
-
-button{
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.btn-save{
-  width:100%;
-  background:#3C6E47;
-  color:#fff;
-}
-
-.btn-delete{
-  background:#b93b3b;
-  color:#fff;
-  margin-top:6px;
-}
-
-/* LISTA */
-.card{
-  background:#fff;
-  padding:16px;
-  border-radius:12px;
-  margin-bottom:12px;
-  border:1px solid #ddd;
-}
+  .card{ background:#fff; padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid #ddd; }
+  .img-preview { max-width: 100px; display: block; margin: 10px 0; border-radius: 8px; }
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>Gestão de Cardápio</h2>
+  <h2>Gestão de Cardápio</h2>
 </header>
 
 <div class="container">
 
   <button class="btn-new" onclick="toggleForm()">+ Novo Produto</button>
 
+  <!-- FORMULÁRIO ÚNICO E ORGANIZADO -->
   <div id="form-box" class="form-card" style="display:none;">
     <h3>Novo Produto</h3>
-
     <div class="field">
       <input id="novo-nome" placeholder="Nome do produto">
     </div>
-
     <div class="field">
       <textarea id="novo-desc" placeholder="Descrição"></textarea>
     </div>
-
     <div class="field">
-      <input id="novo-preco" placeholder="Preço (ex: 19.90)">
+      <input id="novo-preco" type="number" step="0.01" placeholder="Preço (ex: 19.90)">
     </div>
-
     <div class="field">
-      <input type="file" id="novo-img-file" accept="image/png, image/jpeg">
+      <label style="font-size: 12px; color: #666;">Foto do Produto:</label>
+      <input type="file" id="novo-img-file" accept="image/png, image/jpeg, image/webp">
     </div>
-
-    <button class="btn-save" onclick="criarProduto()">Salvar</button>
+    <button class="btn-save" id="btn-criar" onclick="criarProduto()">Salvar Produto</button>
   </div>
 
-  <div id="lista"></div>
-
-</div>
-
-
-  <!-- NOVO PRODUTO -->
-  <div class="form-card">
-    <h3>Novo Produto</h3>
-
-    <div class="field">
-      <input id="novo-nome" placeholder="Nome do produto">
-    </div>
-
-    <div class="field">
-      <textarea id="novo-desc" placeholder="Descrição"></textarea>
-    </div>
-
-    <div class="field">
-      <input id="novo-preco" placeholder="Preço (ex: 19.90)">
-    </div>
-
-    <div class="field">
-      <input id="novo-img" placeholder="URL da imagem">
-    </div>
-
-    <button class="btn-save" onclick="criarProduto()">Salvar Produto</button>
-  </div>
-
-  <!-- LISTA -->
   <div id="lista"></div>
 
 </div>
 
 <script>
-
-const API = "https://tanamao-backend.onrender.com/api/operations";
+// Ajuste a URL se o seu backend estiver em outra rota de operações
+const API = "https://onrender.com"; 
 
 function toggleForm(){
   const el = document.getElementById("form-box");
   el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
+// Converter arquivo para Base64
 function fileToBase64(file){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -165,126 +80,125 @@ function fileToBase64(file){
     reader.onerror = error => reject(error);
   });
 }
-  
 
-// ================= CARREGAR =================
+// ================= CARREGAR PRODUTOS =================
 async function carregar(){
   try {
-    const res = await fetch(API + "/products");
+    const res = await fetch(API);
     const data = await res.json();
-
     const el = document.getElementById("lista");
     el.innerHTML = "";
 
     (data.products || []).forEach(p => {
       el.innerHTML += `
         <div class="card">
-          <input value="${p.name}" id="name-${p.id}">
-          <textarea id="desc-${p.id}">${p.description || ""}</textarea>
-          <input value="${p.price}" id="price-${p.id}">
-          <input value="${p.image_url || ""}" id="img-${p.id}">
-
-          <button class="btn-save" onclick="salvar('${p.id}')">Salvar</button>
+          <div class="field"><input value="${p.name}" id="name-${p.id}"></div>
+          <div class="field"><textarea id="desc-${p.id}">${p.description || ""}</textarea></div>
+          <div class="field"><input type="number" value="${p.price}" id="price-${p.id}"></div>
+          ${p.image_url ? `<img src="${p.image_url}" class="img-preview">` : ''}
+          <button class="btn-save" onclick="salvar('${p.id}')">Atualizar</button>
           <button class="btn-delete" onclick="deletar('${p.id}')">Excluir</button>
         </div>
       `;
     });
-
   } catch (e) {
     console.error(e);
     alert("Erro ao carregar produtos");
   }
 }
 
-// ================= CRIAR =================
+// ================= CRIAR PRODUTO =================
 async function criarProduto(){
-  const name = document.getElementById("novo-nome").value;
-  const description = document.getElementById("novo-desc").value;
+  const btn = document.getElementById("btn-criar");
+  const name = document.getElementById("novo-nome").value.trim();
+  const description = document.getElementById("novo-desc").value.trim();
   const price = document.getElementById("novo-preco").value;
-  const file = document.getElementById("novo-img").files[0]; // ✅ CORRIGIDO
+  const fileInput = document.getElementById("novo-img-file");
+  const file = fileInput.files[0];
 
-  if (!name) {
-    alert("Nome obrigatório");
-    return;
-  }
+  if (!name) { alert("Nome obrigatório"); return; }
+
+  btn.disabled = true;
+  btn.innerText = "Enviando...";
 
   let image_url = "";
-
   if (file) {
-    image_url = await new Promise((resolve, reject)=>{
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
+    try {
+      image_url = await fileToBase64(file);
+    } catch (e) {
+      alert("Erro ao processar imagem");
+      btn.disabled = false;
+      return;
+    }
+  }
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        description,
+        price: Number(price) || 0,
+        image_url
+      })
     });
-  }
 
-  console.log("Imagem enviada:", image_url);
+    const data = await res.json();
 
-  const res = await fetch(API + "/products",{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name,
-      description,
-      price:Number(price)||0,
-      image_url
-    })
-  });
-
-  const data = await res.json();
-
-  console.log("Resposta backend:", data);
-
-  if (!data.ok) {
-    alert("Erro ao salvar");
-    return;
-  }
-
-  carregar(); 
-}
-
-    // limpar
-    document.getElementById("novo-nome").value = "";
-    document.getElementById("novo-desc").value = "";
-    document.getElementById("novo-preco").value = "";
-    document.getElementById("novo-img").value = "";
-
-    await carregar();
-
+    if (data.ok) {
+      alert("Produto criado!");
+      // Limpar campos
+      document.getElementById("novo-nome").value = "";
+      document.getElementById("novo-desc").value = "";
+      document.getElementById("novo-preco").value = "";
+      fileInput.value = "";
+      toggleForm();
+      carregar();
+    } else {
+      alert("Erro: " + data.message);
+    }
   } catch (e) {
     console.error(e);
-    alert("Erro de conexão");
+    alert("Erro de conexão com o servidor");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Salvar Produto";
   }
 }
 
-// ================= SALVAR =================
+// ================= ATUALIZAR (SALVAR) =================
 async function salvar(id){
   const name = document.getElementById("name-"+id).value;
   const description = document.getElementById("desc-"+id).value;
   const price = document.getElementById("price-"+id).value;
-  const image_url = document.getElementById("img-"+id).value;
 
-  await fetch(API+"/products/"+id,{
-    method:"PATCH",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ name, description, price, image_url })
-  });
-
-  alert("Salvo!");
+  try {
+    const res = await fetch(`${API}/${id}`, {
+      method: "PATCH",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, description, price: Number(price) })
+    });
+    const data = await res.json();
+    if(data.ok) alert("Atualizado!");
+  } catch (e) {
+    alert("Erro ao atualizar");
+  }
 }
 
 // ================= DELETAR =================
 async function deletar(id){
   if(!confirm("Excluir produto?")) return;
-
-  await fetch(API+"/products/"+id,{ method:"DELETE" });
-  carregar();
+  try {
+    await fetch(`${API}/${id}`, { method: "DELETE" });
+    carregar();
+  } catch (e) {
+    alert("Erro ao deletar");
+  }
 }
 
-// INIT
+// Inicialização
 carregar();
-
 </script>
 
 </body>
