@@ -695,7 +695,7 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://SEU-BACKEND-AQUI.com";
+    const BACKEND_URL = "https://tanamao-backend.onrender.com";
     const STORAGE_CART = "tanamao_cart_v1";
     const STORAGE_PAYMENT = "tanamao_payment_v1";
     const STORAGE_CLIENT = "tanamao_cliente";
@@ -851,11 +851,12 @@
 
         if (!data.ok) throw new Error(data.message || "api erro");
 
-        PRODS = Array.isArray(data.products) ? data.products : [];
+        PRODS = Array.isArray(data.products) ? data.products.filter(p => p.active !== false) : [];
 
         if (!PRODS.length) {
           document.getElementById("produtos-container").innerHTML =
             '<div class="erro-cardapio"><p>Cardápio vazio.</p></div>';
+          atualizarResumo();
           return;
         }
 
@@ -874,7 +875,7 @@
           atualizarResumo();
         }
       } catch (e) {
-        console.error("ERRO:", e);
+        console.error("ERRO AO CARREGAR PRODUTOS:", e);
         document.getElementById("produtos-container").innerHTML = `
           <div class="erro-cardapio">
             <p>Erro ao carregar cardápio.</p>
@@ -1135,7 +1136,7 @@
       if (cep.length !== 8) return;
 
       try {
-        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const res = await fetch("https://viacep.com.br/ws/" + cep + "/json/");
         const data = await res.json();
 
         if (!data.erro) {
