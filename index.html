@@ -897,7 +897,7 @@
         return `
           <div class="product">
             <div class="product-left">
-              ${imageSrc ? `<img src="${imageSrc}" alt="${(p.name || "Produto").replace(/"/g, """)}">` : ""}
+              ${imageSrc ? `<img src="${imageSrc}" alt="${(p.name || "Produto").replace(/"/g, "&quot;")}">` : ""}
               <div class="product-info">
                 <div class="p-nome">${p.name || ""}</div>
                 <div class="p-desc">${p.description || ""}</div>
