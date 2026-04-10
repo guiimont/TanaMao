@@ -26,6 +26,7 @@ display:flex;
 gap:10px;
 padding:16px;
 justify-content:center;
+flex-wrap: wrap;
 }
 
 .btn{
@@ -37,11 +38,25 @@ cursor:pointer;
 font-weight:bold;
 }
 
+.btn-admin-access {
+    background: #243126;
+    color: var(--dourado);
+}
+
 .board{
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:12px;
 padding:16px;
+}
+
+/* Estilo para a área administrativa que será expandida */
+.admin-section {
+    padding: 16px;
+    background: #e9ece9;
+    margin: 16px;
+    border-radius: 12px;
+    border: 2px dashed var(--dourado);
 }
 
 .column{
@@ -80,8 +95,17 @@ width:100%;
 
 <div class="topbar">
 <button class="btn" onclick="carregarPedidos()">Atualizar</button>
-<button class="btn" onclick="editarLimite()">Definir limite</button>
-<button class="btn" onclick="abrirCardapio()">Editar Cardápio</button>
+<button class="btn" onclick="loginAdmin()" id="btn-login-admin">Acesso Admin 🔒</button>
+
+<!-- Botões protegidos por Role Admin -->
+<button class="btn" data-role="admin" onclick="editarLimite()">Definir limite</button>
+<button class="btn" data-role="admin" onclick="abrirCardapio()">Editar Cardápio</button>
+</div>
+
+<!-- Área Reservada para Financeiro e Custos (Invisível para Operador) -->
+<div class="admin-section" data-role="admin">
+    <h3>Dashboard Administrativo</h3>
+    <p>Aqui entrarão os dados de Faturamento, Taxas e Custos que estamos integrando.</p>
 </div>
 
 <div class="board">
@@ -113,12 +137,47 @@ const API = "https://tanamao-backend.onrender.com/api";
 let pedidos = [];
 let LIMITE = 100;
 
+// ✅ LÓGICA DE ACESSO (TESS)
+let USER_ROLE = localStorage.getItem("tnm_role") || "operador";
+
+function loginAdmin() {
+  const senha = prompt("Senha admin:");
+  if (senha === "123456") {
+    USER_ROLE = "admin";
+    localStorage.setItem("tnm_role", "admin");
+    aplicarPermissoes();
+    alert("Acesso Administrativo Liberado!");
+  } else {
+    alert("Senha incorreta");
+  }
+}
+
+function aplicarPermissoes() {
+  document.querySelectorAll("[data-role]").forEach(el => {
+    const role = el.getAttribute("data-role");
+    if (role === "admin" && USER_ROLE !== "admin") {
+      el.style.display = "none";
+    } else {
+      el.style.display = "block";
+    }
+  });
+
+  // Altera o texto do botão se já estiver logado
+  if(USER_ROLE === "admin"){
+      document.getElementById("btn-login-admin").innerText = "Admin Autenticado ✅";
+  }
+}
+
 // ================= PEDIDOS =================
 async function carregarPedidos(){
-const res = await fetch(API + "/orders");
-const data = await res.json();
-pedidos = data.orders || [];
-renderizar();
+try {
+    const res = await fetch(API + "/operations/orders"); // Rota ajustada para o novo padrão operacional
+    const data = await res.json();
+    pedidos = data.orders || [];
+    renderizar();
+} catch (error) {
+    console.error("Erro ao carregar pedidos:", error);
+}
 }
 
 // ================= RENDER =================
@@ -143,17 +202,15 @@ el.innerHTML += `
 <div class="card">
 <strong>${p.customer_name || "Cliente"}</strong><br>
 Total: R$ ${Number(p.total||0).toFixed(2)}<br>
-
     ${botao(p)}
   </div>
 `;
-
 });
 }
 
 // ================= BOTÕES =================
 function botao(p){
-  if(p.delivery_status==="pending"){
+  if(p.delivery_status==="pending" || !p.delivery_status){
     return `<button onclick="atualizar('${p.id}','preparing')">Produção</button>`;
   }
   if(p.delivery_status==="preparing"){
@@ -192,10 +249,12 @@ window.location.href = "/cardapio.html";
 // AUTO REFRESH
 setInterval(carregarPedidos,30000);
 
+// INICIALIZAÇÃO
+aplicarPermissoes();
 carregarPedidos();
 
 </script>
 
 </body>
 </html>
-:::
+
