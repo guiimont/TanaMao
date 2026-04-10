@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alimentação Inteligente</title>
+  <title>Tá na Mão! | Alimentação Inteligente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -582,14 +582,8 @@
 <body>
   <div class="wrap">
     <section class="hero">
-  <img
-    src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
-
-    alt="Ícone Tá na Mão!"
-    style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 14px;"
-  >
-  <div class="tag">• Alimentação Inteligente •</div>
-  <h1>Monte seu pedido com praticidade</h1>
+      <div class="tag">Tá na Mão! • Alimentação Inteligente</div>
+      <h1>Monte seu pedido com praticidade</h1>
       <p>
         Escolha seus produtos, selecione a forma de pagamento e finalize em poucos passos.
         Seu carrinho fica salvo mesmo se a página recarregar.
@@ -712,6 +706,44 @@
     let pagSel = null;
     let clienteAtual = null;
     let isSubmittingCheckout = false;
+
+    // ✅ LÓGICA DO INDEXEDDB (CACHE)
+    const DB_NAME = "TanamaoDB";
+    const STORE_NAME = "produtos_cache";
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          e.target.result.createObjectStore(STORE_NAME, { keyPath: "id" });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function getCachedProducts() {
+      try {
+        const db = await initDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve([]);
+        });
+      } catch { return []; }
+    }
+
+    async function saveProductsToCache(products) {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.clear(); // Limpa o cache antigo
+        products.forEach(p => store.put(p)); // Salva os novos
+      } catch (e) { console.error("Erro ao salvar cache", e); }
+    }
 
     function fmt(v) {
       return "R$ " + Number(v || 0).toFixed(2).replace(".", ",");
@@ -849,7 +881,25 @@
       return p.image_url;
     }
 
+    // ✅ LÓGICA DE CARREGAMENTO OTIMIZADA (Stale-While-Revalidate)
     async function carregarProdutos() {
+      // 1. Tenta carregar do Cache (IndexedDB) primeiro para renderização instantânea
+      const cachedProducts = await getCachedProducts();
+      if (cachedProducts && cachedProducts.length > 0) {
+        PRODS = cachedProducts.filter(p => p.active !== false);
+        const cartSalvo = carregarCarrinho();
+        PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
+        renderProdutos();
+        
+        const pagamentoSalvo = carregarPagamento();
+        if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
+          selecionarPag(pagamentoSalvo, false);
+        } else {
+          atualizarResumo();
+        }
+      }
+
+      // 2. Faz a requisição em background para atualizar os dados
       try {
         const res = await fetch(BACKEND_URL + "/api/products", { method: "GET" });
         if (!res.ok) throw new Error("erro http");
@@ -857,8 +907,14 @@
 
         if (!data.ok) throw new Error(data.message || "api erro");
 
-        PRODS = Array.isArray(data.products) ? data.products.filter(p => p.active !== false) : [];
+        const fetchedProds = Array.isArray(data.products) ? data.products : [];
+        
+        // Salva os dados novos no cache silenciosamente
+        await saveProductsToCache(fetchedProds);
 
+        // Atualiza a interface com os dados frescos
+        PRODS = fetchedProds.filter(p => p.active !== false);
+        
         if (!PRODS.length) {
           document.getElementById("produtos-container").innerHTML =
             '<div class="erro-cardapio"><p>Cardápio vazio.</p></div>';
@@ -867,11 +923,8 @@
         }
 
         const cartSalvo = carregarCarrinho();
-
-        PRODS.forEach(p => {
-          qtds[p.id] = Number(cartSalvo[p.id] || 0);
-        });
-
+        PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
+        
         renderProdutos();
 
         const pagamentoSalvo = carregarPagamento();
@@ -881,11 +934,14 @@
           atualizarResumo();
         }
       } catch (e) {
-        console.error("ERRO AO CARREGAR PRODUTOS:", e);
-        document.getElementById("produtos-container").innerHTML = `
-          <div class="erro-cardapio">
-            <p>Erro ao carregar cardápio.</p>
-          </div>`;
+        console.error("ERRO AO CARREGAR PRODUTOS DA API:", e);
+        // Só mostra erro se o cache também estiver vazio
+        if (!PRODS.length) {
+          document.getElementById("produtos-container").innerHTML = `
+            <div class="erro-cardapio">
+              <p>Erro ao carregar cardápio.</p>
+            </div>`;
+        }
       }
     }
 
@@ -903,7 +959,7 @@
         return `
           <div class="product">
             <div class="product-left">
-              ${imageSrc ? `<img src="${imageSrc}" alt="${(p.name || "Produto").replace(/"/g, "&quot;")}">` : ""}
+              ${imageSrc ? `<img src="${imageSrc}" alt="${(p.name || "Produto").replace(/"/g, """)}">` : ""}
               <div class="product-info">
                 <div class="p-nome">${p.name || ""}</div>
                 <div class="p-desc">${p.description || ""}</div>
@@ -1168,6 +1224,10 @@
 
     checarLogin();
     carregarProdutos();
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
