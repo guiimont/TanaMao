@@ -64,6 +64,22 @@ font-weight:bold;
 
 .fin-item b { color: var(--verde); }
 
+/* FORMULÁRIO DE CUSTOS */
+.form-custos {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.form-custos input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    flex: 1;
+    min-width: 120px;
+}
+
 .board{
 display:grid;
 grid-template-columns:repeat(4,1fr);
@@ -113,7 +129,7 @@ width:100%;
     <button class="btn" data-role="admin" onclick="abrirCardapio()">Editar Cardápio</button>
 </div>
 
-<!-- DASHBOARD FINANCEIRO (TESS) -->
+<!-- DASHBOARD FINANCEIRO -->
 <div data-role="admin">
   <h3>📊 Financeiro</h3>
   <div class="financeiro-grid">
@@ -124,10 +140,15 @@ width:100%;
   </div>
 </div>
 
-<!-- BLOCO CUSTOS (EM BREVE) -->
+<!-- LANÇAR CUSTO (TESS) -->
 <div data-role="admin">
-  <h3>💸 Custos Operacionais</h3>
-  <p>Módulo de lançamento de despesas em desenvolvimento.</p>
+  <h3>💸 Lançar Custo</h3>
+  <div class="form-custos">
+      <input id="c-desc" placeholder="Descrição (Ex: Carne, Aluguel)">
+      <input id="c-valor" type="number" placeholder="Valor (R$)">
+      <input id="c-cat" placeholder="Categoria">
+      <button class="btn" style="background: var(--verde); color: white;" onclick="salvarCusto()">Salvar</button>
+  </div>
 </div>
 
 <div class="board">
@@ -154,7 +175,6 @@ const API = "https://onrender.com";
 let pedidos = [];
 let LIMITE = 100;
 
-// FORMATADOR DE MOEDA
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
 // ✅ CONTROLE DE ACESSO
@@ -166,7 +186,7 @@ function loginAdmin() {
     USER_ROLE = "admin";
     localStorage.setItem("tnm_role", "admin");
     aplicarPermissoes();
-    carregarFinanceiro(); // Carrega os dados logo após logar
+    carregarFinanceiro();
   } else {
     alert("Senha incorreta");
   }
@@ -178,10 +198,9 @@ function aplicarPermissoes() {
   });
 }
 
-// ✅ FINANCEIRO (TESS)
+// ✅ FINANCEIRO & CUSTOS (TESS)
 async function carregarFinanceiro() {
   if (USER_ROLE !== "admin") return;
-
   try {
       const res = await fetch(API + "/operations/orders");
       const data = await res.json();
@@ -197,7 +216,6 @@ async function carregarFinanceiro() {
         }
       });
 
-      // Busca Custos
       const resCosts = await fetch(API + "/costs");
       const dataCosts = await resCosts.json();
       const custos = (dataCosts.costs || []).reduce((acc, c) => acc + Number(c.value), 0);
@@ -208,9 +226,27 @@ async function carregarFinanceiro() {
       document.getElementById("f-taxas").textContent = fmt(taxas);
       document.getElementById("f-custos").textContent = fmt(custos);
       document.getElementById("f-lucro").textContent = fmt(lucro);
-  } catch (e) {
-      console.error("Erro no financeiro:", e);
-  }
+  } catch (e) { console.error("Erro no financeiro:", e); }
+}
+
+async function salvarCusto() {
+  const description = document.getElementById("c-desc").value;
+  const value = document.getElementById("c-valor").value;
+  const category = document.getElementById("c-cat").value;
+
+  if (!description || !value) return alert("Preencha descrição e valor");
+
+  await fetch(API + "/costs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ description, value, category })
+  });
+
+  alert("Custo salvo com sucesso!");
+  document.getElementById("c-desc").value = "";
+  document.getElementById("c-valor").value = "";
+  document.getElementById("c-cat").value = "";
+  carregarFinanceiro();
 }
 
 // ================= PEDIDOS =================
@@ -220,10 +256,8 @@ async function carregarPedidos(){
         const data = await res.json();
         pedidos = data.orders || [];
         renderizar();
-        if(USER_ROLE === "admin") carregarFinanceiro(); // Atualiza financeiro junto
-    } catch (e) {
-        console.error("Erro ao carregar pedidos:", e);
-    }
+        if(USER_ROLE === "admin") carregarFinanceiro();
+    } catch (e) { console.error("Erro ao carregar pedidos:", e); }
 }
 
 function renderizar(){
@@ -277,9 +311,9 @@ function abrirCardapio(){ window.location.href = "/cardapio.html"; }
 setInterval(carregarPedidos,30000);
 aplicarPermissoes();
 carregarPedidos();
-
 </script>
 </body>
 </html>
+
 
 
