@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Operacional</title>
+<title>Painel Operacional - Tá na Mão!</title>
 
 <style>
 :root{
@@ -38,25 +38,37 @@ cursor:pointer;
 font-weight:bold;
 }
 
-.btn-admin-access {
-    background: #243126;
-    color: var(--dourado);
+/* ÁREAS ADMINISTRATIVAS */
+[data-role="admin"] {
+    background: #fff;
+    margin: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid var(--dourado);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+
+.financeiro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.fin-item {
+    padding: 10px;
+    border-radius: 8px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+}
+
+.fin-item b { color: var(--verde); }
 
 .board{
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:12px;
 padding:16px;
-}
-
-/* Estilo para a área administrativa que será expandida */
-.admin-section {
-    padding: 16px;
-    background: #e9ece9;
-    margin: 16px;
-    border-radius: 12px;
-    border: 2px dashed var(--dourado);
 }
 
 .column{
@@ -94,50 +106,58 @@ width:100%;
 </header>
 
 <div class="topbar">
-<button class="btn" onclick="carregarPedidos()">Atualizar</button>
-<button class="btn" onclick="loginAdmin()" id="btn-login-admin">Acesso Admin 🔒</button>
-
-<!-- Botões protegidos por Role Admin -->
-<button class="btn" data-role="admin" onclick="editarLimite()">Definir limite</button>
-<button class="btn" data-role="admin" onclick="abrirCardapio()">Editar Cardápio</button>
+    <button class="btn" onclick="carregarPedidos()">Atualizar</button>
+    <button class="btn" onclick="loginAdmin()">Admin 🔒</button>
+    
+    <button class="btn" data-role="admin" onclick="editarLimite()">Definir limite</button>
+    <button class="btn" data-role="admin" onclick="abrirCardapio()">Editar Cardápio</button>
 </div>
 
-<!-- Área Reservada para Financeiro e Custos (Invisível para Operador) -->
-<div class="admin-section" data-role="admin">
-    <h3>Dashboard Administrativo</h3>
-    <p>Aqui entrarão os dados de Faturamento, Taxas e Custos que estamos integrando.</p>
+<!-- DASHBOARD FINANCEIRO (TESS) -->
+<div data-role="admin">
+  <h3>📊 Financeiro</h3>
+  <div class="financeiro-grid">
+      <div class="fin-item">Faturamento: <b id="f-bruto">R$ 0,00</b></div>
+      <div class="fin-item">Taxas: <b id="f-taxas">R$ 0,00</b></div>
+      <div class="fin-item">Custos: <b id="f-custos">R$ 0,00</b></div>
+      <div class="fin-item">Lucro: <b id="f-lucro" style="font-size: 1.1em;">R$ 0,00</b></div>
+  </div>
+</div>
+
+<!-- BLOCO CUSTOS (EM BREVE) -->
+<div data-role="admin">
+  <h3>💸 Custos Operacionais</h3>
+  <p>Módulo de lançamento de despesas em desenvolvimento.</p>
 </div>
 
 <div class="board">
-<div class="column">
-<div class="column-header">Entrou</div>
-<div id="col-paid"></div>
-</div>
-
-<div class="column">
-<div class="column-header">Produção</div>
-<div id="col-preparing"></div>
-</div>
-
-<div class="column">
-<div class="column-header">Pronto</div>
-<div id="col-ready"></div>
-</div>
-
-<div class="column">
-<div class="column-header">Entrega</div>
-<div id="col-delivery"></div>
-</div>
+    <div class="column">
+        <div class="column-header">Entrou</div>
+        <div id="col-paid"></div>
+    </div>
+    <div class="column">
+        <div class="column-header">Produção</div>
+        <div id="col-preparing"></div>
+    </div>
+    <div class="column">
+        <div class="column-header">Pronto</div>
+        <div id="col-ready"></div>
+    </div>
+    <div class="column">
+        <div class="column-header">Entrega</div>
+        <div id="col-delivery"></div>
+    </div>
 </div>
 
 <script>
-
-const API = "https://tanamao-backend.onrender.com/api";
-
+const API = "https://onrender.com";
 let pedidos = [];
 let LIMITE = 100;
 
-// ✅ LÓGICA DE ACESSO (TESS)
+// FORMATADOR DE MOEDA
+const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+
+// ✅ CONTROLE DE ACESSO
 let USER_ROLE = localStorage.getItem("tnm_role") || "operador";
 
 function loginAdmin() {
@@ -146,7 +166,7 @@ function loginAdmin() {
     USER_ROLE = "admin";
     localStorage.setItem("tnm_role", "admin");
     aplicarPermissoes();
-    alert("Acesso Administrativo Liberado!");
+    carregarFinanceiro(); // Carrega os dados logo após logar
   } else {
     alert("Senha incorreta");
   }
@@ -154,107 +174,112 @@ function loginAdmin() {
 
 function aplicarPermissoes() {
   document.querySelectorAll("[data-role]").forEach(el => {
-    const role = el.getAttribute("data-role");
-    if (role === "admin" && USER_ROLE !== "admin") {
-      el.style.display = "none";
-    } else {
-      el.style.display = "block";
-    }
+    el.style.display = (USER_ROLE === "admin") ? "block" : "none";
   });
+}
 
-  // Altera o texto do botão se já estiver logado
-  if(USER_ROLE === "admin"){
-      document.getElementById("btn-login-admin").innerText = "Admin Autenticado ✅";
+// ✅ FINANCEIRO (TESS)
+async function carregarFinanceiro() {
+  if (USER_ROLE !== "admin") return;
+
+  try {
+      const res = await fetch(API + "/operations/orders");
+      const data = await res.json();
+      const pedidosFin = data.orders || [];
+
+      let bruto = 0;
+      let taxas = 0;
+
+      pedidosFin.forEach(p => {
+        if (p.payment_status === "approved") {
+          bruto += Number(p.total || 0);
+          taxas += Number(p.gateway_fee || 0);
+        }
+      });
+
+      // Busca Custos
+      const resCosts = await fetch(API + "/costs");
+      const dataCosts = await resCosts.json();
+      const custos = (dataCosts.costs || []).reduce((acc, c) => acc + Number(c.value), 0);
+
+      const lucro = bruto - taxas - custos;
+
+      document.getElementById("f-bruto").textContent = fmt(bruto);
+      document.getElementById("f-taxas").textContent = fmt(taxas);
+      document.getElementById("f-custos").textContent = fmt(custos);
+      document.getElementById("f-lucro").textContent = fmt(lucro);
+  } catch (e) {
+      console.error("Erro no financeiro:", e);
   }
 }
 
 // ================= PEDIDOS =================
 async function carregarPedidos(){
-try {
-    const res = await fetch(API + "/operations/orders"); // Rota ajustada para o novo padrão operacional
-    const data = await res.json();
-    pedidos = data.orders || [];
-    renderizar();
-} catch (error) {
-    console.error("Erro ao carregar pedidos:", error);
-}
+    try {
+        const res = await fetch(API + "/operations/orders");
+        const data = await res.json();
+        pedidos = data.orders || [];
+        renderizar();
+        if(USER_ROLE === "admin") carregarFinanceiro(); // Atualiza financeiro junto
+    } catch (e) {
+        console.error("Erro ao carregar pedidos:", e);
+    }
 }
 
-// ================= RENDER =================
 function renderizar(){
-renderCol("col-paid", pedidos.filter(p => p.payment_status==="approved" && (p.delivery_status==="pending" || !p.delivery_status)));
-renderCol("col-preparing", pedidos.filter(p => p.delivery_status==="preparing"));
-renderCol("col-ready", pedidos.filter(p => p.delivery_status==="ready"));
-renderCol("col-delivery", pedidos.filter(p => p.delivery_status==="out_for_delivery"));
+    renderCol("col-paid", pedidos.filter(p => p.payment_status==="approved" && (p.delivery_status==="pending" || !p.delivery_status)));
+    renderCol("col-preparing", pedidos.filter(p => p.delivery_status==="preparing"));
+    renderCol("col-ready", pedidos.filter(p => p.delivery_status==="ready"));
+    renderCol("col-delivery", pedidos.filter(p => p.delivery_status==="out_for_delivery"));
 }
 
 function renderCol(id, lista){
-const el = document.getElementById(id);
-el.innerHTML = "";
-
-if(!lista.length){
-el.innerHTML = "<div class='card'>Vazio</div>";
-return;
+    const el = document.getElementById(id);
+    el.innerHTML = "";
+    if(!lista.length){
+        el.innerHTML = "<div class='card'>Vazio</div>";
+        return;
+    }
+    lista.forEach(p=>{
+        el.innerHTML += `<div class="card">
+            <strong>${p.customer_name || "Cliente"}</strong><br>
+            Total: R$ ${Number(p.total||0).toFixed(2)}<br>
+            ${botao(p)}
+        </div>`;
+    });
 }
 
-lista.forEach(p=>{
-el.innerHTML += `
-<div class="card">
-<strong>${p.customer_name || "Cliente"}</strong><br>
-Total: R$ ${Number(p.total||0).toFixed(2)}<br>
-    ${botao(p)}
-  </div>
-`;
-});
-}
-
-// ================= BOTÕES =================
 function botao(p){
-  if(p.delivery_status==="pending" || !p.delivery_status){
-    return `<button onclick="atualizar('${p.id}','preparing')">Produção</button>`;
-  }
-  if(p.delivery_status==="preparing"){
-    return `<button onclick="atualizar('${p.id}','ready')">Pronto</button>`;
-  }
-  if(p.delivery_status==="ready"){
-    return `<button onclick="atualizar('${p.id}','out_for_delivery')">Entrega</button>`;
-  }
-  if(p.delivery_status==="out_for_delivery"){
-    return `<button onclick="atualizar('${p.id}','delivered')">Finalizar</button>`;
-  }
+  const s = p.delivery_status;
+  if(s==="pending" || !s) return `<button onclick="atualizar('${p.id}','preparing')">Produção</button>`;
+  if(s==="preparing") return `<button onclick="atualizar('${p.id}','ready')">Pronto</button>`;
+  if(s==="ready") return `<button onclick="atualizar('${p.id}','out_for_delivery')">Entrega</button>`;
+  if(s==="out_for_delivery") return `<button onclick="atualizar('${p.id}','delivered')">Finalizar</button>`;
   return "";
 }
 
-// ================= UPDATE =================
 async function atualizar(id,status){
-await fetch(API+"/operations/orders/"+id+"/status",{
-method:"PATCH",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({delivery_status:status})
-});
-
-carregarPedidos();
+    await fetch(API+"/operations/orders/"+id+"/status",{
+        method:"PATCH",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({delivery_status:status})
+    });
+    carregarPedidos();
 }
 
-// ================= EXTRA =================
 function editarLimite(){
-const novo = prompt("Novo limite:", LIMITE);
-if(novo) LIMITE = Number(novo);
+    const novo = prompt("Novo limite:", LIMITE);
+    if(novo) LIMITE = Number(novo);
 }
 
-function abrirCardapio(){
-window.location.href = "/cardapio.html";
-}
+function abrirCardapio(){ window.location.href = "/cardapio.html"; }
 
-// AUTO REFRESH
 setInterval(carregarPedidos,30000);
-
-// INICIALIZAÇÃO
 aplicarPermissoes();
 carregarPedidos();
 
 </script>
-
 </body>
 </html>
+
 
