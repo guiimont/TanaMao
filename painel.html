@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ERP Tá na Mão! - Operacional & Gestão</title>
 
+<script src="js/auth.js"></script> 
+
 <style>
 :root{
   --verde:#3C6E47;
@@ -17,9 +19,7 @@
 }
 
 body{font-family:'Arial', sans-serif; background:var(--fundo); margin:0; color:#333;}
-
 header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
-
 .wrap { padding: 16px; max-width: 1200px; margin: 0 auto; }
 
 /* MENU DE ABAS */
@@ -60,15 +60,14 @@ header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
 </header>
 
 <div class="wrap">
-  <!-- Menu de Abas -->
   <div class="tabs">
     <button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">📦 Vendas (Operação)</button>
     <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">🛒 Compras & Estoque</button>
     <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">📊 Financeiro & Dash</button>
-    <button class="tab-btn" id="btn-login-admin" onclick="loginAdmin()" style="background: #eee;">Admin 🔒</button>
+    
+    <button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
   </div>
 
-  <!-- ABA 1: VENDAS (KANBAN) -->
   <div id="aba-vendas" class="tab-content active">
     <div class="topbar-btns">
         <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">🔄 Atualizar</button>
@@ -82,7 +81,6 @@ header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
     </div>
   </div>
 
-  <!-- ABA 2: COMPRAS E ESTOQUE (ADMIN) -->
   <div id="aba-compras" class="tab-content">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
         <div class="admin-card">
@@ -109,9 +107,8 @@ header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
     </div>
   </div>
 
-  <!-- ABA 3: FINANCEIRO (ADMIN) -->
   <div id="aba-config" class="tab-content">
-    <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
+    <div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
       <h3>Dashboard de Resultado Real</h3>
       <p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
       <p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$ 0,00</strong></p>
@@ -121,49 +118,99 @@ header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
       <h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde); font-size: 1.5rem;">R$ 0,00</strong></h4>
       <button onclick="atualizarDashboardFinanceiro()" style="margin-top: 15px;">Atualizar Dados</button>
     </div>
+
+    <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
+      <h3>🔒 Segurança da Conta</h3>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
+        Altere sua senha de acesso ao sistema.
+      </p>
+      <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
+      <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
+      
+      <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
+    </div>
   </div>
 </div>
 
 <script>
-const BACKEND_URL = "https://onrender.com";
+const BACKEND_URL = "https://onrender.com"; // Lembre-se de ajustar isso quando tiver o link do seu Render
 const API = BACKEND_URL + "/api";
 let pedidos = [];
 
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-// ================= ACESSO & ABAS =================
-let USER_ROLE = localStorage.getItem("tnm_role") || "operador";
+// ================= ACESSO & SEGURANÇA =================
+const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
+let USER_ROLE = USER_DATA.role || "operador";
 
-function loginAdmin() {
-  const senha = prompt("Senha admin:");
-  if (senha === "123456") {
-    USER_ROLE = "admin";
-    localStorage.setItem("tnm_role", "admin");
-    aplicarPermissoes();
-    alert("Bem-vindo, Admin!");
-  } else { alert("Senha incorreta"); }
+// Logout
+function logout() {
+    localStorage.removeItem("tnm_token");
+    localStorage.removeItem("tnm_user");
+    localStorage.removeItem("tnm_role");
+    window.location.href = "login.html";
 }
 
+// Permissões
 function aplicarPermissoes() {
   document.querySelectorAll("[data-role='admin']").forEach(el => {
     el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
   });
+  
+  const btnLogin = document.getElementById("btn-login-admin");
   if(USER_ROLE === "admin") {
-      document.getElementById("btn-login-admin").innerText = "Admin ✅";
-      document.getElementById("btn-login-admin").style.background = "var(--dourado)";
+      btnLogin.innerText = "Admin ✅";
+      btnLogin.style.background = "var(--dourado)";
+  } else {
+      btnLogin.innerText = "Funcionário 👤";
   }
 }
 
+// Troca de Senha API
+async function alterarMinhaSenha() {
+    const btn = document.getElementById("btn-trocar-senha");
+    const novaSenha = document.getElementById("nova-senha").value;
+    
+    if (!novaSenha || novaSenha.length < 6) {
+      return alert("A senha deve ter no mínimo 6 caracteres.");
+    }
+
+    if (!USER_DATA.id) return alert("Sessão corrompida. Faça login novamente.");
+
+    btn.disabled = true;
+    btn.innerText = "Salvando...";
+
+    try {
+      const res = await fetch(`${API}/employees/${USER_DATA.id}/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword: novaSenha })
+      });
+      const data = await res.json();
+      
+      if (data.ok) {
+        alert("Senha atualizada com sucesso!");
+        document.getElementById("nova-senha").value = "";
+      } else {
+        alert(data.message || "Erro ao atualizar senha.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro de conexão ao tentar alterar senha.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Atualizar Senha";
+    }
+}
+
+// ================= CONTROLE DAS ABAS =================
 function abrirAba(idAba, btn) {
-  // 1. Remove 'active' de todos os conteúdos e botões
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-  // 2. Adiciona 'active' apenas na aba e botão clicado
   document.getElementById(idAba).classList.add('active');
   btn.classList.add('active');
 
-  // 3. Gatilhos específicos
   if(idAba === 'aba-compras') carregarFornecedores();
   if(idAba === 'aba-config') atualizarDashboardFinanceiro();
 }
