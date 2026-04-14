@@ -1,4 +1,4 @@
-// public/js/auth.js
+//auth.js
 (function() {
   const token = localStorage.getItem("tnm_token");
   const user = JSON.parse(localStorage.getItem("tnm_user") || "{}");
