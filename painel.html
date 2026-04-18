@@ -4,59 +4,65 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ERP Tá na Mão! - Operacional & Gestão</title>
-
-<script src="/auth.js"></script> 
-
+<script src="/auth.js"></script>
 <style>
 :root{
-  --verde:#3C6E47;
-  --verde-escuro:#2d5235;
-  --dourado:#C9A86A;
-  --fundo:#f4f6f4;
-  --borda:#ddd;
-  --muted:#666;
-  --sombra: 0 4px 12px rgba(0,0,0,0.08);
+--verde:#3C6E47;
+--verde-escuro:#2d5235;
+--dourado:#C9A86A;
+--fundo:#f4f6f4;
+--borda:#ddd;
+--muted:#666;
+--sombra: 0 4px 12px rgba(0,0,0,0.08);
 }
-
-body{font-family:'Arial', sans-serif; background:var(--fundo); margin:0; color:#333;}
+body{font-family:'Arial', sans-serif; background:var(--fundo); margin:0;
+color:#333;}
 header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
 .wrap { padding: 16px; max-width: 1200px; margin: 0 auto; }
-
 /* MENU DE ABAS */
-.tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid var(--borda); padding-bottom: 10px; justify-content: center; }
-.tab-btn { background: transparent; border: none; font-size: 1rem; font-weight: 600; color: var(--muted); cursor: pointer; padding: 10px 20px; border-radius: 8px; transition: 0.2s; }
+.tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid
+var(--borda); padding-bottom: 10px; justify-content: center; }
+.tab-btn { background: transparent; border: none; font-size: 1rem; font-weight:
+600; color: var(--muted); cursor: pointer; padding: 10px 20px; border-radius:
+8px; transition: 0.2s; }
 .tab-btn:hover { background: rgba(60,110,71,0.05); }
 .tab-btn.active { background: var(--verde); color: #fff; }
-
 /* Lógica de exibição das abas */
 .tab-content { display: none; }
 .tab-content.active { display: block !important; }
-
 /* CARDS ADMIN */
-.admin-card { background: #fff; border: 1px solid var(--borda); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); }
-.admin-card h3 { color: var(--verde-escuro); margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-.admin-card input, .admin-card select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-.admin-card button { background: var(--dourado); color: var(--verde-escuro); border: none; padding: 12px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; }
+.admin-card { background: #fff; border: 1px solid var(--borda); border-radius:
+16px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); }
+.admin-card h3 { color: var(--verde-escuro); margin-top: 0; margin-bottom: 16px;
+font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+.admin-card input, .admin-card select { width: 100%; padding: 12px;
+margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing:
+border-box; }
+.admin-card button { background: var(--dourado); color: var(--verde-escuro);
+border: none; padding: 12px 20px; border-radius: 8px; font-weight: 800; cursor:
+pointer; width: 100%; transition: 0.3s; }
 .admin-card button:hover { background: #b8965a; }
-
 /* KANBAN OPERACIONAL */
-.board{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
-.column{ background:#fff; border-radius:12px; padding:10px; min-height:400px; border: 1px solid #eee; }
-.column-header{ font-weight:bold; margin-bottom:10px; color:var(--verde); text-align: center; border-bottom: 2px solid var(--fundo); padding-bottom: 5px; }
-.card{ background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:8px; font-size:14px; border-left: 4px solid var(--dourado); }
-.card button{ margin-top:8px; width:100%; background: var(--verde); color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
-
-.topbar-btns { display: flex; gap: 10px; margin-bottom: 15px; justify-content: flex-end; }
-
+.board{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,
+1fr)); gap: 12px; }
+.column{ background:#fff; border-radius:12px; padding:10px; min-height:400px;
+border: 1px solid #eee; }
+.column-header{ font-weight:bold; margin-bottom:10px; color:var(--verde);
+text-align: center; border-bottom: 2px solid var(--fundo); padding-bottom: 5px;
+}
+.card{ background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:8px;
+font-size:14px; border-left: 4px solid var(--dourado); }
+.card button{ margin-top:8px; width:100%; background: var(--verde); color:
+white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
+.topbar-btns { display: flex; gap: 10px; margin-bottom: 15px; justify-content:
+flex-end; }
 /* Esconder botões/abas de admin por padrão */
 [data-role="admin"] { display: none; }
 </style>
 </head>
-
 <body>
-
 <header>
-  <section class="hero">
+<section class="hero">
 <img
 src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uplo
 ads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
@@ -64,373 +70,341 @@ alt="Ícone Tá na Mão!"
 style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
 14px;"
 >
-  <h2>Painel Operacional & Gestão</h2>
+<h2>Painel Operacional & Gestão</h2>
 </header>
-
 <div class="wrap">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">📦 Vendas (Operação)</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">🛒 Compras & Estoque</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">📊 Financeiro & Dash</button>
-    
-    <button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
-  </div>
-
-  <div id="aba-vendas" class="tab-content active">
-    <div class="topbar-btns">
-        <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">🔄 Atualizar</button>
-        <button class="tab-btn" data-role="admin" style="background: #444; color: white;" onclick="editarLimite()">Definir Limite</button>
-    </div>
-    <div class="board">
-        <div class="column"><div class="column-header">Entrou</div><div id="col-paid"></div></div>
-        <div class="column"><div class="column-header">Produção</div><div id="col-preparing"></div></div>
-        <div class="column"><div class="column-header">Pronto</div><div id="col-ready"></div></div>
-        <div class="column"><div class="column-header">Entrega</div><div id="col-delivery"></div></div>
-    </div>
-  </div>
-
-  <div id="aba-compras" class="tab-content">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-        <div class="admin-card">
-          <h3>Cadastrar Fornecedor</h3>
-          <input id="f-nome" placeholder="Nome do Fornecedor / Empresa">
-          <input id="f-contato" placeholder="Contato (WhatsApp / Email)">
-          <input id="f-doc" placeholder="CNPJ / CPF">
-          <button onclick="salvarFornecedor()">Salvar Fornecedor</button>
-        </div>
-
-        <div class="admin-card">
-          <h3>Lançar Compra / Entrada</h3>
-          <select id="e-fornecedor"><option value="">Selecione o Fornecedor...</option></select>
-          <input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
-          <input id="e-qtd" type="number" placeholder="Quantidade">
-          <input id="e-valor" type="number" placeholder="Valor Total (R$)">
-          <select id="e-cat">
-            <option value="Insumos">Insumos / Ingredientes</option>
-            <option value="Embalagens">Embalagens</option>
-            <option value="Outros">Outros</option>
-          </select>
-          <button onclick="salvarCompra()">Registrar Compra</button>
-        </div>
-    </div>
-  </div>
-
-  <div id="aba-config" class="tab-content">
-    <div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
-      <h3>Dashboard de Resultado Real</h3>
-      <p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
-      <p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$ 0,00</strong></p>
-      <p>Custos Fixos: <strong id="dash-custos" style="color: #c0392b;">R$ 0,00</strong></p>
-      <p>Compras/Estoque: <strong id="dash-compras" style="color: #c0392b;">R$ 0,00</strong></p>
-      <hr>
-      <h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde); font-size: 1.5rem;">R$ 0,00</strong></h4>
-      <button onclick="atualizarDashboardFinanceiro()" style="margin-top: 15px;">Atualizar Dados</button>
-    </div>
-
-    <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
-      <h3>🔒 Segurança da Conta</h3>
-      <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
-        Altere sua senha de acesso ao sistema.
-      </p>
-      <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
-      <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
-      
-      <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
-    </div>
-  </div>
+<div class="tabs">
+<button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">📦
+Vendas (Operação)</button>
+<button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras',
+this)">🛒 Compras & Estoque</button>
+<button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config',
+this)">📊 Financeiro & Dash</button>
+<button class="tab-btn" id="btn-login-admin" style="background: #eee;
+cursor: default;">Carregando...</button>
 </div>
-
+<div id="aba-vendas" class="tab-content active">
+<div class="topbar-btns">
+<button class="tab-btn" style="background: var(--dourado); color:
+white;" onclick="carregarPedidos()">🔄 Atualizar</button>
+<button class="tab-btn" data-role="admin" style="background: #444;
+color: white;" onclick="editarLimite()">Definir Limite</button>
+</div>
+<div class="board">
+<div class="column"><div class="column-header">Entrou</div><div
+id="col-paid"></div></div>
+<div class="column"><div class="column-header">Produção</div><div
+id="col-preparing"></div></div>
+<div class="column"><div class="column-header">Pronto</div><div
+id="col-ready"></div></div>
+<div class="column"><div class="column-header">Entrega</div><div
+id="col-delivery"></div></div>
+</div>
+</div>
+<div id="aba-compras" class="tab-content">
+<div style="display: grid; grid-template-columns: repeat(auto-fit,
+minmax(300px, 1fr)); gap: 20px;">
+<div class="admin-card">
+<h3>Cadastrar Fornecedor</h3>
+<input id="f-nome" placeholder="Nome do Fornecedor / Empresa">
+<input id="f-contato" placeholder="Contato (WhatsApp / Email)">
+<input id="f-doc" placeholder="CNPJ / CPF">
+<button onclick="salvarFornecedor()">Salvar Fornecedor</button>
+</div>
+<div class="admin-card">
+<h3>Lançar Compra / Entrada</h3>
+<select id="e-fornecedor"><option value="">Selecione o
+Fornecedor...</option></select>
+<input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
+<input id="e-qtd" type="number" placeholder="Quantidade">
+<input id="e-valor" type="number" placeholder="Valor Total (R$)">
+<select id="e-cat">
+<option value="Insumos">Insumos / Ingredientes</option>
+<option value="Embalagens">Embalagens</option>
+<option value="Outros">Outros</option>
+</select>
+<button onclick="salvarCompra()">Registrar Compra</button>
+</div>
+</div>
+</div>
+<div id="aba-config" class="tab-content">
+<div class="admin-card" style="max-width: 500px; margin: 0 auto;
+margin-bottom: 20px;">
+<h3>Dashboard de Resultado Real</h3>
+<p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
+<p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$
+0,00</strong></p>
+<p>Custos Fixos: <strong id="dash-custos" style="color: #c0392b;">R$
+0,00</strong></p>
+<p>Compras/Estoque: <strong id="dash-compras" style="color: #c0392b;">R$
+0,00</strong></p>
+<hr>
+<h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde);
+font-size: 1.5rem;">R$ 0,00</strong></h4>
+<button onclick="atualizarDashboardFinanceiro()" style="margin-top:
+15px;">Atualizar Dados</button>
+</div>
+<div class="admin-card" style="max-width: 500px; margin: 0 auto;">
+<h3>🔒 Segurança da Conta</h3>
+<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
+Altere sua senha de acesso ao sistema.
+</p>
+<input type="password" id="nova-senha" placeholder="Digite sua nova
+senha">
+<button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar
+Senha</button>
+<button onclick="logout()" style="background: #e74c3c; color: white;
+margin-top: 10px;">Sair do Sistema</button>
+</div>
+</div>
+</div>
 <script>
-const BACKEND_URL = "https://tanamao-backend.onrender.com"; // Lembre-se de ajustar isso quando tiver o link do seu Render
+const BACKEND_URL = "https://tanamao-backend.onrender.com"; // Lembre-se de
+ajustar isso quando tiver o link do seu Render
 const API = BACKEND_URL + "/api";
 let pedidos = [];
-
-const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-
+const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency:
+'BRL' }).format(v);
 // ================= ACESSO & SEGURANÇA =================
 const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
 let USER_ROLE = USER_DATA.role || "operador";
-
 // Logout
 function logout() {
-    localStorage.removeItem("tnm_token");
-    localStorage.removeItem("tnm_user");
-    localStorage.removeItem("tnm_role");
-    window.location.href = "login.html";
+localStorage.removeItem("tnm_token");
+localStorage.removeItem("tnm_user");
+localStorage.removeItem("tnm_role");
+window.location.href = "login.html";
 }
-
 // Permissões
 function aplicarPermissoes() {
-  document.querySelectorAll("[data-role='admin']").forEach(el => {
-    el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
-  });
-  
-  const btnLogin = document.getElementById("btn-login-admin");
-  if(USER_ROLE === "admin") {
-      btnLogin.innerText = "Admin ✅";
-      btnLogin.style.background = "var(--dourado)";
-  } else {
-      btnLogin.innerText = "Funcionário 👤";
-  }
+document.querySelectorAll("[data-role='admin']").forEach(el => {
+el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
+});
+const btnLogin = document.getElementById("btn-login-admin");
+if(USER_ROLE === "admin") {
+btnLogin.innerText = "Admin ✅";
+btnLogin.style.background = "var(--dourado)";
+} else {
+btnLogin.innerText = "Funcionário 👤";
 }
-
+}
 // Troca de Senha API
 async function alterarMinhaSenha() {
-    const btn = document.getElementById("btn-trocar-senha");
-    const novaSenha = document.getElementById("nova-senha").value;
-    
-    if (!novaSenha || novaSenha.length < 6) {
-      return alert("A senha deve ter no mínimo 6 caracteres.");
-    }
-
-    if (!USER_DATA.id) return alert("Sessão corrompida. Faça login novamente.");
-
-    btn.disabled = true;
-    btn.innerText = "Salvando...";
-
-    try {
-      const res = await fetch(`${API}/employees/${USER_DATA.id}/password`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPassword: novaSenha })
-      });
-      const data = await res.json();
-      
-      if (data.ok) {
-        alert("Senha atualizada com sucesso!");
-        document.getElementById("nova-senha").value = "";
-      } else {
-        alert(data.message || "Erro ao atualizar senha.");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Erro de conexão ao tentar alterar senha.");
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Atualizar Senha";
-    }
+const btn = document.getElementById("btn-trocar-senha");
+const novaSenha = document.getElementById("nova-senha").value;
+if (!novaSenha || novaSenha.length < 6) {
+return alert("A senha deve ter no mínimo 6 caracteres.");
 }
-
+if (!USER_DATA.id) return alert("Sessão corrompida. Faça login novamente.");
+btn.disabled = true;
+btn.innerText = "Salvando...";
+try {
+const res = await fetch(`${API}/employees/${USER_DATA.id}/password`, {
+method: "PUT",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ newPassword: novaSenha })
+});
+const data = await res.json();
+if (data.ok) {
+alert("Senha atualizada com sucesso!");
+document.getElementById("nova-senha").value = "";
+} else {
+alert(data.message || "Erro ao atualizar senha.");
+}
+} catch (e) {
+console.error(e);
+alert("Erro de conexão ao tentar alterar senha.");
+} finally {
+btn.disabled = false;
+btn.innerText = "Atualizar Senha";
+}
+}
 // ================= CONTROLE DAS ABAS =================
 function abrirAba(idAba, btn) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-  document.getElementById(idAba).classList.add('active');
-  btn.classList.add('active');
-
-  if(idAba === 'aba-compras') carregarFornecedores();
-  if(idAba === 'aba-config') atualizarDashboardFinanceiro();
+document.querySelectorAll('.tab-content').forEach(el =>
+el.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(el =>
+el.classList.remove('active'));
+document.getElementById(idAba).classList.add('active');
+btn.classList.add('active');
+if(idAba === 'aba-compras') carregarFornecedores();
+if(idAba === 'aba-config') atualizarDashboardFinanceiro();
 }
-
 // ================= PEDIDOS (KANBAN) =================
 async function carregarPedidos(){
-  try {
-    const res = await fetch(API + "/operations/orders");
-    const data = await res.json();
-    pedidos = data.orders || [];
-    renderizar();
-  } catch (e) { console.error("Erro ao carregar pedidos:", e); }
+try {
+const res = await fetch(API + "/operations/orders");
+const data = await res.json();
+pedidos = data.orders || [];
+renderizar();
+} catch (e) { console.error("Erro ao carregar pedidos:", e); }
 }
-
 function renderizar(){
-  // Filtramos a lista base para remover o que já foi entregue ou cancelado antes de distribuir nas colunas
-  const ativos = pedidos.filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled');
-
-  const filter = (status) => ativos.filter(p => 
-    p.delivery_status === status || 
-    (status === 'pending' && !p.delivery_status && p.payment_status === 'approved')
-  );
-
-  renderCol("col-paid", filter('pending'));
-  renderCol("col-preparing", filter('preparing'));
-  renderCol("col-ready", filter('ready'));
-  renderCol("col-delivery", filter('out_for_delivery'));
+// Filtramos a lista base para remover o que já foi entregue ou cancelado
+antes de distribuir nas colunas
+const ativos = pedidos.filter(p => p.delivery_status !== 'delivered' &&
+p.delivery_status !== 'canceled');
+const filter = (status) => ativos.filter(p =>
+p.delivery_status === status ||
+(status === 'pending' && !p.delivery_status && p.payment_status ===
+'approved')
+);
+renderCol("col-paid", filter('pending'));
+renderCol("col-preparing", filter('preparing'));
+renderCol("col-ready", filter('ready'));
+renderCol("col-delivery", filter('out_for_delivery'));
 }
-
 function renderCol(id, lista){
-  const el = document.getElementById(id);
-  el.innerHTML = lista.length ? "" : "<div class='card'>Vazio</div>";
-  lista.forEach(p => {
-    el.innerHTML += `<div class="card">
-      <strong>${p.customer_name}</strong><br>Total: ${fmt(p.total)}<br>
-      <button onclick="atualizarStatus('${p.id}', '${proximoStatus(p.delivery_status)}')">
-        ${labelBotao(p.delivery_status)}
-      </button>
-    </div>`;
-  });
+const el = document.getElementById(id);
+el.innerHTML = lista.length ? "" : "<div class='card'>Vazio</div>";
+lista.forEach(p => {
+el.innerHTML += `<div class="card">
+<strong>${p.customer_name}</strong><br>Total: ${fmt(p.total)}<br>
+<button onclick="atualizarStatus('${p.id}',
+'${proximoStatus(p.delivery_status)}')">
+${labelBotao(p.delivery_status)}
+</button>
+</div>`;
+});
 }
-
 function proximoStatus(s){
-  if(!s || s==='pending') return 'preparing';
-  if(s==='preparing') return 'ready';
-  if(s==='ready') return 'out_for_delivery';
-  return 'delivered';
+if(!s || s==='pending') return 'preparing';
+if(s==='preparing') return 'ready';
+if(s==='ready') return 'out_for_delivery';
+return 'delivered';
 }
-
 function labelBotao(s){
-  if(!s || s==='pending') return 'Iniciar Produção';
-  if(s==='preparing') return 'Marcar como Pronto';
-  if(s==='ready') return 'Saiu para Entrega';
-  return 'Finalizar Pedido';
+if(!s || s==='pending') return 'Iniciar Produção';
+if(s==='preparing') return 'Marcar como Pronto';
+if(s==='ready') return 'Saiu para Entrega';
+return 'Finalizar Pedido';
 }
-
 async function atualizarStatus(id, status){
-  await fetch(`${API}/operations/orders/${id}/status`, {
-    method: "PATCH", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ delivery_status: status })
-  });
-  carregarPedidos();
+await fetch(`${API}/operations/orders/${id}/status`, {
+method: "PATCH", headers: {"Content-Type": "application/json"},
+body: JSON.stringify({ delivery_status: status })
+});
+carregarPedidos();
 }
-
 // ================= GESTÃO DE COMPRAS & FORNECEDORES =================
 async function carregarFornecedores() {
-  const res = await fetch(API + "/suppliers");
-  const data = await res.json();
-  const select = document.getElementById("e-fornecedor");
-  select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
-  if(data.data) data.data.forEach(f => select.innerHTML += `<option value="${f.id}">${f.name}</option>`);
+const res = await fetch(API + "/suppliers");
+const data = await res.json();
+const select = document.getElementById("e-fornecedor");
+select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
+if(data.data) data.data.forEach(f => select.innerHTML += `<option
+value="${f.id}">${f.name}</option>`);
 }
-
 async function salvarFornecedor() {
-  // 1. Captura de todos os campos, incluindo o documento
-  const name = document.getElementById("f-nome").value; [cite: 266]
-  const contact = document.getElementById("f-contato").value; [cite: 267]
-  const doc = document.getElementById("f-doc").value; 
-
-  if (!name) return alert("Nome obrigatório"); [cite: 268]
-
-  try {
-    const res = await fetch(API + "/suppliers", { [cite: 270]
-      method: "POST",
-      headers: {"Content-Type": "application/json"}, [cite: 272]
-      // 2. Adicionamos o 'document' no envio para o Supabase gravar
-      body: JSON.stringify({ name: name, contact: contact, document: doc })
-    });
-
-    const data = await res.json(); // Corrigido: Faltava o "=" no código original 
-
-    if (res.ok) {
-      alert("Fornecedor cadastrado!"); [cite: 275]
-      
-      // 3. Limpa todos os campos após o sucesso
-      document.getElementById("f-nome").value = ""; [cite: 277]
-      document.getElementById("f-contato").value = ""; [cite: 278]
-      document.getElementById("f-doc").value = ""; 
-      
-      // 4. Recarrega a lista para aparecer no select de compras na hora
-      await carregarFornecedores(); // Corrigido: Removido o espaço do nome da função 
-      
-    } else {
-      // Corrigido: Faltava fechar as aspas na string de erro 
-      alert("Erro ao salvar: " + (data.message || "Tente novamente"));
-    }
-  } catch (err) {
-    alert("Erro de conexão com o servidor"); [cite: 284]
-  }
+const name = document.getElementById("f-nome").value;
+const contact = document.getElementById("f-contato").value;
+if(!name) return alert("Nome obrigatório");
+try {
+const res = await fetch(API + "/suppliers", {
+method: "POST",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify({ name, contact })
+});
+const data = await res.json();
+if (res.ok) {
+alert("Fornecedor cadastrado!");
+// Limpa os campos após o sucesso
+document.getElementById("f-nome").value = "";
+document.getElementById("f-contato").value = "";
+// Aguarda a recarga da lista antes de qualquer outra ação
+await carregarFornecedores();
+} else {
+alert("Erro ao salvar: " + (data.message || "Tente novamente"));
 }
-
+} catch (err) {
+alert("Erro de conexão com o servidor");
+}
+}
 async function salvarCompra() {
-  const sId = document.getElementById("e-fornecedor").value;
+const supplierId = document.getElementById("e-fornecedor").value;
 const body = {
-  supplier_id: sId === "" ? null : sId,
-  item_name: document.getElementById("e-item").value,
-  
-  const body = {
-    // Se o valor for vazio, enviamos null (que o banco aceita) ou avisamos o usuário
-    supplier_id: supplierId === "" ? null : supplierId, 
-    item_name: document.getElementById("e-item").value,
-    quantity: document.getElementById("e-qtd").value,
-    total_value: document.getElementById("e-valor").value,
-    category: document.getElementById("e-cat").value
-  };
-
-  // Validação: Não deixa prosseguir se faltar o básico
-  if(!body.item_name || !body.total_value) {
-    return alert("Preencha os campos Nome do Item e Valor!");
-  }
-
-  // Se o seu banco exige um fornecedor (obrigatório), use esta trava:
-  if(!body.supplier_id) {
-    return alert("Selecione um fornecedor cadastrado!");
-  }
-
-  try {
-    const res = await fetch(API + "/stock", {
-      method: "POST", 
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Compra registrada com sucesso!");
-      // Limpa os campos
-      document.getElementById("e-item").value = "";
-      document.getElementById("e-qtd").value = "";
-      document.getElementById("e-valor").value = "";
-      document.getElementById("e-fornecedor").value = "";
-      
-      // Se tiver a função de recarregar a lista, chame-a aqui
-      if (typeof carregarEstoque === "function") carregarEstoque();
-      
-    } else {
-      // Aqui o data.message vai mostrar o erro real vindo do backend
-      alert("Erro ao registrar: " + (data.error || data.message || "Verifique os dados"));
-    }
-  } catch (err) {
-    console.error("Erro no fetch:", err);
-    alert("Erro ao conectar com o servidor.");
-  }
+// Se o valor for vazio, enviamos null (que o banco aceita) ou avisamos o
+usuário
+supplier_id: supplierId === "" ? null : supplierId,
+item_name: document.getElementById("e-item").value,
+quantity: document.getElementById("e-qtd").value,
+total_value: document.getElementById("e-valor").value,
+category: document.getElementById("e-cat").value
+};
+// Validação: Não deixa prosseguir se faltar o básico
+if(!body.item_name || !body.total_value) {
+return alert("Preencha os campos Nome do Item e Valor!");
 }
-
+// Se o seu banco exige um fornecedor (obrigatório), use esta trava:
+if(!body.supplier_id) {
+return alert("Selecione um fornecedor cadastrado!");
+}
+try {
+const res = await fetch(API + "/stock", {
+method: "POST",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify(body)
+});
+const data = await res.json();
+if (res.ok) {
+alert("Compra registrada com sucesso!");
+// Limpa os campos
+document.getElementById("e-item").value = "";
+document.getElementById("e-qtd").value = "";
+document.getElementById("e-valor").value = "";
+document.getElementById("e-fornecedor").value = "";
+// Se tiver a função de recarregar a lista, chame-a aqui
+if (typeof carregarEstoque === "function") carregarEstoque();
+} else {
+// Aqui o data.message vai mostrar o erro real vindo do backend
+alert("Erro ao registrar: " + (data.error || data.message || "Verifique os
+dados"));
+}
+} catch (err) {
+console.error("Erro no fetch:", err);
+alert("Erro ao conectar com o servidor.");
+}
+}
 // ================= DASHBOARD FINANCEIRO =================
 async function atualizarDashboardFinanceiro() {
-  const resOrders = await fetch(API + "/operations/orders");
-  const dataOrders = await resOrders.json();
-  let bruto = 0, taxas = 0;
-  (dataOrders.orders || []).forEach(p => {
-    if (p.payment_status === "approved") {
-      bruto += Number(p.total || 0);
-      taxas += Number(p.gateway_fee || 0);
-    }
-  });
-
-  const resCosts = await fetch(API + "/costs");
-  const dataCosts = await resCosts.json();
-  const custosFixos = (dataCosts.data || []).reduce((acc, c) => acc + Number(c.value), 0);
-
-  const resStock = await fetch(API + "/stock");
-  const dataStock = await resStock.json();
-  const compras = (dataStock.data || []).reduce((acc, c) => acc + Number(c.total_value), 0);
-
-  const lucro = bruto - taxas - custosFixos - compras;
-
-  document.getElementById("dash-bruto").innerText = fmt(bruto);
-  document.getElementById("dash-taxas").innerText = fmt(taxas);
-  document.getElementById("dash-custos").innerText = fmt(custosFixos);
-  document.getElementById("dash-compras").innerText = fmt(compras);
-  document.getElementById("dash-lucro").innerText = fmt(lucro);
+const resOrders = await fetch(API + "/operations/orders");
+const dataOrders = await resOrders.json();
+let bruto = 0, taxas = 0;
+(dataOrders.orders || []).forEach(p => {
+if (p.payment_status === "approved") {
+bruto += Number(p.total || 0);
+taxas += Number(p.gateway_fee || 0);
 }
-
+});
+const resCosts = await fetch(API + "/costs");
+const dataCosts = await resCosts.json();
+const custosFixos = (dataCosts.data || []).reduce((acc, c) => acc +
+Number(c.value), 0);
+const resStock = await fetch(API + "/stock");
+const dataStock = await resStock.json();
+const compras = (dataStock.data || []).reduce((acc, c) => acc +
+Number(c.total_value), 0);
+const lucro = bruto - taxas - custosFixos - compras;
+document.getElementById("dash-bruto").innerText = fmt(bruto);
+document.getElementById("dash-taxas").innerText = fmt(taxas);
+document.getElementById("dash-custos").innerText = fmt(custosFixos);
+document.getElementById("dash-compras").innerText = fmt(compras);
+document.getElementById("dash-lucro").innerText = fmt(lucro);
+}
 function editarLimite() {
-    const valor = prompt("Defina o novo limite diário de pedidos:");
-    if (valor) {
-        // Por enquanto apenas visual, mas já evita o erro de 'not defined'
-        alert("Limite atualizado para: " + valor + " (integração com API pendente)");
-    }
+const valor = prompt("Defina o novo limite diário de pedidos:");
+if (valor) {
+// Por enquanto apenas visual, mas já evita o erro de 'not defined'
+alert("Limite atualizado para: " + valor + " (integração com API
+pendente)");
 }
-
+}
 // INICIALIZAÇÃO - Sempre por último
 aplicarPermissoes();
 carregarPedidos();
 setInterval(carregarPedidos, 30000);
 </script>
-
 </body>
 </html>
-
-
 
 
