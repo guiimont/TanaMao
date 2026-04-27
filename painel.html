@@ -871,50 +871,52 @@
   }
 
   function renderTabelaCompras(entries, filtros) {
-    const tbody = document.getElementById("tbody-compras");
-    const resumo = document.getElementById("compras-resumo");
-    const totalEl = document.getElementById("compras-total");
+  const tbody = document.getElementById("tbody-compras");
+  const resumo = document.getElementById("compras-resumo");
+  const totalEl = document.getElementById("compras-total");
 
-    const total = (entries || []).reduce((acc, e) => acc + Number(e.total_value || 0), 0);
-    if (totalEl) totalEl.textContent = fmt(total);
+  const total = (entries || []).reduce((acc, e) => acc + Number(e.total_value || 0), 0);
+  if (totalEl) totalEl.textContent = fmt(total);
 
-    const parts = [];
-    if (filtros.fornecedorId) parts.push("Fornecedor filtrado");
-    if (filtros.categoria) parts.push("Categoria: " + filtros.categoria);
-    if (filtros.deStr) parts.push("De: " + filtros.deStr);
-    if (filtros.ateStr) parts.push("Até: " + filtros.ateStr);
+  const parts = [];
+  if (filtros.fornecedorId) parts.push("Fornecedor filtrado");
+  if (filtros.categoria) parts.push("Categoria: " + filtros.categoria);
+  if (filtros.deStr) parts.push("De: " + filtros.deStr);
+  if (filtros.ateStr) parts.push("Até: " + filtros.ateStr);
 
-    const resumoTxt = `${entries.length} registro(s)` + (parts.length ? " • " + parts.join(" • ") : "");
-    if (resumo) resumo.textContent = resumoTxt;
+  const resumoTxt = `${entries.length} registro(s)` + (parts.length ? " • " + parts.join(" • ") : "");
+  if (resumo) resumo.textContent = resumoTxt;
 
-    if (!tbody) return;
+  if (!tbody) return;
 
-    if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="7">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
-      return;
-    }
+  if (!entries.length) {
+    tbody.innerHTML = `<tr><td colspan="7">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
+    return;
+  }
 
-    tbody.innerHTML = entries.map(e => {
-      const dataFmt = e.entry_date ? new Date(e.entry_date).toLocaleString("pt-BR") : "—";
-      const fornecedor = e.suppliers?.name || "—";
-      const qtd = (e.quantity ?? "—");
-      const valor = fmt(Number(e.total_value || 0));
+  tbody.innerHTML = entries.map(e => {
+    const dataFmt = e.entry_date ? new Date(e.entry_date).toLocaleString("pt-BR") : "—";
+    const fornecedor = e.suppliers?.name || "—";
+    const qtd = (e.quantity ?? "—");
+    const valor = fmt(Number(e.total_value || 0));
 
-      const unit = (e.unit_cost === null || typeof e.unit_cost === "undefined")
-  ? "—"
-  : fmt(Number(e.unit_cost || 0));
+    const unit = (e.unit_cost === null || typeof e.unit_cost === "undefined")
+      ? "—"
+      : fmt(Number(e.unit_cost || 0));
 
-return `
-  <tr>
-    <td>${dataFmt}</td>
-    <td>${fornecedor}</td>
-    <td>${badgeCategoria(e.category)}</td>
-    <td><strong>${e.item_name || ""}</strong></td>
-    <td style="text-align:right;">${qtd}</td>
-    <td style="text-align:right;">${unit}</td>
-    <td style="text-align:right;"><strong>${valor}</strong></td>
-  </tr>
-`;
+    return `
+      <tr>
+        <td>${dataFmt}</td>
+        <td>${fornecedor}</td>
+        <td>${badgeCategoria(e.category)}</td>
+        <td><strong>${e.item_name || ""}</strong></td>
+        <td style="text-align:right;">${qtd}</td>
+        <td style="text-align:right;">${unit}</td>
+        <td style="text-align:right;"><strong>${valor}</strong></td>
+      </tr>
+    `;
+  }).join("");
+}
       
   function limparFiltrosCompras() {
     const f1 = document.getElementById("filtro-fornecedor");
