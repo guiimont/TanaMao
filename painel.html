@@ -1,704 +1,1185 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ERP Tá na Mão! - Operacional & Gestão</title>
-	<script src="/auth.js"></script>
-	<style>
-		:root{
-			--verde:#3C6E47;
-			--verde-escuro:#2d5235;
-			--dourado:#C9A86A;
-			--fundo:#f4f6f4;
-			--borda:#ddd;
-			--muted:#666;
-			--sombra: 0 4px 12px rgba(0,0,0,0.08);
-		}
-		body{font-family:'Arial', sans-serif; background:var(--fundo); margin:0; color:#333;}
-		header { background:var(--verde); color:#fff; padding:16px; text-align:center; }
-		.wrap { padding: 16px; max-width: 1200px; margin: 0 auto; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Tá na Mão! - Operacional & Gestão</title>
+  <script src="/auth.js"></script>
 
-		/* MENU DE ABAS */
-		.tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid var(--borda); padding-bottom: 10px; justify-content: center; flex-wrap: wrap;}
-		.tab-btn { background: transparent; border: none; font-size: 1rem; font-weight: 600; color: var(--muted); cursor: pointer; padding: 10px 20px; border-radius: 8px; transition: 0.2s; }
-		.tab-btn:hover { background: rgba(60,110,71,0.05); }
-		.tab-btn.active { background: var(--verde); color: #fff; }
+  <style>
+    :root{
+      --verde:#3C6E47;
+      --verde-escuro:#2d5235;
+      --dourado:#C9A86A;
+      --fundo:#f4f6f4;
+      --borda:#ddd;
+      --muted:#666;
+      --sombra: 0 4px 12px rgba(0,0,0,0.08);
+    }
 
-		/* Lógica de exibição das abas */
-		.tab-content { display: none; }
-		.tab-content.active { display: block !important; }
+    body{
+      font-family:'Arial', sans-serif;
+      background:var(--fundo);
+      margin:0;
+      color:#333;
+    }
 
-		/* CARDS ADMIN */
-		.admin-card { background: #fff; border: 1px solid var(--borda); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); }
-		.admin-card h3 { color: var(--verde-escuro); margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-		.admin-card input, .admin-card select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-		.admin-card button { background: var(--dourado); color: var(--verde-escuro); border: none; padding: 12px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; }
-		.admin-card button:hover { background: #b8965a; }
+    header {
+      background:var(--verde);
+      color:#fff;
+      padding:16px;
+      text-align:center;
+    }
 
-		/* KANBAN OPERACIONAL */
-		.board{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
-		.column{ background:#fff; border-radius:12px; padding:10px; min-height:400px; border: 1px solid #eee; }
-		.column-header{ font-weight:bold; margin-bottom:10px; color:var(--verde); text-align: center; border-bottom: 2px solid var(--fundo); padding-bottom: 5px; }
-		.card{ background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:8px; font-size:14px; border-left: 4px solid var(--dourado); }
-		.card button{ margin-top:8px; width:100%; background: var(--verde); color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; }
+    .wrap {
+      padding: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-		.topbar-btns { display: flex; gap: 10px; margin-bottom: 15px; justify-content: flex-end; flex-wrap: wrap; }
+    /* MENU DE ABAS */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--borda);
+      padding-bottom: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-		/* Esconder botões/abas de admin por padrão */
-		[data-role="admin"] { display: none; }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
 
-		/* ====== TABELA COMPRAS ====== */
-		.table-wrap{ overflow:auto; border:1px solid #eee; border-radius:12px; }
-		table{ width:100%; border-collapse: collapse; min-width: 820px; background:#fff; }
-		thead th{
-			text-align:left;
-			font-size:.85rem;
-			color:#666;
-			padding:12px 10px;
-			border-bottom:1px solid #eee;
-			background:#fbfbfb;
-			position: sticky;
-			top: 0;
-			z-index: 1;
-		}
-		tbody td{
-			padding:12px 10px;
-			border-bottom:1px solid #f0f0f0;
-			font-size:.92rem;
-			vertical-align: top;
-		}
-		tbody tr:hover{ background:#fafafa; }
-		.badge{
-			display:inline-block;
-			padding:4px 10px;
-			border-radius:999px;
-			font-size:.78rem;
-			font-weight:700;
-			border:1px solid #eee;
-			background:#fff;
-		}
-		.badge.insumos{ border-color: rgba(60,110,71,.25); background: rgba(60,110,71,.08); color: var(--verde-escuro); }
-		.badge.embalagens{ border-color: rgba(201,168,106,.35); background: rgba(201,168,106,.12); color: #7b5a21; }
-		.badge.outros{ border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); color: #444; }
+    .tab-btn:hover { background: rgba(60,110,71,0.05); }
+    .tab-btn.active { background: var(--verde); color: #fff; }
 
-		.filters-grid{
-			display:grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 10px;
-			margin-bottom: 12px;
-		}
-		.filters-grid label{
-			display:block;
-			font-size:.78rem;
-			color:#888;
-			font-weight:800;
-			text-transform: uppercase;
-			letter-spacing: .06em;
-			margin-bottom:6px;
-		}
-		.filters-grid input, .filters-grid select{
-			width: 100%;
-			padding: 10px 12px;
-			border: 1px solid #ddd;
-			border-radius: 10px;
-			box-sizing: border-box;
-			outline: none;
-		}
-		.filters-actions{
-			display:flex;
-			gap:10px;
-			align-items:center;
-			justify-content:flex-end;
-			flex-wrap:wrap;
-			margin-top: 10px;
-		}
-		.btn-secondary{
-			background:#fff;
-			border:1px solid #ddd;
-			color:#333;
-			padding:10px 14px;
-			border-radius:10px;
-			font-weight:800;
-			cursor:pointer;
-		}
-		.btn-secondary:hover{ background:#f7f7f7; }
-		.summary-bar{
-			display:flex;
-			justify-content: space-between;
-			align-items:center;
-			gap: 10px;
-			background:#fcfcfc;
-			border:1px solid #eee;
-			border-radius:12px;
-			padding:12px 14px;
-			margin: 10px 0 14px;
-			flex-wrap: wrap;
-		}
-		.summary-bar strong{ color: var(--verde-escuro); }
-		.muted{ color:#777; font-size:.92rem; }
+    /* Lógica de exibição das abas */
+    .tab-content { display: none; }
+    .tab-content.active { display: block !important; }
 
-		@media (max-width: 900px){
-			.filters-grid{ grid-template-columns: 1fr 1fr; }
-		}
-		@media (max-width: 560px){
-			.filters-grid{ grid-template-columns: 1fr; }
-		}
-	</style>
+    /* CARDS ADMIN */
+    .admin-card {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--sombra);
+    }
+
+    .admin-card h3 {
+      color: var(--verde-escuro);
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    .admin-card input,
+    .admin-card select,
+    .admin-card textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    .admin-card button {
+      background: var(--dourado);
+      color: var(--verde-escuro);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.3s;
+    }
+
+    .admin-card button:hover { background: #b8965a; }
+
+    .topbar-btns {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    /* KANBAN OPERACIONAL */
+    .board{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .column{
+      background:#fff;
+      border-radius:12px;
+      padding:10px;
+      min-height:400px;
+      border: 1px solid #eee;
+    }
+
+    .column-header{
+      font-weight:bold;
+      margin-bottom:10px;
+      color:var(--verde);
+      text-align: center;
+      border-bottom: 2px solid var(--fundo);
+      padding-bottom: 5px;
+    }
+
+    .card{
+      background:#f9f9f9;
+      padding:12px;
+      border-radius:8px;
+      margin-bottom:8px;
+      font-size:14px;
+      border-left: 4px solid var(--dourado);
+    }
+
+    .card button{
+      margin-top:8px;
+      width:100%;
+      background: var(--verde);
+      color:white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    /* Esconder botões/abas de admin por padrão */
+    [data-role="admin"] { display: none; }
+
+    /* ====== TABELAS (Compras + Produtos) ====== */
+    .table-wrap{
+      overflow:auto;
+      border: 1px solid #eee;
+      border-radius: 12px;
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      background:#fff;
+    }
+
+    thead th{
+      text-align:left;
+      font-size:.85rem;
+      color:#666;
+      padding:12px 10px;
+      border-bottom:1px solid #eee;
+      background:#fbfbfb;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    tbody td{
+      padding:12px 10px;
+      border-bottom:1px solid #f0f0f0;
+      font-size:.92rem;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover{ background:#fafafa; }
+
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:800;
+      border:1px solid #eee;
+      background:#fff;
+      white-space: nowrap;
+    }
+
+    .badge.on{ border-color: rgba(60,110,71,.25); background: rgba(60,110,71,.08); color: var(--verde-escuro); }
+    .badge.off{ border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); color: #444; }
+
+    .badge.insumos{ border-color: rgba(60,110,71,.25); background: rgba(60,110,71,.08); color: var(--verde-escuro); }
+    .badge.embalagens{ border-color: rgba(201,168,106,.35); background: rgba(201,168,106,.12); color: #7b5a21; }
+    .badge.outros{ border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); color: #444; }
+
+    .filters-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .filters-grid label{
+      display:block;
+      font-size:.78rem;
+      color:#888;
+      font-weight:800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom:6px;
+    }
+
+    .filters-grid input,
+    .filters-grid select{
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    .filters-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      border:1px solid #ddd;
+      color:#333;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .btn-secondary:hover{ background:#f7f7f7; }
+
+    .btn-danger{
+      background:#e74c3c;
+      border:none;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .btn-danger:hover{ filter: brightness(.95); }
+
+    .summary-bar{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      background:#fcfcfc;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:12px 14px;
+      margin: 10px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .summary-bar strong{ color: var(--verde-escuro); }
+    .muted{ color:#777; font-size:.92rem; }
+    .small{ font-size: .9rem; color: var(--muted); }
+
+    .prod-img{
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      background: #f5f5f5;
+    }
+
+    .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    @media (max-width: 900px){
+      .filters-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px){
+      .filters-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
-	<header>
-		<section class="hero">
-			<img
-				src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
-				alt="Ícone Tá na Mão!"
-				style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 14px;"
-			>
-			<h2>Painel Operacional & Gestão</h2>
-		</section>
-	</header>
-
-	<div class="wrap">
-		<div class="tabs">
-			<button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">📦 Vendas (Operação)</button>
-			<button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">🛒 Compras & Estoque</button>
-			<button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">📊 Financeiro & Dash</button>
-			<button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
-		</div>
-
-		<!-- ABA VENDAS -->
-		<div id="aba-vendas" class="tab-content active">
-			<div class="topbar-btns">
-				<button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">🔄 Atualizar</button>
-				<button class="tab-btn" data-role="admin" style="background: #444; color: white;" onclick="editarLimite()">Definir Limite</button>
-			</div>
-
-			<div class="board">
-				<div class="column"><div class="column-header">Entrou</div><div id="col-paid"></div></div>
-				<div class="column"><div class="column-header">Produção</div><div id="col-preparing"></div></div>
-				<div class="column"><div class="column-header">Pronto</div><div id="col-ready"></div></div>
-				<div class="column"><div class="column-header">Entrega</div><div id="col-delivery"></div></div>
-			</div>
-		</div>
-
-		<!-- ABA COMPRAS -->
-		<div id="aba-compras" class="tab-content">
-			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-				<div class="admin-card">
-					<h3>Cadastrar Fornecedor</h3>
-					<input id="f-nome" placeholder="Nome do Fornecedor / Empresa">
-					<input id="f-contato" placeholder="Contato (WhatsApp / Email)">
-					<input id="f-doc" placeholder="CNPJ / CPF">
-					<button onclick="salvarFornecedor()">Salvar Fornecedor</button>
-				</div>
-
-				<div class="admin-card">
-					<h3>Lançar Compra / Entrada</h3>
-					<select id="e-fornecedor"><option value="">Selecione o Fornecedor...</option></select>
-					<input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
-					<input id="e-qtd" type="number" placeholder="Quantidade">
-					<input id="e-valor" type="number" placeholder="Valor Total (R$)">
-					<select id="e-cat">
-						<option value="Insumos">Insumos / Ingredientes</option>
-						<option value="Embalagens">Embalagens</option>
-						<option value="Outros">Outros</option>
-					</select>
-					<button onclick="salvarCompra()">Registrar Compra</button>
-				</div>
-			</div>
-
-			<!-- LISTAGEM PROFISSIONAL (TABELA) -->
-			<div class="admin-card" style="margin-top: 20px;">
-				<h3>Compras registradas</h3>
-
-				<div class="filters-grid">
-					<div>
-						<label>Fornecedor</label>
-						<select id="filtro-fornecedor">
-							<option value="">Todos</option>
-						</select>
-					</div>
-
-					<div>
-						<label>Categoria</label>
-						<select id="filtro-categoria">
-							<option value="">Todas</option>
-							<option value="Insumos">Insumos</option>
-							<option value="Embalagens">Embalagens</option>
-							<option value="Outros">Outros</option>
-						</select>
-					</div>
-
-					<div>
-						<label>De (data)</label>
-						<input id="filtro-de" type="date">
-					</div>
-
-					<div>
-						<label>Até (data)</label>
-						<input id="filtro-ate" type="date">
-					</div>
-				</div>
-
-				<div class="filters-actions">
-					<button class="btn-secondary" onclick="limparFiltrosCompras()">Limpar filtros</button>
-					<button class="btn-secondary" onclick="carregarCompras()">Recarregar</button>
-				</div>
-
-				<div class="summary-bar">
-					<div class="muted" id="compras-resumo">Carregando...</div>
-					<div><strong>Total filtrado:</strong> <span id="compras-total">R$ 0,00</span></div>
-				</div>
-
-				<div class="table-wrap">
-					<table>
-						<thead>
-							<tr>
-								<th>Data</th>
-								<th>Fornecedor</th>
-								<th>Categoria</th>
-								<th>Item</th>
-								<th style="text-align:right;">Qtd</th>
-								<th style="text-align:right;">Valor</th>
-							</tr>
-						</thead>
-						<tbody id="tbody-compras">
-							<tr><td colspan="6">Carregando...</td></tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-
-		<!-- ABA CONFIG -->
-		<div id="aba-config" class="tab-content">
-			<div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
-				<h3>Dashboard de Resultado Real</h3>
-				<p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
-				<p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$ 0,00</strong></p>
-				<p>Custos Fixos: <strong id="dash-custos" style="color: #c0392b;">R$ 0,00</strong></p>
-				<p>Compras/Estoque: <strong id="dash-compras" style="color: #c0392b;">R$ 0,00</strong></p>
-				<hr>
-				<h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde); font-size: 1.5rem;">R$ 0,00</strong></h4>
-				<button onclick="atualizarDashboardFinanceiro()" style="margin-top: 15px;">Atualizar Dados</button>
-			</div>
-
-			<div class="admin-card" style="max-width: 500px; margin: 0 auto;">
-				<h3>🔒 Segurança da Conta</h3>
-				<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
-					Altere sua senha de acesso ao sistema.
-				</p>
-				<input type="password" id="nova-senha" placeholder="Digite sua nova senha">
-				<button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
-				<button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
-			</div>
-		</div>
-	</div>
-
-	<script>
-		const BACKEND_URL = "https://tanamao-backend.onrender.com";
-		const API = BACKEND_URL + "/api";
-		let pedidos = [];
-		const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-
-		// ====== ESTADO (Compras) ======
-		let COMPRAS_ENTRIES = [];
-
-		// ================= ACESSO & SEGURANÇA =================
-		const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
-		let USER_ROLE = USER_DATA.role || "operador";
-
-		function logout() {
-			localStorage.removeItem("tnm_token");
-			localStorage.removeItem("tnm_user");
-			localStorage.removeItem("tnm_role");
-			window.location.href = "login.html";
-		}
-
-		function aplicarPermissoes() {
-			document.querySelectorAll("[data-role='admin']").forEach(el => {
-				el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
-			});
-			const btnLogin = document.getElementById("btn-login-admin");
-			if (USER_ROLE === "admin") {
-				btnLogin.innerText = "Admin ✅";
-				btnLogin.style.background = "var(--dourado)";
-			} else {
-				btnLogin.innerText = "Funcionário 👤";
-			}
-		}
-
-		async function alterarMinhaSenha() {
-			const btn = document.getElementById("btn-trocar-senha");
-			const novaSenha = document.getElementById("nova-senha").value;
-
-			if (!novaSenha || novaSenha.length < 6) {
-				return alert("A senha deve ter no mínimo 6 caracteres.");
-			}
-			if (!USER_DATA.id) return alert("Sessão corrompida. Faça login novamente.");
-
-			btn.disabled = true;
-			btn.innerText = "Salvando...";
-
-			try {
-				const res = await fetch(`${API}/employees/${USER_DATA.id}/password`, {
-					method: "PUT",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ newPassword: novaSenha })
-				});
-				const data = await res.json();
-
-				if (data.ok) {
-					alert("Senha atualizada com sucesso!");
-					document.getElementById("nova-senha").value = "";
-				} else {
-					alert(data.message || "Erro ao atualizar senha.");
-				}
-			} catch (e) {
-				console.error(e);
-				alert("Erro de conexão ao tentar alterar senha.");
-			} finally {
-				btn.disabled = false;
-				btn.innerText = "Atualizar Senha";
-			}
-		}
-
-		// ================= CONTROLE DAS ABAS =================
-		function abrirAba(idAba, btn) {
-			document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-			document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-			document.getElementById(idAba).classList.add('active');
-			btn.classList.add('active');
-
-			if (idAba === 'aba-compras') {
-				carregarFornecedores();
-				carregarCompras();
-			}
-			if (idAba === 'aba-config') atualizarDashboardFinanceiro();
-		}
-
-		function editarLimite() {
-			const valor = prompt("Defina o novo limite diário de pedidos:");
-			if (valor === null) return;
-
-			const num = Number(valor);
-			if (!Number.isFinite(num) || num <= 0) {
-				alert("Digite um número válido (ex: 30).");
-				return;
-			}
-			alert("Limite ajustado para: " + num + " (integração com API depois).");
-		}
-
-		// ================= PEDIDOS (KANBAN) =================
-		async function carregarPedidos() {
-			try {
-				const res = await fetch(API + "/operations/orders");
-				const data = await res.json();
-				pedidos = data.orders || [];
-				renderizar();
-			} catch (e) { console.error("Erro ao carregar pedidos:", e); }
-		}
-
-		function renderizar() {
-			const ativos = pedidos.filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled');
-			const filter = (status) => ativos.filter(p =>
-				p.delivery_status === status ||
-				(status === 'pending' && !p.delivery_status && p.payment_status === 'approved')
-			);
-
-			renderCol("col-paid", filter('pending'));
-			renderCol("col-preparing", filter('preparing'));
-			renderCol("col-ready", filter('ready'));
-			renderCol("col-delivery", filter('out_for_delivery'));
-		}
-
-		function renderCol(id, lista) {
-			const el = document.getElementById(id);
-			el.innerHTML = lista.length ? "" : "<div class='card'>Vazio</div>";
-
-			lista.forEach(p => {
-				el.innerHTML += `
-					<div class="card">
-						<strong>${p.customer_name}</strong><br>
-						Total: ${fmt(p.total)}<br>
-						<button onclick="atualizarStatus('${p.id}', '${proximoStatus(p.delivery_status)}')">
-							${labelBotao(p.delivery_status)}
-						</button>
-					</div>
-				`;
-			});
-		}
-
-		function proximoStatus(s) {
-			if (!s || s === 'pending') return 'preparing';
-			if (s === 'preparing') return 'ready';
-			if (s === 'ready') return 'out_for_delivery';
-			return 'delivered';
-		}
-
-		function labelBotao(s) {
-			if (!s || s === 'pending') return 'Iniciar Produção';
-			if (s === 'preparing') return 'Marcar como Pronto';
-			if (s === 'ready') return 'Saiu para Entrega';
-			return 'Finalizar Pedido';
-		}
-
-		async function atualizarStatus(id, status) {
-			await fetch(`${API}/operations/orders/${id}/status`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ delivery_status: status })
-			});
-			carregarPedidos();
-		}
-
-		// ================= GESTÃO DE COMPRAS & FORNECEDORES =================
-		async function carregarFornecedores() {
-			const res = await fetch(API + "/suppliers");
-			const data = await res.json();
-
-			// Select do form
-			const select = document.getElementById("e-fornecedor");
-			select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
-			const suppliers = data.suppliers || [];
-			suppliers.forEach((f) => {
-				select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
-			});
-
-			// Select do filtro
-			const selFiltro = document.getElementById("filtro-fornecedor");
-			if (selFiltro) {
-				selFiltro.innerHTML = '<option value="">Todos</option>';
-				suppliers.forEach((f) => {
-					selFiltro.innerHTML += `<option value="${f.id}">${f.name}</option>`;
-				});
-			}
-		}
-
-		async function salvarFornecedor() {
-			const name = document.getElementById("f-nome").value;
-			const contact = document.getElementById("f-contato").value;
-			const documentId = document.getElementById("f-doc").value;
-
-			if (!name) return alert("Nome obrigatório");
-			try {
-				const res = await fetch(API + "/suppliers", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ name, contact, document: documentId })
-				});
-				const data = await res.json();
-
-				if (res.ok) {
-					alert("Fornecedor cadastrado!");
-					document.getElementById("f-nome").value = "";
-					document.getElementById("f-contato").value = "";
-					document.getElementById("f-doc").value = "";
-					await carregarFornecedores();
-				} else {
-					alert("Erro ao salvar: " + (data.message || "Tente novamente"));
-				}
-			} catch (err) {
-				alert("Erro de conexão com o servidor");
-			}
-		}
-
-		async function salvarCompra() {
-			const supplierId = document.getElementById("e-fornecedor").value;
-			if (!supplierId) return alert("Selecione um fornecedor cadastrado!");
-
-			const body = {
-				supplier_id: supplierId,
-				item_name: document.getElementById("e-item").value.trim(),
-				quantity: document.getElementById("e-qtd").value,
-				total_value: document.getElementById("e-valor").value,
-				category: document.getElementById("e-cat").value
-			};
-
-			if (!body.item_name || !body.total_value) return alert("Preencha os campos!");
-
-			try {
-				const res = await fetch(API + "/stock", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(body)
-				});
-				const data = await res.json();
-
-				if (res.ok && data.ok) {
-					alert("Compra registrada!");
-					document.getElementById("e-item").value = "";
-					document.getElementById("e-qtd").value = "";
-					document.getElementById("e-valor").value = "";
-					document.getElementById("e-fornecedor").value = "";
-
-					// Atualiza a tabela e o dashboard (se quiser)
-					await carregarCompras();
-				} else {
-					alert("Erro ao registrar: " + (data.message || "Verifique os dados"));
-				}
-			} catch (err) {
-				console.error(err);
-				alert("Erro ao conectar com o banco de dados");
-			}
-		}
-
-		// ================= COMPRAS (TABELA + FILTROS) =================
-		function parseDateOnlyToLocal(dateStr) {
-			// date input vem como "YYYY-MM-DD"
-			if (!dateStr) return null;
-			const [y,m,d] = dateStr.split("-").map(Number);
-			return new Date(y, m - 1, d, 0, 0, 0);
-		}
-
-		function badgeCategoria(cat) {
-			const c = (cat || "").toLowerCase();
-			if (c === "insumos") return '<span class="badge insumos">Insumos</span>';
-			if (c === "embalagens") return '<span class="badge embalagens">Embalagens</span>';
-			return '<span class="badge outros">' + (cat || "Outros") + '</span>';
-		}
-
-		async function carregarCompras() {
-			const tbody = document.getElementById("tbody-compras");
-			const resumo = document.getElementById("compras-resumo");
-			const totalEl = document.getElementById("compras-total");
-
-			if (tbody) tbody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`;
-			if (resumo) resumo.textContent = "Carregando...";
-			if (totalEl) totalEl.textContent = fmt(0);
-
-			try {
-				const res = await fetch(API + "/stock");
-				const data = await res.json();
-
-				COMPRAS_ENTRIES = data.entries || [];
-				aplicarFiltrosCompras();
-			} catch (err) {
-				console.error(err);
-				if (tbody) tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar compras.</td></tr>`;
-				if (resumo) resumo.textContent = "Erro ao carregar compras.";
-			}
-		}
-
-		function aplicarFiltrosCompras() {
-			const fornecedorId = document.getElementById("filtro-fornecedor")?.value || "";
-			const categoria = document.getElementById("filtro-categoria")?.value || "";
-			const deStr = document.getElementById("filtro-de")?.value || "";
-			const ateStr = document.getElementById("filtro-ate")?.value || "";
-
-			const de = parseDateOnlyToLocal(deStr);
-			const ate = parseDateOnlyToLocal(ateStr);
-			if (ate) ate.setHours(23,59,59,999);
-
-			const filtrados = (COMPRAS_ENTRIES || []).filter(e => {
-				if (fornecedorId && String(e.supplier_id) !== String(fornecedorId)) return false;
-				if (categoria && String(e.category) !== String(categoria)) return false;
-
-				const dt = e.entry_date ? new Date(e.entry_date) : null;
-				if (de && dt && dt < de) return false;
-				if (ate && dt && dt > ate) return false;
-
-				return true;
-			});
-
-			renderTabelaCompras(filtrados, { fornecedorId, categoria, deStr, ateStr });
-		}
-
-		function renderTabelaCompras(entries, filtros) {
-			const tbody = document.getElementById("tbody-compras");
-			const resumo = document.getElementById("compras-resumo");
-			const totalEl = document.getElementById("compras-total");
-
-			const total = (entries || []).reduce((acc, e) => acc + Number(e.total_value || 0), 0);
-			if (totalEl) totalEl.textContent = fmt(total);
-
-			const parts = [];
-			if (filtros.fornecedorId) parts.push("Fornecedor filtrado");
-			if (filtros.categoria) parts.push("Categoria: " + filtros.categoria);
-			if (filtros.deStr) parts.push("De: " + filtros.deStr);
-			if (filtros.ateStr) parts.push("Até: " + filtros.ateStr);
-
-			const resumoTxt = `${entries.length} registro(s)` + (parts.length ? " • " + parts.join(" • ") : "");
-			if (resumo) resumo.textContent = resumoTxt;
-
-			if (!tbody) return;
-
-			if (!entries.length) {
-				tbody.innerHTML = `<tr><td colspan="6">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
-				return;
-			}
-
-			tbody.innerHTML = entries.map(e => {
-				const dataFmt = e.entry_date ? new Date(e.entry_date).toLocaleString("pt-BR") : "—";
-				const fornecedor = e.suppliers?.name || "—";
-				const qtd = (e.quantity ?? "—");
-				const valor = fmt(Number(e.total_value || 0));
-
-				return `
-					<tr>
-						<td>${dataFmt}</td>
-						<td>${fornecedor}</td>
-						<td>${badgeCategoria(e.category)}</td>
-						<td><strong>${e.item_name || ""}</strong></td>
-						<td style="text-align:right;">${qtd}</td>
-						<td style="text-align:right;"><strong>${valor}</strong></td>
-					</tr>
-				`;
-			}).join("");
-		}
-
-		function limparFiltrosCompras() {
-			const f1 = document.getElementById("filtro-fornecedor");
-			const f2 = document.getElementById("filtro-categoria");
-			const f3 = document.getElementById("filtro-de");
-			const f4 = document.getElementById("filtro-ate");
-			if (f1) f1.value = "";
-			if (f2) f2.value = "";
-			if (f3) f3.value = "";
-			if (f4) f4.value = "";
-			aplicarFiltrosCompras();
-		}
-
-		// listeners para filtros (atualiza ao mudar)
-		window.addEventListener("change", (e) => {
-			const ids = ["filtro-fornecedor", "filtro-categoria", "filtro-de", "filtro-ate"];
-			if (ids.includes(e.target?.id)) aplicarFiltrosCompras();
-		});
-
-		// ================= DASHBOARD FINANCEIRO =================
-		async function atualizarDashboardFinanceiro() {
-			const resOrders = await fetch(API + "/operations/orders");
-			const dataOrders = await resOrders.json();
-
-			let bruto = 0, taxas = 0;
-			(dataOrders.orders || []).forEach(p => {
-				if (p.payment_status === "approved") {
-					bruto += Number(p.total || 0);
-					taxas += Number(p.gateway_fee || 0);
-				}
-			});
-
-			const resCosts = await fetch(API + "/costs");
-			const dataCosts = await resCosts.json();
-			const custosFixos = (dataCosts.data || []).reduce((acc, c) => acc + Number(c.value), 0);
-
-			const resStock = await fetch(API + "/stock");
-			const dataStock = await resStock.json();
-			const compras = (dataStock.entries || []).reduce((acc, c) => acc + Number(c.total_value), 0);
-
-			const lucro = bruto - taxas - custosFixos - compras;
-			document.getElementById("dash-bruto").innerText = fmt(bruto);
-			document.getElementById("dash-taxas").innerText = fmt(taxas);
-			document.getElementById("dash-custos").innerText = fmt(custosFixos);
-			document.getElementById("dash-compras").innerText = fmt(compras);
-			document.getElementById("dash-lucro").innerText = fmt(lucro);
-		}
-
-		// INICIALIZAÇÃO
-		aplicarPermissoes();
-		carregarPedidos();
-		setInterval(carregarPedidos, 30000);
-	</script>
+<header>
+  <section class="hero">
+    <img
+      src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
+      alt="Ícone Tá na Mão!"
+      style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 14px;"
+    >
+    <h2>Painel Operacional & Gestão</h2>
+  </section>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">📦 Vendas (Operação)</button>
+    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">🛒 Compras & Estoque</button>
+    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-cardapio', this)">🍽️ Cardápio & Estoque</button>
+    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">📊 Financeiro & Dash</button>
+    <button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
+  </div>
+
+  <!-- ABA VENDAS -->
+  <div id="aba-vendas" class="tab-content active">
+    <div class="topbar-btns">
+      <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">🔄 Atualizar</button>
+      <button class="tab-btn" data-role="admin" style="background: #444; color: white;" onclick="editarLimite()">Definir Limite</button>
+    </div>
+
+    <div class="board">
+      <div class="column"><div class="column-header">Entrou</div><div id="col-paid"></div></div>
+      <div class="column"><div class="column-header">Produção</div><div id="col-preparing"></div></div>
+      <div class="column"><div class="column-header">Pronto</div><div id="col-ready"></div></div>
+      <div class="column"><div class="column-header">Entrega</div><div id="col-delivery"></div></div>
+    </div>
+  </div>
+
+  <!-- ABA COMPRAS -->
+  <div id="aba-compras" class="tab-content">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      <div class="admin-card">
+        <h3>Cadastrar Fornecedor</h3>
+        <input id="f-nome" placeholder="Nome do Fornecedor / Empresa">
+        <input id="f-contato" placeholder="Contato (WhatsApp / Email)">
+        <input id="f-doc" placeholder="CNPJ / CPF">
+        <button onclick="salvarFornecedor()">Salvar Fornecedor</button>
+      </div>
+
+      <div class="admin-card">
+        <h3>Lançar Compra / Entrada</h3>
+        <select id="e-fornecedor"><option value="">Selecione o Fornecedor...</option></select>
+        <input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
+        <input id="e-qtd" type="number" placeholder="Quantidade">
+        <input id="e-valor" type="number" placeholder="Valor Total (R$)">
+        <select id="e-cat">
+          <option value="Insumos">Insumos / Ingredientes</option>
+          <option value="Embalagens">Embalagens</option>
+          <option value="Outros">Outros</option>
+        </select>
+        <button onclick="salvarCompra()">Registrar Compra</button>
+      </div>
+    </div>
+
+    <div class="admin-card" style="margin-top: 20px;">
+      <h3>Compras registradas</h3>
+
+      <div class="filters-grid">
+        <div>
+          <label>Fornecedor</label>
+          <select id="filtro-fornecedor">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Categoria</label>
+          <select id="filtro-categoria">
+            <option value="">Todas</option>
+            <option value="Insumos">Insumos</option>
+            <option value="Embalagens">Embalagens</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+
+        <div>
+          <label>De (data)</label>
+          <input id="filtro-de" type="date">
+        </div>
+
+        <div>
+          <label>Até (data)</label>
+          <input id="filtro-ate" type="date">
+        </div>
+      </div>
+
+      <div class="filters-actions">
+        <button class="btn-secondary" onclick="limparFiltrosCompras()">Limpar filtros</button>
+        <button class="btn-secondary" onclick="carregarCompras()">Recarregar</button>
+      </div>
+
+      <div class="summary-bar">
+        <div class="muted" id="compras-resumo">Carregando...</div>
+        <div><strong>Total filtrado:</strong> <span id="compras-total">R$ 0,00</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table style="min-width: 820px;">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Fornecedor</th>
+              <th>Categoria</th>
+              <th>Item</th>
+              <th style="text-align:right;">Qtd</th>
+              <th style="text-align:right;">Valor</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-compras">
+            <tr><td colspan="6">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA CARDÁPIO & ESTOQUE -->
+  <div id="aba-cardapio" class="tab-content">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+      <div class="admin-card">
+        <h3 id="cardapio-form-title">Cadastrar produto</h3>
+
+        <input type="hidden" id="p-id">
+
+        <label>Nome</label>
+        <input id="p-nome" placeholder="Nome do produto">
+
+        <label>Descrição</label>
+        <textarea id="p-desc" placeholder="Descrição"></textarea>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label>Preço (R$)</label>
+            <input id="p-preco" type="number" step="0.01" placeholder="Ex: 19.90">
+          </div>
+          <div>
+            <label>Ordem</label>
+            <input id="p-ordem" type="number" step="1" placeholder="0" value="0">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label>Ativo</label>
+            <select id="p-ativo">
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Imagem</label>
+            <input id="p-img" type="file" accept="image/*">
+          </div>
+        </div>
+
+        <div class="small" style="margin-top:6px;">
+          Dica: imagens grandes podem demorar. O backend otimiza em WebP automaticamente.
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+          <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="salvarProduto()">💾 Salvar</button>
+          <button class="tab-btn" style="background:#fff;border:1px solid #ddd;color:#333;" onclick="limparFormProduto()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Produtos (Cardápio + Estoque)</h3>
+
+        <div class="topbar-btns" style="justify-content:flex-end;">
+          <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="carregarProdutosAdmin()">🔄 Atualizar</button>
+        </div>
+
+        <div class="table-wrap">
+          <table style="min-width: 1040px;">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Produto</th>
+                <th>Ativo</th>
+                <th style="text-align:right;">Preço</th>
+                <th style="text-align:right;">Estoque</th>
+                <th style="text-align:right;">Ordem</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-produtos">
+              <tr><td colspan="7">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="small" style="margin-top:10px;">
+          Ajuste de estoque: use delta (+/-). Ex.: <b>+10</b> para produzir 10 unidades, <b>-2</b> para perdas/ajustes.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA CONFIG -->
+  <div id="aba-config" class="tab-content">
+    <div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
+      <h3>Dashboard de Resultado Real</h3>
+      <p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
+      <p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$ 0,00</strong></p>
+      <p>Custos Fixos: <strong id="dash-custos" style="color: #c0392b;">R$ 0,00</strong></p>
+      <p>Compras/Estoque: <strong id="dash-compras" style="color: #c0392b;">R$ 0,00</strong></p>
+      <hr>
+      <h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde); font-size: 1.5rem;">R$ 0,00</strong></h4>
+      <button onclick="atualizarDashboardFinanceiro()" style="margin-top: 15px;">Atualizar Dados</button>
+    </div>
+
+    <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
+      <h3>🔒 Segurança da Conta</h3>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
+        Altere sua senha de acesso ao sistema.
+      </p>
+      <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
+      <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
+      <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BACKEND_URL = "https://tanamao-backend.onrender.com";
+  const API = BACKEND_URL + "/api";
+
+  let pedidos = [];
+  const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+
+  // ====== ESTADO (Compras) ======
+  let COMPRAS_ENTRIES = [];
+
+  // ====== ESTADO (Produtos Admin) ======
+  let PRODUTOS_ADMIN = [];
+
+  // ================= ACESSO & SEGURANÇA =================
+  const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
+  let USER_ROLE = USER_DATA.role || "operador";
+
+  function logout() {
+    localStorage.removeItem("tnm_token");
+    localStorage.removeItem("tnm_user");
+    localStorage.removeItem("tnm_role");
+    window.location.href = "login.html";
+  }
+
+  function aplicarPermissoes() {
+    document.querySelectorAll("[data-role='admin']").forEach(el => {
+      el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
+    });
+    const btnLogin = document.getElementById("btn-login-admin");
+    if (USER_ROLE === "admin") {
+      btnLogin.innerText = "Admin ✅";
+      btnLogin.style.background = "var(--dourado)";
+    } else {
+      btnLogin.innerText = "Funcionário 👤";
+    }
+  }
+
+  async function alterarMinhaSenha() {
+    const btn = document.getElementById("btn-trocar-senha");
+    const novaSenha = document.getElementById("nova-senha").value;
+
+    if (!novaSenha || novaSenha.length < 6) {
+      return alert("A senha deve ter no mínimo 6 caracteres.");
+    }
+    if (!USER_DATA.id) return alert("Sessão corrompida. Faça login novamente.");
+
+    btn.disabled = true;
+    btn.innerText = "Salvando...";
+
+    try {
+      const res = await fetch(`${API}/employees/${USER_DATA.id}/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword: novaSenha })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        alert("Senha atualizada com sucesso!");
+        document.getElementById("nova-senha").value = "";
+      } else {
+        alert(data.message || "Erro ao atualizar senha.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro de conexão ao tentar alterar senha.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Atualizar Senha";
+    }
+  }
+
+  // ================= CONTROLE DAS ABAS =================
+  function abrirAba(idAba, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(idAba).classList.add('active');
+    btn.classList.add('active');
+
+    if (idAba === 'aba-compras') {
+      carregarFornecedores();
+      carregarCompras();
+    }
+    if (idAba === 'aba-config') atualizarDashboardFinanceiro();
+    if (idAba === 'aba-cardapio') carregarProdutosAdmin();
+  }
+
+  function editarLimite() {
+    const valor = prompt("Defina o novo limite diário de pedidos:");
+    if (valor === null) return;
+
+    const num = Number(valor);
+    if (!Number.isFinite(num) || num <= 0) {
+      alert("Digite um número válido (ex: 30).");
+      return;
+    }
+    alert("Limite ajustado para: " + num + " (integração com API depois).");
+  }
+
+  // ================= PEDIDOS (KANBAN) =================
+  async function carregarPedidos(){
+    try {
+      const res = await fetch(API + "/operations/orders");
+      const data = await res.json();
+      pedidos = data.orders || [];
+      renderizar();
+    } catch (e) {
+      console.error("Erro ao carregar pedidos:", e);
+    }
+  }
+
+  function renderizar(){
+    const ativos = pedidos.filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled');
+    const filter = (status) => ativos.filter(p =>
+      p.delivery_status === status ||
+      (status === 'pending' && !p.delivery_status && p.payment_status === 'approved')
+    );
+    renderCol("col-paid", filter('pending'));
+    renderCol("col-preparing", filter('preparing'));
+    renderCol("col-ready", filter('ready'));
+    renderCol("col-delivery", filter('out_for_delivery'));
+  }
+
+  function renderCol(id, lista){
+    const el = document.getElementById(id);
+    el.innerHTML = lista.length ? "" : "<div class='card'>Vazio</div>";
+    lista.forEach(p => {
+      el.innerHTML += `<div class="card">
+        <strong>${p.customer_name}</strong><br>
+        Total: ${fmt(p.total)}<br>
+        <button onclick="atualizarStatus('${p.id}','${proximoStatus(p.delivery_status)}')">
+          ${labelBotao(p.delivery_status)}
+        </button>
+      </div>`;
+    });
+  }
+
+  function proximoStatus(s){
+    if(!s || s==='pending') return 'preparing';
+    if(s==='preparing') return 'ready';
+    if(s==='ready') return 'out_for_delivery';
+    return 'delivered';
+  }
+
+  function labelBotao(s){
+    if(!s || s==='pending') return 'Iniciar Produção';
+    if(s==='preparing') return 'Marcar como Pronto';
+    if(s==='ready') return 'Saiu para Entrega';
+    return 'Finalizar Pedido';
+  }
+
+  async function atualizarStatus(id, status){
+    await fetch(`${API}/operations/orders/${id}/status`, {
+      method: "PATCH",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ delivery_status: status })
+    });
+    carregarPedidos();
+  }
+
+  // ================= GESTÃO DE COMPRAS & FORNECEDORES =================
+  async function carregarFornecedores() {
+    const res = await fetch(API + "/suppliers");
+    const data = await res.json();
+
+    // Select do form
+    const select = document.getElementById("e-fornecedor");
+    select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
+    const suppliers = data.suppliers || [];
+    suppliers.forEach((f) => {
+      select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+    });
+
+    // Select do filtro
+    const selFiltro = document.getElementById("filtro-fornecedor");
+    if (selFiltro) {
+      selFiltro.innerHTML = '<option value="">Todos</option>';
+      suppliers.forEach((f) => {
+        selFiltro.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+      });
+    }
+  }
+
+  async function salvarFornecedor() {
+    const name = document.getElementById("f-nome").value;
+    const contact = document.getElementById("f-contato").value;
+    const documentId = document.getElementById("f-doc").value;
+
+    if(!name) return alert("Nome obrigatório");
+    try {
+      const res = await fetch(API + "/suppliers", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, contact, document: documentId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Fornecedor cadastrado!");
+        document.getElementById("f-nome").value = "";
+        document.getElementById("f-contato").value = "";
+        document.getElementById("f-doc").value = "";
+        await carregarFornecedores();
+      } else {
+        alert("Erro ao salvar: " + (data.message || "Tente novamente"));
+      }
+    } catch (err) {
+      alert("Erro de conexão com o servidor");
+    }
+  }
+
+  async function salvarCompra() {
+    const supplierId = document.getElementById("e-fornecedor").value;
+    if (!supplierId) return alert("Selecione um fornecedor cadastrado!");
+
+    const body = {
+      supplier_id: supplierId,
+      item_name: document.getElementById("e-item").value.trim(),
+      quantity: document.getElementById("e-qtd").value,
+      total_value: document.getElementById("e-valor").value,
+      category: document.getElementById("e-cat").value
+    };
+
+    if (!body.item_name || !body.total_value) return alert("Preencha os campos!");
+
+    try {
+      const res = await fetch(API + "/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        alert("Compra registrada!");
+        document.getElementById("e-item").value = "";
+        document.getElementById("e-qtd").value = "";
+        document.getElementById("e-valor").value = "";
+        document.getElementById("e-fornecedor").value = "";
+
+        await carregarCompras();
+      } else {
+        alert("Erro ao registrar: " + (data.message || "Verifique os dados"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao conectar com o banco de dados");
+    }
+  }
+
+  // ================= COMPRAS (TABELA + FILTROS) =================
+  function parseDateOnlyToLocal(dateStr) {
+    if (!dateStr) return null;
+    const [y,m,d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0);
+  }
+
+  function badgeCategoria(cat) {
+    const c = (cat || "").toLowerCase();
+    if (c === "insumos") return '<span class="badge insumos">Insumos</span>';
+    if (c === "embalagens") return '<span class="badge embalagens">Embalagens</span>';
+    return '<span class="badge outros">' + (cat || "Outros") + '</span>';
+  }
+
+  async function carregarCompras() {
+    const tbody = document.getElementById("tbody-compras");
+    const resumo = document.getElementById("compras-resumo");
+    const totalEl = document.getElementById("compras-total");
+
+    if (tbody) tbody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`;
+    if (resumo) resumo.textContent = "Carregando...";
+    if (totalEl) totalEl.textContent = fmt(0);
+
+    try {
+      const res = await fetch(API + "/stock");
+      const data = await res.json();
+
+      COMPRAS_ENTRIES = data.entries || [];
+      aplicarFiltrosCompras();
+    } catch (err) {
+      console.error(err);
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar compras.</td></tr>`;
+      if (resumo) resumo.textContent = "Erro ao carregar compras.";
+    }
+  }
+
+  function aplicarFiltrosCompras() {
+    const fornecedorId = document.getElementById("filtro-fornecedor")?.value || "";
+    const categoria = document.getElementById("filtro-categoria")?.value || "";
+    const deStr = document.getElementById("filtro-de")?.value || "";
+    const ateStr = document.getElementById("filtro-ate")?.value || "";
+
+    const de = parseDateOnlyToLocal(deStr);
+    const ate = parseDateOnlyToLocal(ateStr);
+    if (ate) ate.setHours(23,59,59,999);
+
+    const filtrados = (COMPRAS_ENTRIES || []).filter(e => {
+      if (fornecedorId && String(e.supplier_id) !== String(fornecedorId)) return false;
+      if (categoria && String(e.category) !== String(categoria)) return false;
+
+      const dt = e.entry_date ? new Date(e.entry_date) : null;
+      if (de && dt && dt < de) return false;
+      if (ate && dt && dt > ate) return false;
+
+      return true;
+    });
+
+    renderTabelaCompras(filtrados, { fornecedorId, categoria, deStr, ateStr });
+  }
+
+  function renderTabelaCompras(entries, filtros) {
+    const tbody = document.getElementById("tbody-compras");
+    const resumo = document.getElementById("compras-resumo");
+    const totalEl = document.getElementById("compras-total");
+
+    const total = (entries || []).reduce((acc, e) => acc + Number(e.total_value || 0), 0);
+    if (totalEl) totalEl.textContent = fmt(total);
+
+    const parts = [];
+    if (filtros.fornecedorId) parts.push("Fornecedor filtrado");
+    if (filtros.categoria) parts.push("Categoria: " + filtros.categoria);
+    if (filtros.deStr) parts.push("De: " + filtros.deStr);
+    if (filtros.ateStr) parts.push("Até: " + filtros.ateStr);
+
+    const resumoTxt = `${entries.length} registro(s)` + (parts.length ? " • " + parts.join(" • ") : "");
+    if (resumo) resumo.textContent = resumoTxt;
+
+    if (!tbody) return;
+
+    if (!entries.length) {
+      tbody.innerHTML = `<tr><td colspan="6">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = entries.map(e => {
+      const dataFmt = e.entry_date ? new Date(e.entry_date).toLocaleString("pt-BR") : "—";
+      const fornecedor = e.suppliers?.name || "—";
+      const qtd = (e.quantity ?? "—");
+      const valor = fmt(Number(e.total_value || 0));
+
+      return `
+        <tr>
+          <td>${dataFmt}</td>
+          <td>${fornecedor}</td>
+          <td>${badgeCategoria(e.category)}</td>
+          <td><strong>${e.item_name || ""}</strong></td>
+          <td style="text-align:right;">${qtd}</td>
+          <td style="text-align:right;"><strong>${valor}</strong></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function limparFiltrosCompras() {
+    const f1 = document.getElementById("filtro-fornecedor");
+    const f2 = document.getElementById("filtro-categoria");
+    const f3 = document.getElementById("filtro-de");
+    const f4 = document.getElementById("filtro-ate");
+    if (f1) f1.value = "";
+    if (f2) f2.value = "";
+    if (f3) f3.value = "";
+    if (f4) f4.value = "";
+    aplicarFiltrosCompras();
+  }
+
+  window.addEventListener("change", (e) => {
+    const ids = ["filtro-fornecedor", "filtro-categoria", "filtro-de", "filtro-ate"];
+    if (ids.includes(e.target?.id)) aplicarFiltrosCompras();
+  });
+
+  // ================= CARDÁPIO & ESTOQUE (ADMIN) =================
+  function fileToBase64(file){
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.readAsDataURL(file);
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+    });
+  }
+
+  function getEl(id){ return document.getElementById(id); }
+
+  function limparFormProduto(){
+    getEl("p-id").value = "";
+    getEl("p-nome").value = "";
+    getEl("p-desc").value = "";
+    getEl("p-preco").value = "";
+    getEl("p-ordem").value = "0";
+    getEl("p-ativo").value = "true";
+    getEl("p-img").value = "";
+    getEl("cardapio-form-title").innerText = "Cadastrar produto";
+  }
+
+  function preencherFormProdutoById(id){
+    const p = (PRODUTOS_ADMIN || []).find(x => String(x.id) === String(id));
+    if (!p) return;
+    getEl("p-id").value = p.id;
+    getEl("p-nome").value = p.name || "";
+    getEl("p-desc").value = p.description || "";
+    getEl("p-preco").value = Number(p.price || 0);
+    getEl("p-ordem").value = Number(p.sort_order || 0);
+    getEl("p-ativo").value = String(!!p.active);
+    getEl("p-img").value = "";
+    getEl("cardapio-form-title").innerText = "Editar produto";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function salvarProduto(){
+    const id = getEl("p-id").value.trim();
+    const name = getEl("p-nome").value.trim();
+    const description = getEl("p-desc").value.trim();
+    const price = getEl("p-preco").value;
+    const sort_order = getEl("p-ordem").value;
+    const active = (getEl("p-ativo").value === "true");
+
+    if(!name) return alert("Nome obrigatório.");
+
+    const file = getEl("p-img").files[0];
+
+    try{
+      if(!id){
+        let image_url = "";
+        if (file) image_url = await fileToBase64(file);
+
+        const res = await fetch(API + "/products", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ name, description, price, image_url })
+        });
+        const data = await res.json();
+        if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao criar produto");
+        alert("Produto criado!");
+      } else {
+        // Se não escolheu imagem, não envia image_url (pra não mexer)
+        if (!file) {
+          const res = await fetch(API + "/products/" + id, {
+            method: "PUT",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({ name, description, price, active, sort_order })
+          });
+          const data = await res.json();
+          if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao atualizar produto");
+        } else {
+          const image_url = await fileToBase64(file);
+          const res = await fetch(API + "/products/" + id, {
+            method: "PUT",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({ name, description, price, image_url, active, sort_order })
+          });
+          const data = await res.json();
+          if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao atualizar produto");
+        }
+
+        alert("Produto atualizado!");
+      }
+
+      limparFormProduto();
+      await carregarProdutosAdmin();
+    } catch(e){
+      console.error(e);
+      alert(e.message || "Erro ao salvar produto.");
+    }
+  }
+
+  async function carregarProdutosAdmin(){
+    const tbody = getEl("tbody-produtos");
+    tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
+
+    try{
+      const res = await fetch(API + "/products");
+      const data = await res.json();
+      PRODUTOS_ADMIN = data.products || [];
+      renderProdutosAdmin();
+    } catch(e){
+      console.error(e);
+      tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar produtos.</td></tr>`;
+    }
+  }
+
+  function renderProdutosAdmin(){
+    const tbody = getEl("tbody-produtos");
+
+    if(!PRODUTOS_ADMIN.length){
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = PRODUTOS_ADMIN.map(p => {
+      const img = p.image_url
+        ? `<img class="prod-img" src="${p.image_url}" alt="Foto">`
+        : `<div class="prod-img"></div>`;
+
+      const ativo = p.active ? `<span class="badge on">Ativo</span>` : `<span class="badge off">Inativo</span>`;
+      const preco = fmt(Number(p.price || 0));
+      const estoque = Number(p.stock_quantity || 0);
+      const ordem = Number(p.sort_order || 0);
+
+      return `
+        <tr>
+          <td>${img}</td>
+          <td>
+            <strong>${p.name || ""}</strong><br>
+            <span class="small">${(p.description || "").slice(0, 90)}${(p.description || "").length > 90 ? "..." : ""}</span>
+          </td>
+          <td>${ativo}</td>
+          <td style="text-align:right;"><strong>${preco}</strong></td>
+          <td style="text-align:right;">
+            <strong>${estoque}</strong>
+            <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+              <input id="delta-${p.id}" type="number" step="1" placeholder="+/-" style="width:90px;padding:8px;border:1px solid #ddd;border-radius:10px;">
+              <button class="btn-secondary" onclick="ajustarEstoque('${p.id}', ${estoque})">Aplicar</button>
+            </div>
+            <div style="margin-top:6px; display:flex; justify-content:flex-end;">
+              <input id="motivo-${p.id}" type="text" placeholder="Motivo (opcional)" style="width: 240px; max-width: 100%; padding:8px;border:1px solid #ddd;border-radius:10px;">
+            </div>
+          </td>
+          <td style="text-align:right;">${ordem}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-secondary" onclick="preencherFormProdutoById('${p.id}')">Editar</button>
+              <button class="btn-secondary" onclick="toggleAtivo('${p.id}', ${!!p.active})">${p.active ? "Desativar" : "Ativar"}</button>
+              <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function toggleAtivo(id, isActive){
+    try{
+      const res = await fetch(API + "/products/" + id, {
+        method: "PUT",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ active: !isActive })
+      });
+      const data = await res.json();
+      if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao atualizar");
+      await carregarProdutosAdmin();
+    } catch(e){
+      console.error(e);
+      alert(e.message || "Erro ao ativar/desativar.");
+    }
+  }
+
+  async function ajustarEstoque(id, estoqueAtual){
+    const deltaEl = getEl("delta-" + id);
+    const motivoEl = getEl("motivo-" + id);
+
+    const delta = Number(deltaEl.value);
+    if (!Number.isFinite(delta) || delta === 0) {
+      return alert("Informe um delta válido (ex.: +10 ou -2).");
+    }
+
+    const novo = estoqueAtual + Math.trunc(delta);
+    if (novo < 0) return alert("Estoque não pode ficar negativo.");
+
+    const motivo = (motivoEl?.value || "").trim();
+    if (motivo) console.log("[Ajuste de estoque] motivo:", motivo);
+
+    try{
+      const res = await fetch(API + "/products/" + id, {
+        method: "PUT",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ stock_quantity: novo })
+      });
+      const data = await res.json();
+      if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao ajustar estoque");
+
+      deltaEl.value = "";
+      if (motivoEl) motivoEl.value = "";
+      await carregarProdutosAdmin();
+    } catch(e){
+      console.error(e);
+      alert(e.message || "Erro ao ajustar estoque.");
+    }
+  }
+
+  async function excluirProduto(id){
+    if(!confirm("Tem certeza que deseja excluir este produto?")) return;
+    try{
+      const res = await fetch(API + "/products/" + id, { method:"DELETE" });
+      const data = await res.json();
+      if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao excluir");
+      await carregarProdutosAdmin();
+    } catch(e){
+      console.error(e);
+      alert(e.message || "Erro ao excluir produto.");
+    }
+  }
+
+  // ================= DASHBOARD FINANCEIRO =================
+  async function atualizarDashboardFinanceiro() {
+    const resOrders = await fetch(API + "/operations/orders");
+    const dataOrders = await resOrders.json();
+
+    let bruto = 0, taxas = 0;
+    (dataOrders.orders || []).forEach(p => {
+      if (p.payment_status === "approved") {
+        bruto += Number(p.total || 0);
+        taxas += Number(p.gateway_fee || 0);
+      }
+    });
+
+    const resCosts = await fetch(API + "/costs");
+    const dataCosts = await resCosts.json();
+    const custosFixos = (dataCosts.data || []).reduce((acc, c) => acc + Number(c.value), 0);
+
+    const resStock = await fetch(API + "/stock");
+    const dataStock = await resStock.json();
+    const compras = (dataStock.entries || []).reduce((acc, c) => acc + Number(c.total_value), 0);
+
+    const lucro = bruto - taxas - custosFixos - compras;
+
+    document.getElementById("dash-bruto").innerText = fmt(bruto);
+    document.getElementById("dash-taxas").innerText = fmt(taxas);
+    document.getElementById("dash-custos").innerText = fmt(custosFixos);
+    document.getElementById("dash-compras").innerText = fmt(compras);
+    document.getElementById("dash-lucro").innerText = fmt(lucro);
+  }
+
+  // INICIALIZAÇÃO
+  aplicarPermissoes();
+  carregarPedidos();
+  setInterval(carregarPedidos, 30000);
+</script>
 </body>
 </html>
