@@ -436,11 +436,12 @@
               <th>Categoria</th>
               <th>Item</th>
               <th style="text-align:right;">Qtd</th>
+              <th style="text-align:right;">Custo unit.</th>
               <th style="text-align:right;">Valor</th>
             </tr>
           </thead>
           <tbody id="tbody-compras">
-            <tr><td colspan="6">Carregando...</td></tr>
+            <tr><td colspan="7">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -828,7 +829,7 @@
     const resumo = document.getElementById("compras-resumo");
     const totalEl = document.getElementById("compras-total");
 
-    if (tbody) tbody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
     if (resumo) resumo.textContent = "Carregando...";
     if (totalEl) totalEl.textContent = fmt(0);
 
@@ -840,7 +841,7 @@
       aplicarFiltrosCompras();
     } catch (err) {
       console.error(err);
-      if (tbody) tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar compras.</td></tr>`;
+      if (tbody) tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar compras.</td></tr>`;
       if (resumo) resumo.textContent = "Erro ao carregar compras.";
     }
   }
@@ -889,7 +890,7 @@
     if (!tbody) return;
 
     if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="6">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7">Nenhuma compra encontrada para os filtros atuais.</td></tr>`;
       return;
     }
 
@@ -899,19 +900,22 @@
       const qtd = (e.quantity ?? "—");
       const valor = fmt(Number(e.total_value || 0));
 
-      return `
-        <tr>
-          <td>${dataFmt}</td>
-          <td>${fornecedor}</td>
-          <td>${badgeCategoria(e.category)}</td>
-          <td><strong>${e.item_name || ""}</strong></td>
-          <td style="text-align:right;">${qtd}</td>
-          <td style="text-align:right;"><strong>${valor}</strong></td>
-        </tr>
-      `;
-    }).join("");
-  }
+      const unit = (e.unit_cost === null || typeof e.unit_cost === "undefined")
+  ? "—"
+  : fmt(Number(e.unit_cost || 0));
 
+return `
+  <tr>
+    <td>${dataFmt}</td>
+    <td>${fornecedor}</td>
+    <td>${badgeCategoria(e.category)}</td>
+    <td><strong>${e.item_name || ""}</strong></td>
+    <td style="text-align:right;">${qtd}</td>
+    <td style="text-align:right;">${unit}</td>
+    <td style="text-align:right;"><strong>${valor}</strong></td>
+  </tr>
+`;
+      
   function limparFiltrosCompras() {
     const f1 = document.getElementById("filtro-fornecedor");
     const f2 = document.getElementById("filtro-categoria");
