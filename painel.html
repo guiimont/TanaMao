@@ -730,7 +730,7 @@
   }
 
   function proximoStatus(s){
-    if(!s || s==='pending') return 'preparing';
+    if(!s || s==='pending') return 'pending';
     if(s==='preparing') return 'ready';
     if(s==='ready') return 'out_for_delivery';
     return 'delivered';
@@ -744,13 +744,37 @@
   }
 
   async function atualizarStatus(id, status){
-    await fetch(`${API}/operations/orders/${id}/status`, {
-      method: "PATCH",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ delivery_status: status })
+  // Se está em pending e clicou "Iniciar Produção", roda a baixa inteligente
+  if(status === "pending"){
+    const res = await fetch(`${API}/operations/orders/${id}/start-production`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
     });
+    const data = await res.json();
+
+    if(!res.ok || !data.ok){
+      alert(data.message || "Erro ao iniciar produção.");
+      return;
+    }
+
+    // Se faltou item, avisa (sem travar a operação)
+    if (data.delivery_status === "preparing" && Array.isArray(data.issues) && data.issues.length){
+      const msg = data.issues.map(i => `• ${i.product_id}: faltou ${i.missing} (pediu ${i.requested}, tinha ${i.available})`).join("\n");
+      alert("Pedido enviado para Produção (faltas detectadas):\n\n" + msg);
+    }
+
     carregarPedidos();
+    return;
   }
+
+  // Fluxo normal pros outros status
+  await fetch(`${API}/operations/orders/${id}/status`, {
+    method: "PATCH",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ delivery_status: status })
+  });
+  carregarPedidos();
+}
 
   // ================= GESTÃO DE COMPRAS & FORNECEDORES =================
   async function carregarFornecedores() {
