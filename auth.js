@@ -33,6 +33,7 @@
     if (response.status === 401 && !window.location.pathname.includes("login.html")) {
       localStorage.removeItem("tnm_token");
       localStorage.removeItem("tnm_user");
+      localStorage.removeItem("tnm_role");
       window.location.href = "login.html";
     }
     return response;

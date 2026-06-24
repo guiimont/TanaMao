@@ -1101,7 +1101,7 @@
           </label>
           <label class="field">
             <span>Preço (R$)</span>
-            <input id="p-preco" type="number" step="0.01" placeholder="Ex: 19.90">
+            <input id="p-preco" type="text" inputmode="decimal" placeholder="Ex: 19,90">
           </label>
           <label class="field">
             <span>Ordem de exibição</span>
@@ -1399,6 +1399,22 @@
   let pedidos = [];
   let agendaFiltro = "all";
   const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+
+  function parseMoneyInput(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return NaN;
+    const normalized = raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }
+
+  async function readJsonResponse(res) {
+    try {
+      return await res.json();
+    } catch {
+      return {};
+    }
+  }
 
   // ====== ESTADO (Compras) ======
   let COMPRAS_ENTRIES = [];
@@ -2251,6 +2267,12 @@
 
     if(!name) return alert("Nome obrigatório.");
 
+    const parsedPrice = parseMoneyInput(price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      alert("Preço inválido. Use 19,90 ou 19.90.");
+      return;
+    }
+
     const file = getEl("p-img").files[0];
     const selectedDays = getCheckedProductDays();
     const allDaysSelected = !!getEl("p-todos-dias")?.checked;
@@ -2262,7 +2284,7 @@
     const productPayload = {
       name,
       description,
-      price,
+      price: parsedPrice,
       active,
       sort_order,
       category: getEl("p-categoria").value || null,
@@ -2285,8 +2307,8 @@
         headers: { "Content-Type":"application/json" },
         body: JSON.stringify(productPayload)
       });
-      const data = await res.json();
-      if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar produto");
+      const data = await readJsonResponse(res);
+      if(!res.ok || !data.ok) throw new Error(data.message || `Erro ${res.status} ao salvar produto`);
 
       alert(id ? "Produto atualizado!" : "Produto criado!");
       limparFormProduto();
