@@ -709,6 +709,18 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
         </div>
       </div>
 
+      <span class="form-label">Encomenda programada</span>
+      <div class="form-grid">
+        <input type="date" id="m-data-entrega" class="input-full">
+        <select id="m-janela-entrega" class="input-full">
+          <option value="">Escolha uma janela</option>
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+          <option value="Combinar pelo WhatsApp">Combinar pelo WhatsApp</option>
+        </select>
+      </div>
+
       <div class="erro-msg" id="erro-msg"></div>
       <button class="btn-pagar" id="btn-pagar" onclick="finalizarPedido()">Ir para pagamento</button>
     </div>
@@ -899,7 +911,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       checarLogin();
 
       const campos = [
-        "m-nome","m-tel","m-cep","m-rua","m-numero","m-complemento","m-bairro","m-cidade","m-estado"
+        "m-nome","m-tel","m-cep","m-rua","m-numero","m-complemento","m-bairro","m-cidade","m-estado","m-data-entrega","m-janela-entrega"
       ];
 
       campos.forEach(id => {
@@ -918,7 +930,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       // 1. Tenta carregar do Cache (IndexedDB) primeiro para renderização instantânea
       const cachedProducts = await getCachedProducts();
       if (cachedProducts && cachedProducts.length > 0) {
-        PRODS = cachedProducts.filter(p => p.active !== false);
+        PRODS = cachedProducts.filter(p => p.active !== false && p.is_sellable !== false);
         const cartSalvo = carregarCarrinho();
         PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
         renderProdutos();
@@ -945,7 +957,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
         await saveProductsToCache(fetchedProds);
 
         // Atualiza a interface com os dados frescos
-        PRODS = fetchedProds.filter(p => p.active !== false);
+        PRODS = fetchedProds.filter(p => p.active !== false && p.is_sellable !== false);
         
         if (!PRODS.length) {
           document.getElementById("produtos-container").innerHTML =
@@ -1065,6 +1077,15 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       rt.textContent = "Total a pagar: " + fmt(total);
     }
 
+    function configurarDataMinimaEntrega() {
+      const input = document.getElementById("m-data-entrega");
+      if (!input) return;
+      const minDate = new Date();
+      minDate.setDate(minDate.getDate() + 1);
+      input.min = minDate.toISOString().slice(0, 10);
+      if (!input.value) input.value = input.min;
+    }
+
     function abrirModal() {
       const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
 
@@ -1104,6 +1125,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
         : "Preencha seus dados para finalizar.";
 
       checarLogin();
+      configurarDataMinimaEntrega();
       ocultarErro();
       resetBtn();
       restoreBtnIfNeeded();
@@ -1136,7 +1158,26 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       if (!end.cidade) return "Informe a cidade.";
       if (!end.estado) return "Informe o estado.";
 
+      
+      const fulfillment = montarFulfillmentDoFormulario();
+      const fulfillmentError = validarFulfillment(fulfillment);
+      if (fulfillmentError) return fulfillmentError;
+
       return null;
+    }
+
+    function validarFulfillment(fulfillment) {
+      if (!fulfillment.scheduledDate) return "Escolha a data da encomenda.";
+      if (!fulfillment.deliveryWindow) return "Escolha a janela de entrega.";
+      return null;
+    }
+
+    function montarFulfillmentDoFormulario() {
+      return {
+        scheduledDate: getVal("m-data-entrega"),
+        deliveryWindow: getVal("m-janela-entrega"),
+        type: "delivery"
+      };
     }
 
     function montarClienteDoFormulario() {
@@ -1174,6 +1215,13 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
     checarLogin();
   }
 
+  const fulfillment = montarFulfillmentDoFormulario();
+  const fulfillmentError = validarFulfillment(fulfillment);
+  if (fulfillmentError) {
+    mostrarErro(fulfillmentError);
+    return;
+  }
+
   const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
   if (!ativos.length) {
     mostrarErro("Seu carrinho está vazio.");
@@ -1199,6 +1247,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       telefone: cliente.tel || "",
       endereco: cliente.endereco || {}
     },
+    fulfillment,
     source: "site"
   };
 
