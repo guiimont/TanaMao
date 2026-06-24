@@ -409,7 +409,7 @@
     }
 
     /* Esconder botões/abas de admin por padrão */
-    [data-role="admin"] { display: none; }
+    [data-role="admin"]:not(option) { display: none; }
 
     /* ====== TABELAS (Compras + Produtos) ====== */
     .table-wrap{
@@ -1450,6 +1450,7 @@
       if (el.tagName === "OPTION") {
         el.hidden = !isAdmin;
         el.disabled = !isAdmin;
+        el.style.display = isAdmin ? "" : "none";
       } else {
         el.style.display = isAdmin ? "inline-block" : "none";
       }
