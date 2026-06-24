@@ -196,6 +196,33 @@
       color: var(--dourado);
     }
 
+    .p-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 6px;
+    }
+
+    .p-chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(60,110,71,0.18);
+      background: rgba(60,110,71,0.06);
+      color: var(--verde-escuro);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .p-guide {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      margin-top: 6px;
+    }
+
     .qty-wrap {
       display: flex;
       align-items: center;
@@ -740,7 +767,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
     let isSubmittingCheckout = false;
 
     // ✅ LÓGICA DO INDEXEDDB (CACHE)
-    const DB_NAME = "TanamaoDB";
+    const DB_NAME = "TanamaoDB_v2";
     const STORE_NAME = "produtos_cache";
 
     function initDB() {
@@ -989,6 +1016,33 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       }
     }
 
+    function formatAvailableDays(days) {
+      const labels = { monday: "Seg", tuesday: "Ter", wednesday: "Qua", thursday: "Qui", friday: "Sex", saturday: "Sab", sunday: "Dom" };
+      return Array.isArray(days) && days.length ? days.map(day => labels[day] || day).join(", ") : "Todos os dias";
+    }
+
+    function renderProductDetails(p) {
+      const chips = [];
+      if (p.serving_size) chips.push(`Porcao: ${p.serving_size}`);
+      if (p.shelf_life_days) chips.push(`Validade: ${p.shelf_life_days} dia(s)`);
+      if (p.lead_time_hours) chips.push(`Encomenda: ${p.lead_time_hours}h antes`);
+      if (Array.isArray(p.available_days) && p.available_days.length) chips.push(`Dias: ${formatAvailableDays(p.available_days)}`);
+
+      const meta = chips.length
+        ? `<div class="p-meta">${chips.map(chip => `<span class="p-chip">${chip}</span>`).join("")}</div>`
+        : "";
+
+      const storage = p.storage_instructions
+        ? `<div class="p-guide">${p.storage_instructions}</div>`
+        : "";
+
+      const note = p.weekly_guide_note
+        ? `<div class="p-guide">${p.weekly_guide_note}</div>`
+        : "";
+
+      return `${meta}${storage}${note}`;
+    }
+
     function renderProdutos() {
   const container = document.getElementById("produtos-container");
 
@@ -1007,6 +1061,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
           <div class="product-info">
             <div class="p-nome">${p.name || ""}</div>
             <div class="p-desc">${p.description || ""}</div>
+            ${renderProductDetails(p)}
             <div class="p-preco">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
           </div>
         </div>
