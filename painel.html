@@ -1195,7 +1195,7 @@
     getEl("p-nota-semanal").value = p.weekly_guide_note || "";
     setCheckedProductDays(p.available_days || []);
     getEl("cardapio-form-title").innerText = "Editar produto";
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    getEl("cardapio-form-title").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   async function salvarProduto(){
