@@ -59,8 +59,9 @@
       height:52px;
       object-fit:contain;
       border-radius:14px;
-      background:#f7f4ec;
-      border:1px solid rgba(201,168,106,.25);
+      background:var(--verde);
+      border:1px solid rgba(45,82,53,.25);
+      padding:6px;
     }
 
     .app-brand small {
@@ -642,6 +643,7 @@
     <button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">Vendas e produção</button>
     <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">Compras</button>
     <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-cardapio', this)">Cardápio e estoque</button>
+    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-textos', this)">Textos do site</button>
     <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">Financeiro</button>
     <button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
   </div>
@@ -1013,6 +1015,144 @@
   </div>
 </div>
 
+  <!-- ABA TEXTOS DO SITE -->
+  <div id="aba-textos" class="tab-content">
+    <div class="admin-card">
+      <div class="card-heading">
+        <div>
+          <span class="eyebrow">Conteúdo público</span>
+          <h3>Textos do site</h3>
+          <p>Edite os textos principais da página pública sem mexer no código.</p>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">
+          <strong>Cabeçalho e apresentação</strong>
+          <span>Texto da marca, chamada principal e explicação inicial.</span>
+        </div>
+        <div class="form-grid">
+          <label class="field">
+            <span>Subtítulo da marca</span>
+            <input id="txt-brandSubtitle">
+          </label>
+          <label class="field">
+            <span>Selo do topo</span>
+            <input id="txt-headerBadge">
+          </label>
+          <label class="field full">
+            <span>Etiqueta da chamada</span>
+            <input id="txt-heroEyebrow">
+          </label>
+          <label class="field full">
+            <span>Título principal</span>
+            <input id="txt-heroTitle">
+          </label>
+          <label class="field full">
+            <span>Descrição principal</span>
+            <textarea id="txt-heroDescription"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">
+          <strong>Como funciona</strong>
+          <span>Os três blocos que explicam o fluxo para o cliente.</span>
+        </div>
+        <div class="form-grid">
+          <label class="field full">
+            <span>Título da seção</span>
+            <input id="txt-howItWorksTitle">
+          </label>
+          <label class="field">
+            <span>Bloco 1 - título</span>
+            <input id="txt-step1Title">
+          </label>
+          <label class="field">
+            <span>Bloco 1 - texto</span>
+            <input id="txt-step1Text">
+          </label>
+          <label class="field">
+            <span>Bloco 2 - título</span>
+            <input id="txt-step2Title">
+          </label>
+          <label class="field">
+            <span>Bloco 2 - texto</span>
+            <input id="txt-step2Text">
+          </label>
+          <label class="field">
+            <span>Bloco 3 - título</span>
+            <input id="txt-step3Title">
+          </label>
+          <label class="field">
+            <span>Bloco 3 - texto</span>
+            <input id="txt-step3Text">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">
+          <strong>Pedido e rodapé</strong>
+          <span>Chamadas finais, nomes das seções e mensagens de fechamento.</span>
+        </div>
+        <div class="form-grid">
+          <label class="field">
+            <span>Título pagamento</span>
+            <input id="txt-paymentTitle">
+          </label>
+          <label class="field">
+            <span>Título pedido</span>
+            <input id="txt-orderTitle">
+          </label>
+          <label class="field">
+            <span>CTA - título</span>
+            <input id="txt-ctaTitle">
+          </label>
+          <label class="field">
+            <span>CTA - botão</span>
+            <input id="txt-ctaButton">
+          </label>
+          <label class="field full">
+            <span>CTA - texto</span>
+            <input id="txt-ctaText">
+          </label>
+          <label class="field">
+            <span>Rodapé - título</span>
+            <input id="txt-footerTitle">
+          </label>
+          <label class="field">
+            <span>Rodapé - linha 1</span>
+            <input id="txt-footerLine1">
+          </label>
+          <label class="field full">
+            <span>Rodapé - linha 2</span>
+            <input id="txt-footerLine2">
+          </label>
+          <label class="field">
+            <span>Selo 1</span>
+            <input id="txt-footerTag1">
+          </label>
+          <label class="field">
+            <span>Selo 2</span>
+            <input id="txt-footerTag2">
+          </label>
+          <label class="field">
+            <span>Selo 3</span>
+            <input id="txt-footerTag3">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" type="button" onclick="salvarTextosSite()">Salvar textos</button>
+        <button class="btn-secondary" type="button" onclick="carregarTextosSiteAdmin()">Recarregar</button>
+        <button class="btn-secondary" type="button" onclick="restaurarTextosSitePadrao()">Restaurar padrão</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ABA CONFIG -->
   <div id="aba-config" class="tab-content">
     <div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
@@ -1056,6 +1196,33 @@
 
   // ====== ESTADO (Produtos Admin) ======
   let PRODUTOS_ADMIN = [];
+
+  const SITE_CONTENT_DEFAULTS = {
+    brandSubtitle: "Alimentação inteligente sob encomenda",
+    headerBadge: "Produção sob encomenda",
+    heroEyebrow: "Alimentação inteligente para rotina corrida",
+    heroTitle: "Comida pronta, saudável e feita no tempo certo",
+    heroDescription: "Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos. A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.",
+    howItWorksTitle: "Como funciona",
+    step1Title: "1. Escolha seus itens",
+    step1Text: "Monte seu pedido com produtos pensados para a rotina da semana.",
+    step2Title: "2. Agende sua encomenda",
+    step2Text: "Informe a data e a janela de retirada ou entrega no fechamento do pedido.",
+    step3Title: "3. Receba com previsibilidade",
+    step3Text: "Produtos preparados sob demanda para facilitar alimentação e treino.",
+    paymentTitle: "Forma de Pagamento",
+    orderTitle: "Seu Pedido",
+    ctaTitle: "Resolva sua semana agora",
+    ctaText: "Revise seu pedido e finalize com rapidez.",
+    ctaButton: "Finalizar Pedido",
+    footerTitle: "Tá na Mão",
+    footerLine1: "Alimentação saudável pronta para quem tem rotina corrida.",
+    footerLine2: "Cardápio fixo, produção sob encomenda e organização semanal.",
+    footerTag1: "Frescor",
+    footerTag2: "Praticidade",
+    footerTag3: "Rotina saudável"
+  };
+  const SITE_CONTENT_FIELDS = Object.keys(SITE_CONTENT_DEFAULTS);
 
   // ================= ACESSO & SEGURANÇA =================
   const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
@@ -1129,6 +1296,7 @@
     }
     if (idAba === 'aba-config') atualizarDashboardFinanceiro();
     if (idAba === 'aba-cardapio') carregarProdutosAdmin();
+    if (idAba === 'aba-textos') carregarTextosSiteAdmin();
   }
 
   function editarLimite() {
@@ -1141,6 +1309,54 @@
       return;
     }
     alert("Limite ajustado para: " + num + " (integração com API depois).");
+  }
+
+  function preencherTextosSite(content = {}) {
+    const merged = { ...SITE_CONTENT_DEFAULTS, ...(content || {}) };
+    SITE_CONTENT_FIELDS.forEach(key => {
+      const el = document.getElementById("txt-" + key);
+      if (el) el.value = merged[key] || "";
+    });
+  }
+
+  function coletarTextosSite() {
+    return SITE_CONTENT_FIELDS.reduce((acc, key) => {
+      const el = document.getElementById("txt-" + key);
+      acc[key] = el ? el.value.trim() : SITE_CONTENT_DEFAULTS[key];
+      return acc;
+    }, {});
+  }
+
+  function restaurarTextosSitePadrao() {
+    preencherTextosSite(SITE_CONTENT_DEFAULTS);
+  }
+
+  async function carregarTextosSiteAdmin() {
+    try {
+      const res = await fetch(API + "/settings/site_content");
+      const data = await res.json();
+      preencherTextosSite(data?.data?.value || SITE_CONTENT_DEFAULTS);
+    } catch (e) {
+      console.error(e);
+      preencherTextosSite(SITE_CONTENT_DEFAULTS);
+      alert("Não foi possível carregar os textos do site.");
+    }
+  }
+
+  async function salvarTextosSite() {
+    const value = coletarTextosSite();
+    try {
+      const res = await fetch(API + "/settings/site_content", {
+        method: "PUT",
+        body: JSON.stringify({ value })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar textos.");
+      alert("Textos do site atualizados!");
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao salvar textos do site.");
+    }
   }
 
   // ================= PEDIDOS (KANBAN) =================
@@ -1953,6 +2169,7 @@ async function salvarProducaoLote(){
 
   // INICIALIZAÇÃO
   aplicarPermissoes();
+  if (USER_ROLE === "admin") preencherTextosSite(SITE_CONTENT_DEFAULTS);
   carregarPedidos();
   setInterval(carregarPedidos, 30000);
 </script>
