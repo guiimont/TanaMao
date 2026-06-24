@@ -11,7 +11,7 @@
 
   // 2. Define o cargo globalmente para o painel funcionar
   // Isso faz com que o USER_ROLE no painel.html não seja "undefined"
-  window.USER_ROLE = user.role || 'operador';
+  window.USER_ROLE = user.role || localStorage.getItem("tnm_role") || "";
 
   // 3. Interceptador global do Fetch API
   const originalFetch = window.fetch;
