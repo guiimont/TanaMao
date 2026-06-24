@@ -6,7 +6,7 @@
   <title>Tá na Mão! | Alimentação Inteligente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --verde: #3c6e47;
@@ -34,16 +34,109 @@
     }
 
     body {
-      font-family: "Outfit", sans-serif;
+      font-family: "Poppins", sans-serif;
       background: linear-gradient(180deg, #f8f7f3 0%, #f2efe8 100%);
       color: var(--texto);
+      min-height: 100vh;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,0.94);
+      border-bottom: 1px solid rgba(60,110,71,0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .site-header-inner {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-block {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      color: var(--texto);
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #f7f4ec;
+      border: 1px solid rgba(201,168,106,0.25);
+    }
+
+    .brand-name {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--verde-escuro);
+      line-height: 1.1;
+    }
+
+    .brand-subtitle {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .site-nav a,
+    .site-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      border-radius: 999px;
+      padding: 0 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .site-nav a {
+      color: var(--verde-escuro);
+      border: 1px solid rgba(60,110,71,0.16);
+      background: #fff;
+    }
+
+    .site-pill {
+      color: #7b5a21;
+      background: rgba(201,168,106,0.14);
+      border: 1px solid rgba(201,168,106,0.26);
     }
 
     .wrap {
       width: 100%;
       max-width: 920px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 20px 16px 40px;
     }
 
     .hero {
@@ -346,7 +439,7 @@
       font-size: 1rem;
       font-weight: 800;
       cursor: pointer;
-      font-family: "Outfit", sans-serif;
+      font-family: "Poppins", sans-serif;
       transition: all 0.2s ease;
       box-shadow: 0 6px 18px rgba(201,168,106,0.35);
     }
@@ -356,11 +449,52 @@
       transform: translateY(-2px);
     }
 
-    footer {
-      text-align: center;
-      padding: 24px 16px;
-      font-size: 0.8rem;
-      color: #a09a90;
+    .site-footer {
+      border-top: 1px solid rgba(60,110,71,0.12);
+      background: #ffffff;
+      margin-top: 10px;
+    }
+
+    .site-footer-inner {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 26px 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .site-footer strong {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .site-footer span {
+      display: block;
+      line-height: 1.5;
+    }
+
+    .footer-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .footer-tags span {
+      border: 1px solid var(--borda);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fcfbf8;
+      color: var(--verde-escuro);
+      font-weight: 700;
+      font-size: 0.78rem;
     }
 
     .overlay {
@@ -447,7 +581,7 @@
       border: 2px solid #eee;
       border-radius: 10px;
       font-size: 0.92rem;
-      font-family: "Outfit", sans-serif;
+      font-family: "Poppins", sans-serif;
       outline: none;
       transition: border 0.2s;
       color: var(--texto);
@@ -498,7 +632,7 @@
       font-size: 1.02rem;
       font-weight: 800;
       cursor: pointer;
-      font-family: "Outfit", sans-serif;
+      font-family: "Poppins", sans-serif;
       margin-top: 18px;
       transition: all 0.2s;
       box-shadow: 0 4px 14px rgba(201,168,106,0.4);
@@ -584,6 +718,29 @@
     }
 
     @media (max-width: 760px) {
+      .site-header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .site-nav {
+        justify-content: flex-start;
+        width: 100%;
+      }
+
+      .site-nav a,
+      .site-pill {
+        flex: 1 1 calc(50% - 5px);
+      }
+
+      .site-footer-inner {
+        flex-direction: column;
+      }
+
+      .footer-tags {
+        justify-content: flex-start;
+      }
+
       .hero h1 {
         font-size: 1.7rem;
       }
@@ -619,21 +776,31 @@
     }
   </style>
 </head>
-<body>
+<body id="topo">
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand-block" href="#topo" aria-label="Tá na Mão - início">
+      <img class="brand-logo" src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
+      <span>
+        <span class="brand-name">Tá na Mão</span>
+        <span class="brand-subtitle">Alimentação prática sob encomenda</span>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Navegação principal">
+      <span class="site-pill">Produção sob encomenda</span>
+      <a href="#produtos-container">Cardápio</a>
+      <a href="#resumo-lista">Pedido</a>
+    </nav>
+  </div>
+</header>
+
 <div class="wrap">
 <section class="hero">
-<img
-src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uplo
-ads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
-alt="Ícone Tá na Mão!"
-style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
-14px;"
->
-<div class="tag">• Alimentação Inteligente •</div>
-      <h1>Monte seu pedido com praticidade</h1>
+      <div class="tag">Alimentação inteligente para rotina corrida</div>
+      <h1>Comida pronta, saudável e feita no tempo certo</h1>
       <p>
-        Escolha seus produtos, selecione a forma de pagamento e finalize em poucos passos.
-        Seu carrinho fica salvo mesmo se a página recarregar.
+        Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos.
+        A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.
       </p>
     </section>
 
@@ -642,15 +809,15 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
       <div class="intro-info">
         <div class="intro-card">
           <strong>1. Escolha seus itens</strong>
-          <span>Adicione as refeições e monte seu pedido no seu ritmo.</span>
+          <span>Monte seu pedido com produtos pensados para a rotina da semana.</span>
         </div>
         <div class="intro-card">
-          <strong>2. Selecione o pagamento</strong>
-          <span>Pix e débito possuem 10% de desconto aplicado automaticamente.</span>
+          <strong>2. Agende sua encomenda</strong>
+          <span>Informe a data e a janela de retirada ou entrega no fechamento do pedido.</span>
         </div>
         <div class="intro-card">
-          <strong>3. Finalize com segurança</strong>
-          <span>Proteção contra múltiplos cliques para evitar cobranças duplicadas.</span>
+          <strong>3. Receba com previsibilidade</strong>
+          <span>Produtos preparados sob demanda para facilitar alimentação e treino.</span>
         </div>
       </div>
     </div>
@@ -701,7 +868,20 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
     </div>
   </div>
 
-  <footer>Tá na Mão! © 2026 · Alimentação Inteligente.</footer>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div>
+        <strong>Tá na Mão</strong>
+        <span>Alimentação saudável pronta para quem tem rotina corrida.</span>
+        <span>Cardápio fixo, produção sob encomenda e organização semanal.</span>
+      </div>
+      <div class="footer-tags" aria-label="Pilares da operação">
+        <span>Frescor</span>
+        <span>Praticidade</span>
+        <span>Rotina saudável</span>
+      </div>
+    </div>
+  </footer>
 
   <div class="overlay" id="overlay">
     <div class="modal">
@@ -1391,8 +1571,3 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
   </script>
 </body>
 </html>
-
-  </script>
-</body>
-</html>
-
