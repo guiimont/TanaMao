@@ -582,6 +582,72 @@
           <input id="p-img" type="file" accept="image/*">
         </div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div>
+          <label>Categoria</label>
+          <select id="p-categoria">
+            <option value="">Selecione</option>
+            <option value="salgado">Salgado</option>
+            <option value="doce">Doce</option>
+            <option value="lanche">Lanche</option>
+            <option value="kit-semanal">Kit semanal</option>
+            <option value="brinde">Brinde / Receita</option>
+          </select>
+        </div>
+        <div>
+          <label>Porção / unidade</label>
+          <input id="p-porcao" placeholder="Ex: 1 unidade, 250g, kit com 5">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;">
+        <div>
+          <label>Validade (dias)</label>
+          <input id="p-validade" type="number" min="0" step="1" placeholder="Ex: 5">
+        </div>
+        <div>
+          <label>Antecedência (horas)</label>
+          <input id="p-antecedencia" type="number" min="0" step="1" value="24">
+        </div>
+        <div>
+          <label>Limite por dia</label>
+          <input id="p-limite-dia" type="number" min="0" step="1" placeholder="Ex: 20">
+        </div>
+      </div>
+
+      <label style="margin-top:10px;">Conservação</label>
+      <textarea id="p-conservacao" placeholder="Ex: Manter refrigerado. Consumir em até 5 dias."></textarea>
+
+      <label style="margin-top:10px;">Dias disponíveis para encomenda</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <label><input type="checkbox" class="p-dia" value="monday"> Seg</label>
+        <label><input type="checkbox" class="p-dia" value="tuesday"> Ter</label>
+        <label><input type="checkbox" class="p-dia" value="wednesday"> Qua</label>
+        <label><input type="checkbox" class="p-dia" value="thursday"> Qui</label>
+        <label><input type="checkbox" class="p-dia" value="friday"> Sex</label>
+        <label><input type="checkbox" class="p-dia" value="saturday"> Sáb</label>
+        <label><input type="checkbox" class="p-dia" value="sunday"> Dom</label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label>Vendável</label>
+          <select id="p-vendavel">
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </select>
+        </div>
+        <div>
+          <label>Receita brinde</label>
+          <select id="p-brinde">
+            <option value="false">Não</option>
+            <option value="true">Sim</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="margin-top:10px;">Nota para organização semanal</label>
+      <textarea id="p-nota-semanal" placeholder="Ex: Boa opção para lanche da tarde ou pré-treino."></textarea>
 
       <div class="small" style="margin-top:6px;">
         Dica: imagens grandes podem demorar. O backend otimiza em WebP automaticamente.
@@ -1078,6 +1144,15 @@
 
   function getEl(id){ return document.getElementById(id); }
 
+  function getCheckedProductDays(){
+    return Array.from(document.querySelectorAll(".p-dia:checked")).map(el => el.value);
+  }
+
+  function setCheckedProductDays(days){
+    const selected = new Set(Array.isArray(days) ? days : []);
+    document.querySelectorAll(".p-dia").forEach(el => { el.checked = selected.has(el.value); });
+  }
+
   function limparFormProduto(){
     getEl("p-id").value = "";
     getEl("p-nome").value = "";
@@ -1086,6 +1161,16 @@
     getEl("p-ordem").value = "0";
     getEl("p-ativo").value = "true";
     getEl("p-img").value = "";
+    getEl("p-categoria").value = "";
+    getEl("p-porcao").value = "";
+    getEl("p-validade").value = "";
+    getEl("p-antecedencia").value = "24";
+    getEl("p-limite-dia").value = "";
+    getEl("p-conservacao").value = "";
+    getEl("p-vendavel").value = "true";
+    getEl("p-brinde").value = "false";
+    getEl("p-nota-semanal").value = "";
+    setCheckedProductDays([]);
     getEl("cardapio-form-title").innerText = "Cadastrar produto";
   }
 
@@ -1099,6 +1184,16 @@
     getEl("p-ordem").value = Number(p.sort_order || 0);
     getEl("p-ativo").value = String(!!p.active);
     getEl("p-img").value = "";
+    getEl("p-categoria").value = p.category || "";
+    getEl("p-porcao").value = p.serving_size || "";
+    getEl("p-validade").value = p.shelf_life_days ?? "";
+    getEl("p-antecedencia").value = p.lead_time_hours ?? 24;
+    getEl("p-limite-dia").value = p.max_units_per_day ?? "";
+    getEl("p-conservacao").value = p.storage_instructions || "";
+    getEl("p-vendavel").value = String(p.is_sellable !== false);
+    getEl("p-brinde").value = String(!!p.is_gift_recipe);
+    getEl("p-nota-semanal").value = p.weekly_guide_note || "";
+    setCheckedProductDays(p.available_days || []);
     getEl("cardapio-form-title").innerText = "Editar produto";
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1114,44 +1209,36 @@
     if(!name) return alert("Nome obrigatório.");
 
     const file = getEl("p-img").files[0];
+    const productPayload = {
+      name,
+      description,
+      price,
+      active,
+      sort_order,
+      category: getEl("p-categoria").value || null,
+      serving_size: getEl("p-porcao").value.trim() || null,
+      shelf_life_days: getEl("p-validade").value || null,
+      storage_instructions: getEl("p-conservacao").value.trim() || null,
+      lead_time_hours: getEl("p-antecedencia").value || 24,
+      available_days: getCheckedProductDays(),
+      max_units_per_day: getEl("p-limite-dia").value || null,
+      is_sellable: getEl("p-vendavel").value === "true",
+      is_gift_recipe: getEl("p-brinde").value === "true",
+      weekly_guide_note: getEl("p-nota-semanal").value.trim() || null
+    };
 
     try{
-      if(!id){
-        let image_url = "";
-        if (file) image_url = await fileToBase64(file);
+      if (file) productPayload.image_url = await fileToBase64(file);
 
-        const res = await fetch(API + "/products", {
-          method: "POST",
-          headers: { "Content-Type":"application/json" },
-          body: JSON.stringify({ name, description, price, image_url })
-        });
-        const data = await res.json();
-        if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao criar produto");
-        alert("Produto criado!");
-      } else {
-        // Se não escolheu imagem, não envia image_url (pra não mexer)
-        if (!file) {
-          const res = await fetch(API + "/products/" + id, {
-            method: "PUT",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify({ name, description, price, active, sort_order })
-          });
-          const data = await res.json();
-          if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao atualizar produto");
-        } else {
-          const image_url = await fileToBase64(file);
-          const res = await fetch(API + "/products/" + id, {
-            method: "PUT",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify({ name, description, price, image_url, active, sort_order })
-          });
-          const data = await res.json();
-          if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao atualizar produto");
-        }
+      const res = await fetch(id ? API + "/products/" + id : API + "/products", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(productPayload)
+      });
+      const data = await res.json();
+      if(!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar produto");
 
-        alert("Produto atualizado!");
-      }
-
+      alert(id ? "Produto atualizado!" : "Produto criado!");
       limparFormProduto();
       await carregarProdutosAdmin();
     } catch(e){
@@ -1173,6 +1260,11 @@
       console.error(e);
       tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar produtos.</td></tr>`;
     }
+  }
+
+  function formatProductDays(days){
+    const labels = { monday:"Seg", tuesday:"Ter", wednesday:"Qua", thursday:"Qui", friday:"Sex", saturday:"Sáb", sunday:"Dom" };
+    return Array.isArray(days) && days.length ? days.map(d => labels[d] || d).join(", ") : "Todos os dias";
   }
 
   function renderProdutosAdmin(){
@@ -1199,6 +1291,15 @@
           <td>
             <strong>${p.name || ""}</strong><br>
             <span class="small">${(p.description || "").slice(0, 90)}${(p.description || "").length > 90 ? "..." : ""}</span>
+            <div class="small" style="margin-top:6px;line-height:1.45;">
+              ${p.category ? `Categoria: ${p.category}<br>` : ""}
+              ${p.serving_size ? `Porção: ${p.serving_size}<br>` : ""}
+              ${p.shelf_life_days ? `Validade: ${p.shelf_life_days} dia(s)<br>` : ""}
+              Antecedência: ${Number(p.lead_time_hours || 0)}h<br>
+              Disponível: ${formatProductDays(p.available_days)}
+              ${p.max_units_per_day ? `<br>Limite/dia: ${p.max_units_per_day}` : ""}
+              ${p.is_gift_recipe ? `<br>Brinde/receita` : ""}
+            </div>
           </td>
           <td>${ativo}</td>
           <td style="text-align:right;"><strong>${preco}</strong></td>
