@@ -541,11 +541,16 @@
       resize:vertical;
     }
 
+    .days-control {
+      display:grid;
+      gap:8px;
+      margin-top:8px;
+    }
+
     .days-grid {
       display:grid;
       grid-template-columns:repeat(7, minmax(0, 1fr));
       gap:8px;
-      margin-top:8px;
     }
 
     .day-option {
@@ -561,6 +566,29 @@
       font-weight:800;
       color:var(--verde-escuro);
       cursor:pointer;
+      transition:border .2s, background .2s, box-shadow .2s;
+    }
+
+    .day-option input {
+      accent-color:var(--verde);
+    }
+
+    .day-option:has(input:checked) {
+      border-color:rgba(60,110,71,.55);
+      background:rgba(60,110,71,.09);
+      box-shadow:inset 0 0 0 1px rgba(60,110,71,.12);
+    }
+
+    .day-option:has(input:disabled) {
+      opacity:.62;
+      cursor:not-allowed;
+    }
+
+    .day-option-all {
+      justify-content:flex-start;
+      padding:0 12px;
+      background:rgba(201,168,106,.12);
+      border-color:rgba(201,168,106,.32);
     }
 
     .choice-grid {
@@ -967,14 +995,17 @@
         </label>
         <div style="margin-top:12px;">
           <span class="field-label">Dias disponíveis para encomenda</span>
-          <div class="days-grid">
-            <label class="day-option"><input type="checkbox" class="p-dia" value="monday"> Seg</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="tuesday"> Ter</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="wednesday"> Qua</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="thursday"> Qui</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="friday"> Sex</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="saturday"> Sáb</label>
-            <label class="day-option"><input type="checkbox" class="p-dia" value="sunday"> Dom</label>
+          <div class="days-control">
+            <label class="day-option day-option-all"><input type="checkbox" id="p-todos-dias" onchange="toggleAllProductDays(this.checked)"> Todos os dias</label>
+            <div class="days-grid">
+              <label class="day-option"><input type="checkbox" class="p-dia" value="monday" onchange="syncAllDaysFromSelection()"> Seg</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="tuesday" onchange="syncAllDaysFromSelection()"> Ter</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="wednesday" onchange="syncAllDaysFromSelection()"> Qua</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="thursday" onchange="syncAllDaysFromSelection()"> Qui</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="friday" onchange="syncAllDaysFromSelection()"> Sex</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="saturday" onchange="syncAllDaysFromSelection()"> Sáb</label>
+              <label class="day-option"><input type="checkbox" class="p-dia" value="sunday" onchange="syncAllDaysFromSelection()"> Dom</label>
+            </div>
           </div>
         </div>
       </div>
@@ -1311,8 +1342,13 @@
     alert("Limite ajustado para: " + num + " (integração com API depois).");
   }
 
+  function normalizeSiteContentValue(value) {
+    if (typeof value !== "string") return value || {};
+    try { return JSON.parse(value); } catch { return {}; }
+  }
+
   function preencherTextosSite(content = {}) {
-    const merged = { ...SITE_CONTENT_DEFAULTS, ...(content || {}) };
+    const merged = { ...SITE_CONTENT_DEFAULTS, ...normalizeSiteContentValue(content) };
     SITE_CONTENT_FIELDS.forEach(key => {
       const el = document.getElementById("txt-" + key);
       if (el) el.value = merged[key] || "";
@@ -1333,13 +1369,26 @@
 
   async function carregarTextosSiteAdmin() {
     try {
-      const res = await fetch(API + "/settings/site_content");
+      const res = await fetch(API + "/settings/site_content?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("Erro ao carregar textos.");
       const data = await res.json();
       preencherTextosSite(data?.data?.value || SITE_CONTENT_DEFAULTS);
     } catch (e) {
       console.error(e);
       preencherTextosSite(SITE_CONTENT_DEFAULTS);
       alert("Não foi possível carregar os textos do site.");
+    }
+  }
+
+  async function verificarTextosPublicados(value) {
+    try {
+      const res = await fetch(API + "/settings/public/site_content?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) return false;
+      const data = await res.json();
+      const publicValue = normalizeSiteContentValue(data?.data?.value);
+      return SITE_CONTENT_FIELDS.every(key => (publicValue[key] || "") === (value[key] || ""));
+    } catch {
+      return false;
     }
   }
 
@@ -1352,7 +1401,13 @@
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar textos.");
-      alert("Textos do site atualizados!");
+
+      const publicado = await verificarTextosPublicados(value);
+      if (publicado) {
+        alert("Textos do site atualizados! Recarregue o site público para ver a nova versão.");
+      } else {
+        alert("Textos salvos no painel, mas o site público ainda não está devolvendo esses textos. Confira se o PR do backend foi mesclado/deployado e se a SQL de site_content foi rodada no Supabase.");
+      }
     } catch (e) {
       console.error(e);
       alert(e.message || "Erro ao salvar textos do site.");
@@ -1825,13 +1880,43 @@
 
   function getEl(id){ return document.getElementById(id); }
 
+  const PRODUCT_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+  function isAllProductDays(days){
+    return !Array.isArray(days) || !days.length || PRODUCT_DAYS.every(day => days.includes(day));
+  }
+
   function getCheckedProductDays(){
     return Array.from(document.querySelectorAll(".p-dia:checked")).map(el => el.value);
   }
 
+  function toggleAllProductDays(checked){
+    document.querySelectorAll(".p-dia").forEach(el => {
+      el.checked = false;
+      el.disabled = checked;
+    });
+  }
+
+  function syncAllDaysFromSelection(){
+    const selected = getCheckedProductDays();
+    if (selected.length === PRODUCT_DAYS.length) {
+      setCheckedProductDays([]);
+      return;
+    }
+    const allToggle = getEl("p-todos-dias");
+    if (allToggle) allToggle.checked = false;
+    document.querySelectorAll(".p-dia").forEach(el => { el.disabled = false; });
+  }
+
   function setCheckedProductDays(days){
+    const allDays = isAllProductDays(days);
     const selected = new Set(Array.isArray(days) ? days : []);
-    document.querySelectorAll(".p-dia").forEach(el => { el.checked = selected.has(el.value); });
+    const allToggle = getEl("p-todos-dias");
+    if (allToggle) allToggle.checked = allDays;
+    document.querySelectorAll(".p-dia").forEach(el => {
+      el.checked = !allDays && selected.has(el.value);
+      el.disabled = allDays;
+    });
   }
 
   function limparFormProduto(){
@@ -1890,6 +1975,13 @@
     if(!name) return alert("Nome obrigatório.");
 
     const file = getEl("p-img").files[0];
+    const selectedDays = getCheckedProductDays();
+    const allDaysSelected = !!getEl("p-todos-dias")?.checked;
+    if (!allDaysSelected && !selectedDays.length) {
+      alert("Marque Todos os dias ou escolha pelo menos um dia específico para encomenda.");
+      return;
+    }
+
     const productPayload = {
       name,
       description,
@@ -1901,7 +1993,7 @@
       shelf_life_days: getEl("p-validade").value || null,
       storage_instructions: getEl("p-conservacao").value.trim() || null,
       lead_time_hours: getEl("p-antecedencia").value || 24,
-      available_days: getCheckedProductDays(),
+      available_days: allDaysSelected ? [] : selectedDays,
       max_units_per_day: getEl("p-limite-dia").value || null,
       is_sellable: getEl("p-vendavel").value === "true",
       is_gift_recipe: getEl("p-brinde").value === "true",
@@ -1944,8 +2036,9 @@
   }
 
   function formatProductDays(days){
+    if (isAllProductDays(days)) return "Todos os dias";
     const labels = { monday:"Seg", tuesday:"Ter", wednesday:"Qua", thursday:"Qui", friday:"Sex", saturday:"Sáb", sunday:"Dom" };
-    return Array.isArray(days) && days.length ? days.map(d => labels[d] || d).join(", ") : "Todos os dias";
+    return days.map(d => labels[d] || d).join(", ");
   }
 
   function renderProdutosAdmin(){
