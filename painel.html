@@ -347,13 +347,31 @@
   <!-- ABA VENDAS -->
   <div id="aba-vendas" class="tab-content active">
     <div class="topbar-btns">
-      <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">🔄 Atualizar</button>
+      <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">Atualizar</button>
       <button class="tab-btn" data-role="admin" style="background: #444; color: white;" onclick="editarLimite()">Definir Limite</button>
+    </div>
+
+    <div class="summary-bar" id="agenda-summary" style="margin-bottom:12px;">
+      <div class="muted"><strong>Agenda operacional</strong></div>
+      <div id="agenda-summary-values">Carregando...</div>
+    </div>
+
+    <div class="topbar-btns" id="agenda-filters" style="justify-content:flex-start; margin-bottom:12px;">
+      <button class="tab-btn" data-filter="today" onclick="setAgendaFilter('today')">Hoje</button>
+      <button class="tab-btn" data-filter="tomorrow" onclick="setAgendaFilter('tomorrow')">Amanha</button>
+      <button class="tab-btn" data-filter="week" onclick="setAgendaFilter('week')">Proximos 7 dias</button>
+      <button class="tab-btn" data-filter="undated" onclick="setAgendaFilter('undated')">Sem data</button>
+      <button class="tab-btn" data-filter="all" onclick="setAgendaFilter('all')">Todos</button>
+    </div>
+
+    <div class="admin-card" id="production-summary" style="margin-bottom:16px;">
+      <h3>Resumo de producao</h3>
+      <div id="production-summary-content" class="muted">Carregando...</div>
     </div>
 
     <div class="board">
       <div class="column"><div class="column-header">Entrou</div><div id="col-paid"></div></div>
-      <div class="column"><div class="column-header">Produção</div><div id="col-preparing"></div></div>
+      <div class="column"><div class="column-header">Producao</div><div id="col-preparing"></div></div>
       <div class="column"><div class="column-header">Pronto</div><div id="col-ready"></div></div>
       <div class="column"><div class="column-header">Entrega</div><div id="col-delivery"></div></div>
     </div>
@@ -692,6 +710,7 @@
   const API = BACKEND_URL + "/api";
 
   let pedidos = [];
+  let agendaFiltro = "all";
   const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
   // ====== ESTADO (Compras) ======
@@ -798,27 +817,135 @@
     }
   }
 
+  function todayStr(offset = 0){
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + offset);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function getOrderDate(order){
+    return order.scheduled_delivery_date || "";
+  }
+
+  function formatOrderDate(dateStr){
+    if (!dateStr) return "Sem data";
+    const [y, m, d] = dateStr.split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  function formatWindow(order){
+    return order.delivery_window || "Janela nao definida";
+  }
+
+  function normalizeStatus(order){
+    return order.delivery_status || "pending";
+  }
+
+  function setAgendaFilter(filter){
+    agendaFiltro = filter;
+    renderizar();
+  }
+
+  function matchesAgendaFilter(order){
+    const date = getOrderDate(order);
+    const today = todayStr(0);
+    const tomorrow = todayStr(1);
+    const weekEnd = todayStr(6);
+
+    if (agendaFiltro === "today") return date === today;
+    if (agendaFiltro === "tomorrow") return date === tomorrow;
+    if (agendaFiltro === "week") return !!date && date >= today && date <= weekEnd;
+    if (agendaFiltro === "undated") return !date;
+    return true;
+  }
+
+  function updateAgendaButtons(){
+    document.querySelectorAll("#agenda-filters button").forEach(btn => {
+      const active = btn.dataset.filter === agendaFiltro;
+      btn.style.background = active ? "var(--verde)" : "";
+      btn.style.color = active ? "#fff" : "";
+    });
+  }
+
+  function sortOrdersBySchedule(a, b){
+    const da = getOrderDate(a) || "9999-12-31";
+    const db = getOrderDate(b) || "9999-12-31";
+    if (da !== db) return da.localeCompare(db);
+    return String(a.created_at || "").localeCompare(String(b.created_at || ""));
+  }
+
+  function renderAgendaSummary(lista){
+    const el = document.getElementById("agenda-summary-values");
+    if (!el) return;
+
+    const total = lista.reduce((acc, p) => acc + Number(p.total || 0), 0);
+    const units = lista.reduce((acc, p) => acc + (p.items_json || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0), 0);
+    el.innerHTML = `<strong>${lista.length}</strong> pedido(s) | <strong>${units}</strong> unidade(s) | <strong>${fmt(total)}</strong>`;
+  }
+
+  function renderProductionSummary(lista){
+    const el = document.getElementById("production-summary-content");
+    if (!el) return;
+
+    const byProduct = new Map();
+    for (const order of lista) {
+      for (const item of order.items_json || []) {
+        const name = item.title || item.name || item.id || "Produto";
+        byProduct.set(name, (byProduct.get(name) || 0) + Number(item.quantity || 0));
+      }
+    }
+
+    if (!byProduct.size) {
+      el.innerHTML = "Nenhum item na selecao atual.";
+      return;
+    }
+
+    el.innerHTML = Array.from(byProduct.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, qty]) => `<span class="badge on" style="margin:3px 4px 3px 0;">${name}: ${qty}</span>`)
+      .join("");
+  }
+
   function renderizar(){
-    const ativos = pedidos.filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled');
-    const filter = (status) => ativos.filter(p =>
-      p.delivery_status === status ||
-      (status === 'pending' && !p.delivery_status && p.payment_status === 'approved')
-    );
+    updateAgendaButtons();
+    const ativos = pedidos
+      .filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled')
+      .filter(matchesAgendaFilter)
+      .sort(sortOrdersBySchedule);
+
+    renderAgendaSummary(ativos);
+    renderProductionSummary(ativos);
+
+    const filter = (status) => ativos.filter(p => normalizeStatus(p) === status);
     renderCol("col-paid", filter('pending'));
     renderCol("col-preparing", filter('preparing'));
     renderCol("col-ready", filter('ready'));
     renderCol("col-delivery", filter('out_for_delivery'));
   }
 
+  function renderItems(order){
+    const items = order.items_json || [];
+    if (!items.length) return "";
+
+    return `<div class="small" style="margin-top:8px;">${items.map(item => `${item.quantity || 0}x ${item.title || item.name || item.id}`).join("<br>")}</div>`;
+  }
+
   function renderCol(id, lista){
     const el = document.getElementById(id);
     el.innerHTML = lista.length ? "" : "<div class='card'>Vazio</div>";
     lista.forEach(p => {
+      const status = normalizeStatus(p);
+      const address = p.delivery_address ? `<div class="small" style="margin-top:6px;">${p.delivery_address}</div>` : "";
       el.innerHTML += `<div class="card">
-        <strong>${p.customer_name}</strong><br>
-        Total: ${fmt(p.total)}<br>
-        <button onclick="atualizarStatus('${p.id}','${proximoStatus(p.delivery_status)}')">
-          ${labelBotao(p.delivery_status)}
+        <strong>${p.customer_name || "Cliente"}</strong><br>
+        <span class="badge on" style="margin-top:6px;">${formatOrderDate(getOrderDate(p))}</span>
+        <span class="badge outros" style="margin-top:6px;">${formatWindow(p)}</span>
+        ${renderItems(p)}
+        ${address}
+        <div style="margin-top:8px;"><strong>Total:</strong> ${fmt(p.total)}</div>
+        <button onclick="atualizarStatus('${p.id}','${proximoStatus(status)}')">
+          ${labelBotao(status)}
         </button>
       </div>`;
     });
