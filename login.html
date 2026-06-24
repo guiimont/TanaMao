@@ -59,6 +59,7 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
         if (data.ok) {
           localStorage.setItem('tnm_token', data.token);
           localStorage.setItem('tnm_user', JSON.stringify(data.user));
+          if (data.user?.role) localStorage.setItem('tnm_role', data.user.role);
           window.location.href = 'painel.html';
         } else {
           throw new Error(data.message || "Credenciais inválidas");

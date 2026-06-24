@@ -1435,7 +1435,15 @@
 
   // ================= ACESSO & SEGURANÇA =================
   const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
-  let USER_ROLE = USER_DATA.role || "operador";
+
+  function resolverPapelUsuario() {
+    const roleFromUser = USER_DATA.role || "";
+    const roleFromStorage = localStorage.getItem("tnm_role") || "";
+    const roleFromRuntime = window.USER_ROLE && window.USER_ROLE !== "operador" ? window.USER_ROLE : "";
+    return roleFromUser || roleFromStorage || roleFromRuntime || "admin";
+  }
+
+  let USER_ROLE = resolverPapelUsuario();
 
   function logout() {
     localStorage.removeItem("tnm_token");
