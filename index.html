@@ -967,8 +967,13 @@
       footerTag3: "Rotina saudável"
     };
 
+    function normalizeSiteContentValue(value) {
+      if (typeof value !== "string") return value || {};
+      try { return JSON.parse(value); } catch { return {}; }
+    }
+
     function aplicarTextosSite(content = {}) {
-      const merged = { ...SITE_CONTENT_DEFAULTS, ...(content || {}) };
+      const merged = { ...SITE_CONTENT_DEFAULTS, ...normalizeSiteContentValue(content) };
       document.querySelectorAll("[data-content]").forEach(el => {
         const key = el.dataset.content;
         if (typeof merged[key] === "string") el.textContent = merged[key];
@@ -978,10 +983,10 @@
     async function carregarTextosSite() {
       aplicarTextosSite();
       try {
-        const res = await fetch(BACKEND_URL + "/api/settings/public/site_content");
+        const res = await fetch(BACKEND_URL + "/api/settings/public/site_content?t=" + Date.now(), { cache: "no-store" });
         if (!res.ok) return;
         const data = await res.json();
-        if (data.ok && data.data && data.data.value) aplicarTextosSite(data.data.value);
+        if (data.ok && data.data && data.data.value) aplicarTextosSite(normalizeSiteContentValue(data.data.value));
       } catch (e) {
         console.warn("Textos do site não carregados.", e);
       }
@@ -1243,9 +1248,16 @@
       }
     }
 
+    const PRODUCT_DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+    function isAllProductDays(days) {
+      return !Array.isArray(days) || !days.length || PRODUCT_DAYS.every(day => days.includes(day));
+    }
+
     function formatAvailableDays(days) {
-      const labels = { monday: "Seg", tuesday: "Ter", wednesday: "Qua", thursday: "Qui", friday: "Sex", saturday: "Sab", sunday: "Dom" };
-      return Array.isArray(days) && days.length ? days.map(day => labels[day] || day).join(", ") : "Todos os dias";
+      if (isAllProductDays(days)) return "Todos os dias";
+      const labels = { monday: "Seg", tuesday: "Ter", wednesday: "Qua", thursday: "Qui", friday: "Sex", saturday: "Sáb", sunday: "Dom" };
+      return days.map(day => labels[day] || day).join(", ");
     }
 
     function renderProductDetails(p) {
@@ -1253,7 +1265,7 @@
       if (p.serving_size) chips.push(`Porcao: ${p.serving_size}`);
       if (p.shelf_life_days) chips.push(`Validade: ${p.shelf_life_days} dia(s)`);
       if (p.lead_time_hours) chips.push(`Encomenda: ${p.lead_time_hours}h antes`);
-      if (Array.isArray(p.available_days) && p.available_days.length) chips.push(`Dias: ${formatAvailableDays(p.available_days)}`);
+      chips.push(`Dias: ${formatAvailableDays(p.available_days)}`);
 
       const meta = chips.length
         ? `<div class="p-meta">${chips.map(chip => `<span class="p-chip">${chip}</span>`).join("")}</div>`
