@@ -290,31 +290,95 @@
       color: var(--dourado);
     }
 
-    .p-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 8px 0 6px;
+    .p-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .p-chip {
-      display: inline-flex;
+    .p-card-actions {
+      display: flex;
       align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .p-detail-btn {
       border: 1px solid rgba(60,110,71,0.18);
-      background: rgba(60,110,71,0.06);
+      background: #f8fbf7;
       color: var(--verde-escuro);
       border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      line-height: 1.2;
+      padding: 7px 11px;
+      font-family: "Poppins", sans-serif;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
-    .p-guide {
+    .p-detail-btn:hover {
+      border-color: rgba(60,110,71,0.36);
+      background: #eef6ef;
+    }
+
+    .details-modal {
+      max-width: 540px;
+    }
+
+    .details-head {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .details-head img {
+      width: 86px;
+      height: 86px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 1px solid var(--borda);
+      background: #f5f5f5;
+      flex-shrink: 0;
+    }
+
+    .details-head h3 {
+      margin: 0 0 4px;
+    }
+
+    .details-price {
+      color: var(--dourado);
+      font-weight: 800;
+    }
+
+    .details-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .detail-row {
+      border: 1px solid var(--borda);
+      background: #fcfbf8;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .detail-row strong {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    .detail-row span {
       color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.35;
-      margin-top: 6px;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
 
     .qty-wrap {
@@ -774,6 +838,16 @@
       .qty-wrap {
         align-self: flex-end;
       }
+
+      .p-card-actions {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .details-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -883,6 +957,13 @@
       </div>
     </div>
   </footer>
+
+  <div class="overlay" id="product-details-overlay">
+    <div class="modal details-modal">
+      <button class="btn-fechar" onclick="fecharDetalhesProduto()" aria-label="Fechar">×</button>
+      <div id="product-details-body"></div>
+    </div>
+  </div>
 
   <div class="overlay" id="overlay">
     <div class="modal">
@@ -1260,28 +1341,61 @@
       return days.map(day => labels[day] || day).join(", ");
     }
 
-    function renderProductDetails(p) {
-      const chips = [];
-      if (p.serving_size) chips.push(`Porcao: ${p.serving_size}`);
-      if (p.shelf_life_days) chips.push(`Validade: ${p.shelf_life_days} dia(s)`);
-      if (p.lead_time_hours) chips.push(`Encomenda: ${p.lead_time_hours}h antes`);
-      chips.push(`Dias: ${formatAvailableDays(p.available_days)}`);
-
-      const meta = chips.length
-        ? `<div class="p-meta">${chips.map(chip => `<span class="p-chip">${chip}</span>`).join("")}</div>`
-        : "";
-
-      const storage = p.storage_instructions
-        ? `<div class="p-guide">${p.storage_instructions}</div>`
-        : "";
-
-      const note = p.weekly_guide_note
-        ? `<div class="p-guide">${p.weekly_guide_note}</div>`
-        : "";
-
-      return `${meta}${storage}${note}`;
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
+    function getProductDetails(p) {
+      const details = [];
+      if (p.serving_size) details.push(["Porção", p.serving_size]);
+      if (p.shelf_life_days) details.push(["Validade", `${p.shelf_life_days} dia(s)`]);
+      if (p.lead_time_hours) details.push(["Encomenda", `${p.lead_time_hours}h antes`]);
+      details.push(["Dias disponíveis", formatAvailableDays(p.available_days)]);
+      if (p.storage_instructions) details.push(["Conservação", p.storage_instructions]);
+      if (p.weekly_guide_note) details.push(["Dica para rotina", p.weekly_guide_note]);
+      return details;
+    }
+
+    function renderProductDetails(p) {
+      return getProductDetails(p)
+        .map(([label, value]) => `
+          <div class="detail-row">
+            <strong>${escapeHtml(label)}</strong>
+            <span>${escapeHtml(value)}</span>
+          </div>
+        `).join("");
+    }
+
+    function abrirDetalhesProduto(id) {
+      const p = PRODS.find(item => String(item.id) === String(id));
+      const body = document.getElementById("product-details-body");
+      const overlay = document.getElementById("product-details-overlay");
+      if (!p || !body || !overlay) return;
+
+      const imageSrc = getProductImageSrc(p);
+      body.innerHTML = `
+        <div class="details-head">
+          ${imageSrc ? `<img src="${imageSrc}" alt="${escapeHtml(p.name || "Produto")}">` : ""}
+          <div>
+            <h3>${escapeHtml(p.name || "")}</h3>
+            <p class="m-subtitulo">${escapeHtml(p.description || "")}</p>
+            <div class="details-price">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
+          </div>
+        </div>
+        <div class="details-list">${renderProductDetails(p)}</div>
+      `;
+      overlay.classList.add("on");
+    }
+
+    function fecharDetalhesProduto() {
+      const overlay = document.getElementById("product-details-overlay");
+      if (overlay) overlay.classList.remove("on");
+    }
     function renderProdutos() {
   const container = document.getElementById("produtos-container");
 
@@ -1293,21 +1407,27 @@
   container.innerHTML = PRODS.map(p => {
     const imageSrc = getProductImageSrc(p);
 
+    const safeId = escapeHtml(p.id);
+    const safeName = escapeHtml(p.name || "");
+    const safeDesc = escapeHtml(p.description || "");
+
     return `
       <div class="product">
         <div class="product-left">
-          ${imageSrc ? `<img src="${imageSrc}" alt="Produto">` : ""}
+          ${imageSrc ? `<img src="${imageSrc}" alt="${safeName || "Produto"}">` : ""}
           <div class="product-info">
-            <div class="p-nome">${p.name || ""}</div>
-            <div class="p-desc">${p.description || ""}</div>
-            ${renderProductDetails(p)}
-            <div class="p-preco">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
+            <div class="p-nome">${safeName}</div>
+            <div class="p-desc">${safeDesc}</div>
+            <div class="p-card-actions">
+              <div class="p-preco">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
+              <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">Detalhes e dicas</button>
+            </div>
           </div>
         </div>
         <div class="qty-wrap">
-          <button type="button" onclick="qty('${p.id}', -1)">-</button>
-          <span class="qty-num" id="qtd-${p.id}">${qtds[p.id] || 0}</span>
-          <button type="button" onclick="qty('${p.id}', 1)">+</button>
+          <button type="button" onclick="qty('${safeId}', -1)">-</button>
+          <span class="qty-num" id="qtd-${safeId}">${qtds[p.id] || 0}</span>
+          <button type="button" onclick="qty('${safeId}', 1)">+</button>
         </div>
       </div>
     `;
@@ -1618,6 +1738,7 @@
 
     window.addEventListener("click", e => {
       if (e.target === document.getElementById("overlay")) fecharModal();
+      if (e.target === document.getElementById("product-details-overlay")) fecharDetalhesProduto();
     });
 
     window.addEventListener("beforeunload", () => {
