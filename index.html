@@ -78,8 +78,9 @@
       height: 44px;
       object-fit: contain;
       border-radius: 12px;
-      background: #f7f4ec;
-      border: 1px solid rgba(201,168,106,0.25);
+      background: var(--verde);
+      border: 1px solid rgba(45,82,53,0.25);
+      padding: 5px;
     }
 
     .brand-name {
@@ -783,11 +784,11 @@
       <img class="brand-logo" src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
       <span>
         <span class="brand-name">Tá na Mão</span>
-        <span class="brand-subtitle">Alimentação prática sob encomenda</span>
+        <span class="brand-subtitle" data-content="brandSubtitle">Alimentação inteligente sob encomenda</span>
       </span>
     </a>
     <nav class="site-nav" aria-label="Navegação principal">
-      <span class="site-pill">Produção sob encomenda</span>
+      <span class="site-pill" data-content="headerBadge">Produção sob encomenda</span>
       <a href="#produtos-container">Cardápio</a>
       <a href="#resumo-lista">Pedido</a>
     </nav>
@@ -796,28 +797,28 @@
 
 <div class="wrap">
 <section class="hero">
-      <div class="tag">Alimentação inteligente para rotina corrida</div>
-      <h1>Comida pronta, saudável e feita no tempo certo</h1>
-      <p>
+      <div class="tag" data-content="heroEyebrow">Alimentação inteligente para rotina corrida</div>
+      <h1 data-content="heroTitle">Comida pronta, saudável e feita no tempo certo</h1>
+      <p data-content="heroDescription">
         Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos.
         A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.
       </p>
     </section>
 
     <div class="section">
-      <span class="section-title">Como funciona</span>
+      <span class="section-title" data-content="howItWorksTitle">Como funciona</span>
       <div class="intro-info">
         <div class="intro-card">
-          <strong>1. Escolha seus itens</strong>
-          <span>Monte seu pedido com produtos pensados para a rotina da semana.</span>
+          <strong data-content="step1Title">1. Escolha seus itens</strong>
+          <span data-content="step1Text">Monte seu pedido com produtos pensados para a rotina da semana.</span>
         </div>
         <div class="intro-card">
-          <strong>2. Agende sua encomenda</strong>
-          <span>Informe a data e a janela de retirada ou entrega no fechamento do pedido.</span>
+          <strong data-content="step2Title">2. Agende sua encomenda</strong>
+          <span data-content="step2Text">Informe a data e a janela de retirada ou entrega no fechamento do pedido.</span>
         </div>
         <div class="intro-card">
-          <strong>3. Receba com previsibilidade</strong>
-          <span>Produtos preparados sob demanda para facilitar alimentação e treino.</span>
+          <strong data-content="step3Title">3. Receba com previsibilidade</strong>
+          <span data-content="step3Text">Produtos preparados sob demanda para facilitar alimentação e treino.</span>
         </div>
       </div>
     </div>
@@ -832,7 +833,7 @@
     </div>
 
     <div class="section">
-      <span class="section-title">Forma de Pagamento</span>
+      <span class="section-title" data-content="paymentTitle">Forma de Pagamento</span>
       <div class="pagamentos">
         <div class="pag-item" id="pag-pix" onclick="selecionarPag('pix')">
           <strong>Pix (10% OFF)</strong>
@@ -854,7 +855,7 @@
     </div>
 
     <div class="section">
-      <span class="section-title">Seu Pedido</span>
+      <span class="section-title" data-content="orderTitle">Seu Pedido</span>
       <div id="resumo-lista">
         <span class="r-vazio">Nenhum item selecionado ainda.</span>
       </div>
@@ -862,23 +863,23 @@
     </div>
 
     <div class="cta-section">
-      <h2>Resolva sua semana agora</h2>
-      <p>Revise seu pedido e finalize com rapidez.</p>
-      <button class="btn-pedir" onclick="abrirModal()">Finalizar Pedido</button>
+      <h2 data-content="ctaTitle">Resolva sua semana agora</h2>
+      <p data-content="ctaText">Revise seu pedido e finalize com rapidez.</p>
+      <button class="btn-pedir" onclick="abrirModal()" data-content="ctaButton">Finalizar Pedido</button>
     </div>
   </div>
 
   <footer class="site-footer">
     <div class="site-footer-inner">
       <div>
-        <strong>Tá na Mão</strong>
-        <span>Alimentação saudável pronta para quem tem rotina corrida.</span>
-        <span>Cardápio fixo, produção sob encomenda e organização semanal.</span>
+        <strong data-content="footerTitle">Tá na Mão</strong>
+        <span data-content="footerLine1">Alimentação saudável pronta para quem tem rotina corrida.</span>
+        <span data-content="footerLine2">Cardápio fixo, produção sob encomenda e organização semanal.</span>
       </div>
       <div class="footer-tags" aria-label="Pilares da operação">
-        <span>Frescor</span>
-        <span>Praticidade</span>
-        <span>Rotina saudável</span>
+        <span data-content="footerTag1">Frescor</span>
+        <span data-content="footerTag2">Praticidade</span>
+        <span data-content="footerTag3">Rotina saudável</span>
       </div>
     </div>
   </footer>
@@ -939,6 +940,52 @@
     const STORAGE_PAYMENT = "tanamao_payment_v1";
     const STORAGE_CLIENT = "tanamao_cliente";
     const STORAGE_CHECKOUT_LOCK = "tanamao_checkout_lock_v1";
+
+    const SITE_CONTENT_DEFAULTS = {
+      brandSubtitle: "Alimentação inteligente sob encomenda",
+      headerBadge: "Produção sob encomenda",
+      heroEyebrow: "Alimentação inteligente para rotina corrida",
+      heroTitle: "Comida pronta, saudável e feita no tempo certo",
+      heroDescription: "Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos. A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.",
+      howItWorksTitle: "Como funciona",
+      step1Title: "1. Escolha seus itens",
+      step1Text: "Monte seu pedido com produtos pensados para a rotina da semana.",
+      step2Title: "2. Agende sua encomenda",
+      step2Text: "Informe a data e a janela de retirada ou entrega no fechamento do pedido.",
+      step3Title: "3. Receba com previsibilidade",
+      step3Text: "Produtos preparados sob demanda para facilitar alimentação e treino.",
+      paymentTitle: "Forma de Pagamento",
+      orderTitle: "Seu Pedido",
+      ctaTitle: "Resolva sua semana agora",
+      ctaText: "Revise seu pedido e finalize com rapidez.",
+      ctaButton: "Finalizar Pedido",
+      footerTitle: "Tá na Mão",
+      footerLine1: "Alimentação saudável pronta para quem tem rotina corrida.",
+      footerLine2: "Cardápio fixo, produção sob encomenda e organização semanal.",
+      footerTag1: "Frescor",
+      footerTag2: "Praticidade",
+      footerTag3: "Rotina saudável"
+    };
+
+    function aplicarTextosSite(content = {}) {
+      const merged = { ...SITE_CONTENT_DEFAULTS, ...(content || {}) };
+      document.querySelectorAll("[data-content]").forEach(el => {
+        const key = el.dataset.content;
+        if (typeof merged[key] === "string") el.textContent = merged[key];
+      });
+    }
+
+    async function carregarTextosSite() {
+      aplicarTextosSite();
+      try {
+        const res = await fetch(BACKEND_URL + "/api/settings/public/site_content");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ok && data.data && data.data.value) aplicarTextosSite(data.data.value);
+      } catch (e) {
+        console.warn("Textos do site não carregados.", e);
+      }
+    }
 
     let PRODS = [];
     let qtds = {};
@@ -1566,6 +1613,7 @@
       salvarPagamento();
     });
 
+    carregarTextosSite();
     checarLogin();
     carregarProdutos();
   </script>
