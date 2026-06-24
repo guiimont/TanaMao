@@ -128,15 +128,165 @@
       margin: 0 auto;
     }
 
-    /* MENU DE ABAS */
+    .workspace-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display:grid;
+      grid-template-columns: minmax(220px, 300px) minmax(260px, 1fr) auto;
+      gap:12px;
+      align-items:end;
+      background:rgba(244,246,244,.94);
+      border:1px solid rgba(60,110,71,.14);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:16px;
+      backdrop-filter: blur(12px);
+      box-shadow:0 10px 24px rgba(36,49,38,.06);
+    }
+
+    .toolbar-field {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
+    .toolbar-field span {
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .toolbar-field select,
+    .toolbar-field input {
+      width:100%;
+      min-height:42px;
+      border:1px solid #dbe4d8;
+      border-radius:10px;
+      background:#fff;
+      color:var(--texto);
+      padding:0 12px;
+      font-size:.92rem;
+      box-sizing:border-box;
+      outline:none;
+    }
+
+    .toolbar-field select:focus,
+    .toolbar-field input:focus {
+      border-color:var(--dourado);
+      box-shadow:0 0 0 3px rgba(201,168,106,.14);
+    }
+
+    .toolbar-status {
+      justify-self:end;
+      align-self:center;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      border-radius:999px;
+      padding:0 14px;
+      font-size:.84rem;
+      font-weight:800;
+      background:#edf3ec;
+      color:var(--verde-escuro);
+      white-space:nowrap;
+    }
+
+    .dropdown-actions {
+      display:inline-block;
+      position:relative;
+    }
+
+    .dropdown-actions summary {
+      list-style:none;
+      cursor:pointer;
+      min-height:38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border:1px solid #dbe4d8;
+      border-radius:10px;
+      background:#fff;
+      color:var(--verde-escuro);
+      padding:0 12px;
+      font-weight:800;
+      font-size:.88rem;
+    }
+
+    .dropdown-actions summary::-webkit-details-marker { display:none; }
+
+    .dropdown-actions[open] summary {
+      border-color:rgba(60,110,71,.35);
+      box-shadow:0 0 0 3px rgba(60,110,71,.08);
+    }
+
+    .dropdown-menu {
+      position:absolute;
+      right:0;
+      top:calc(100% + 8px);
+      display:grid;
+      gap:8px;
+      min-width:210px;
+      background:#fff;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:var(--sombra);
+      z-index:30;
+    }
+
+    .dropdown-menu button {
+      width:100%;
+      text-align:left;
+    }
+
+    .section-toolbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .section-toolbar h3 {
+      margin:0;
+      border:0;
+      padding:0;
+    }
+
+    .inline-filter {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .inline-filter label {
+      color:var(--muted);
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .inline-filter select {
+      min-height:38px;
+      border:1px solid #dbe4d8;
+      border-radius:10px;
+      padding:0 12px;
+      background:#fff;
+      color:var(--texto);
+      font-weight:700;
+    }
+
     .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-      border-bottom: 2px solid var(--borda);
-      padding-bottom: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
+      display:none;
     }
 
     .tab-btn {
@@ -155,17 +305,18 @@
     .tab-btn.active { background: var(--verde); color: #fff; }
 
     /* Lógica de exibição das abas */
-    .tab-content { display: none; }
+    .tab-content { display: none; min-width:0; }
     .tab-content.active { display: block !important; }
 
     /* CARDS ADMIN */
     .admin-card {
       background: #fff;
       border: 1px solid var(--borda);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: var(--sombra);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(36,49,38,0.06);
+      min-width:0;
     }
 
     .admin-card h3 {
@@ -222,8 +373,8 @@
       background:#fff;
       border-radius:12px;
       padding:10px;
-      min-height:400px;
-      border: 1px solid #eee;
+      min-height:280px;
+      border: 1px solid #e8eee6;
     }
 
     .column-header{
@@ -236,11 +387,12 @@
     }
 
     .card{
-      background:#f9f9f9;
+      background:#fbfcfb;
       padding:12px;
       border-radius:8px;
       margin-bottom:8px;
       font-size:14px;
+      border: 1px solid #e8eee6;
       border-left: 4px solid var(--dourado);
     }
 
@@ -264,6 +416,7 @@
       overflow:auto;
       border: 1px solid #eee;
       border-radius: 12px;
+      max-width:100%;
     }
 
     table{
@@ -470,6 +623,7 @@
       padding:16px;
       margin-bottom:14px;
       background:#fff;
+      min-width:0;
     }
 
     .form-section-head {
@@ -634,6 +788,8 @@
 
 
     @media (max-width: 900px){
+      .workspace-toolbar{ grid-template-columns: 1fr; position:static; }
+      .toolbar-status{ justify-self:start; }
       .filters-grid{ grid-template-columns: 1fr 1fr; }
       .form-grid, .form-grid.is-three, .choice-grid{ grid-template-columns: 1fr; }
       .days-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -667,20 +823,44 @@
 </header>
 
 <div class="wrap">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="abrirAba('aba-vendas', this)">Vendas e produção</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-compras', this)">Compras</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-cardapio', this)">Cardápio e estoque</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-textos', this)">Textos do site</button>
-    <button class="tab-btn" data-role="admin" onclick="abrirAba('aba-config', this)">Financeiro</button>
-    <button class="tab-btn" id="btn-login-admin" style="background: #eee; cursor: default;">Carregando...</button>
+  <div class="workspace-toolbar">
+    <label class="toolbar-field">
+      <span>Área</span>
+      <select id="nav-select" onchange="abrirAbaSelecionada()">
+        <option value="aba-vendas">Vendas e produção</option>
+        <option value="aba-compras" data-role="admin">Compras</option>
+        <option value="aba-cardapio" data-role="admin">Cardápio e estoque</option>
+        <option value="aba-textos" data-role="admin">Textos do site</option>
+        <option value="aba-config" data-role="admin">Financeiro</option>
+      </select>
+    </label>
+    <label class="toolbar-field">
+      <span>Pesquisar na área atual</span>
+      <input id="global-search" type="search" placeholder="Buscar pedidos, produtos, compras ou textos..." oninput="handleGlobalSearch()">
+    </label>
+    <span class="toolbar-status" id="btn-login-admin">Carregando...</span>
   </div>
 
   <!-- ABA VENDAS -->
   <div id="aba-vendas" class="tab-content active">
-    <div class="topbar-btns">
-      <button class="tab-btn" style="background: var(--dourado); color: white;" onclick="carregarPedidos()">Atualizar</button>
-      <button class="tab-btn" data-role="admin" style="background: #444; color: white;" onclick="editarLimite()">Definir Limite</button>
+    <div class="section-toolbar">
+      <details class="dropdown-actions">
+        <summary>Ações</summary>
+        <div class="dropdown-menu">
+          <button class="btn-secondary" type="button" onclick="carregarPedidos()">Atualizar pedidos</button>
+          <button class="btn-secondary" type="button" data-role="admin" onclick="editarLimite()">Definir limite diário</button>
+        </div>
+      </details>
+      <div class="inline-filter">
+        <label for="agenda-filter-select">Agenda</label>
+        <select id="agenda-filter-select" onchange="setAgendaFilter(this.value)">
+          <option value="all">Todos</option>
+          <option value="today">Hoje</option>
+          <option value="tomorrow">Amanhã</option>
+          <option value="week">Próximos 7 dias</option>
+          <option value="undated">Sem data</option>
+        </select>
+      </div>
     </div>
 
     <div class="summary-bar" id="agenda-summary" style="margin-bottom:12px;">
@@ -688,13 +868,6 @@
       <div id="agenda-summary-values">Carregando...</div>
     </div>
 
-    <div class="topbar-btns" id="agenda-filters" style="justify-content:flex-start; margin-bottom:12px;">
-      <button class="tab-btn" data-filter="today" onclick="setAgendaFilter('today')">Hoje</button>
-      <button class="tab-btn" data-filter="tomorrow" onclick="setAgendaFilter('tomorrow')">Amanhã</button>
-      <button class="tab-btn" data-filter="week" onclick="setAgendaFilter('week')">Próximos 7 dias</button>
-      <button class="tab-btn" data-filter="undated" onclick="setAgendaFilter('undated')">Sem data</button>
-      <button class="tab-btn" data-filter="all" onclick="setAgendaFilter('all')">Todos</button>
-    </div>
 
     <div class="admin-card" id="production-summary" style="margin-bottom:16px;">
       <h3>Resumo de produção</h3>
@@ -836,10 +1009,15 @@
     
     <!-- PRODUTOS (primeiro) -->
     <div class="admin-card">
-      <h3>Produtos (Cardápio + Estoque)</h3>
-
-      <div class="topbar-btns" style="justify-content:flex-end;">
-        <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="carregarProdutosAdmin()">Atualizar</button>
+      <div class="section-toolbar">
+        <h3>Produtos (Cardápio + Estoque)</h3>
+        <details class="dropdown-actions">
+          <summary>Ações</summary>
+          <div class="dropdown-menu">
+            <button class="btn-secondary" type="button" onclick="carregarProdutosAdmin()">Atualizar produtos</button>
+            <button class="btn-secondary" type="button" onclick="preencherTabelaProducao()">Carregar produção do dia</button>
+          </div>
+        </details>
       </div>
 
       <div class="admin-card" style="margin-bottom:20px;">
@@ -1267,15 +1445,26 @@
   }
 
   function aplicarPermissoes() {
+    const isAdmin = USER_ROLE === "admin";
     document.querySelectorAll("[data-role='admin']").forEach(el => {
-      el.style.display = (USER_ROLE === "admin") ? "inline-block" : "none";
+      if (el.tagName === "OPTION") {
+        el.hidden = !isAdmin;
+        el.disabled = !isAdmin;
+      } else {
+        el.style.display = isAdmin ? "inline-block" : "none";
+      }
     });
+    const navSelect = document.getElementById("nav-select");
+    if (navSelect && navSelect.selectedOptions[0]?.disabled) {
+      navSelect.value = "aba-vendas";
+      abrirAba("aba-vendas");
+    }
     const btnLogin = document.getElementById("btn-login-admin");
     if (USER_ROLE === "admin") {
-      btnLogin.innerText = "Admin ✅";
-      btnLogin.style.background = "var(--dourado)";
+      btnLogin.innerText = "Admin";
+      btnLogin.style.background = "rgba(201,168,106,.18)";
     } else {
-      btnLogin.innerText = "Funcionário 👤";
+      btnLogin.innerText = "Operador";
     }
   }
 
@@ -1315,11 +1504,24 @@
   }
 
   // ================= CONTROLE DAS ABAS =================
-  function abrirAba(idAba, btn) {
+  function getCurrentTabId() {
+    return document.querySelector(".tab-content.active")?.id || "aba-vendas";
+  }
+
+  function abrirAbaSelecionada() {
+    abrirAba(document.getElementById("nav-select").value);
+  }
+
+  function abrirAba(idAba) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(idAba).classList.add('active');
-    btn.classList.add('active');
+    const tab = document.getElementById(idAba);
+    if (!tab) return;
+    tab.classList.add('active');
+
+    const navSelect = document.getElementById("nav-select");
+    if (navSelect && navSelect.value !== idAba) navSelect.value = idAba;
+
+    updateSearchPlaceholder();
 
     if (idAba === 'aba-compras') {
       carregarFornecedores();
@@ -1327,7 +1529,46 @@
     }
     if (idAba === 'aba-config') atualizarDashboardFinanceiro();
     if (idAba === 'aba-cardapio') carregarProdutosAdmin();
-    if (idAba === 'aba-textos') carregarTextosSiteAdmin();
+    if (idAba === 'aba-textos') {
+      carregarTextosSiteAdmin();
+      filtrarCamposTextosSite();
+    }
+    handleGlobalSearch();
+  }
+
+  function normalizeSearch(value) {
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  }
+
+  function getGlobalSearch() {
+    return normalizeSearch(document.getElementById("global-search")?.value || "");
+  }
+
+  function matchesGlobalSearch(...values) {
+    const query = getGlobalSearch();
+    if (!query) return true;
+    return normalizeSearch(values.filter(Boolean).join(" ")).includes(query);
+  }
+
+  function updateSearchPlaceholder() {
+    const input = document.getElementById("global-search");
+    if (!input) return;
+    const labels = {
+      "aba-vendas": "Buscar cliente, produto, endereço ou total...",
+      "aba-compras": "Buscar fornecedor, item, categoria ou data...",
+      "aba-cardapio": "Buscar produto, categoria, descrição ou status...",
+      "aba-textos": "Buscar campo ou conteúdo do site...",
+      "aba-config": "Buscar nesta área..."
+    };
+    input.placeholder = labels[getCurrentTabId()] || "Buscar...";
+  }
+
+  function handleGlobalSearch() {
+    const tabId = getCurrentTabId();
+    if (tabId === "aba-vendas") renderizar();
+    if (tabId === "aba-compras") aplicarFiltrosCompras();
+    if (tabId === "aba-cardapio") renderProdutosAdmin();
+    if (tabId === "aba-textos") filtrarCamposTextosSite();
   }
 
   function editarLimite() {
@@ -1352,6 +1593,14 @@
     SITE_CONTENT_FIELDS.forEach(key => {
       const el = document.getElementById("txt-" + key);
       if (el) el.value = merged[key] || "";
+    });
+    filtrarCamposTextosSite();
+  }
+
+  function filtrarCamposTextosSite() {
+    const query = getGlobalSearch();
+    document.querySelectorAll("#aba-textos .field").forEach(field => {
+      field.style.display = !query || normalizeSearch(field.textContent).includes(query) ? "" : "none";
     });
   }
 
@@ -1453,6 +1702,8 @@
 
   function setAgendaFilter(filter){
     agendaFiltro = filter;
+    const select = document.getElementById("agenda-filter-select");
+    if (select && select.value !== filter) select.value = filter;
     renderizar();
   }
 
@@ -1470,11 +1721,8 @@
   }
 
   function updateAgendaButtons(){
-    document.querySelectorAll("#agenda-filters button").forEach(btn => {
-      const active = btn.dataset.filter === agendaFiltro;
-      btn.style.background = active ? "var(--verde)" : "";
-      btn.style.color = active ? "#fff" : "";
-    });
+    const select = document.getElementById("agenda-filter-select");
+    if (select && select.value !== agendaFiltro) select.value = agendaFiltro;
   }
 
   function sortOrdersBySchedule(a, b){
@@ -1521,6 +1769,7 @@
     const ativos = pedidos
       .filter(p => p.delivery_status !== 'delivered' && p.delivery_status !== 'canceled')
       .filter(matchesAgendaFilter)
+      .filter(matchesOrderSearch)
       .sort(sortOrdersBySchedule);
 
     renderAgendaSummary(ativos);
@@ -1531,6 +1780,24 @@
     renderCol("col-preparing", filter('preparing'));
     renderCol("col-ready", filter('ready'));
     renderCol("col-delivery", filter('out_for_delivery'));
+  }
+
+  function orderSearchText(order) {
+    const items = (order.items_json || []).map(item => `${item.title || item.name || item.id} ${item.quantity || ""}`).join(" ");
+    return [
+      order.customer_name,
+      order.customer_phone,
+      order.delivery_address,
+      order.external_reference,
+      order.total,
+      formatOrderDate(getOrderDate(order)),
+      formatWindow(order),
+      items
+    ].join(" ");
+  }
+
+  function matchesOrderSearch(order) {
+    return matchesGlobalSearch(orderSearchText(order));
   }
 
   function renderItems(order){
@@ -1746,6 +2013,7 @@
     const filtrados = (COMPRAS_ENTRIES || []).filter(e => {
       if (fornecedorId && String(e.supplier_id) !== String(fornecedorId)) return false;
       if (categoria && String(e.category) !== String(categoria)) return false;
+      if (!matchesGlobalSearch(e.suppliers?.name, e.item_name, e.category, e.entry_date, e.total_value, e.quantity)) return false;
 
       const dt = e.entry_date ? new Date(e.entry_date) : null;
       if (de && dt && dt < de) return false;
@@ -2044,12 +2312,25 @@
   function renderProdutosAdmin(){
     const tbody = getEl("tbody-produtos");
 
-    if(!PRODUTOS_ADMIN.length){
-      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto cadastrado.</td></tr>`;
+    const produtosFiltrados = (PRODUTOS_ADMIN || []).filter(p =>
+      matchesGlobalSearch(
+        p.name,
+        p.description,
+        p.category,
+        p.serving_size,
+        p.storage_instructions,
+        p.active ? "ativo" : "inativo",
+        p.is_gift_recipe ? "brinde receita" : "",
+        formatProductDays(p.available_days)
+      )
+    );
+
+    if(!produtosFiltrados.length){
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto encontrado.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = PRODUTOS_ADMIN.map(p => {
+    tbody.innerHTML = produtosFiltrados.map(p => {
       const img = p.image_url
         ? `<img class="prod-img" src="${p.image_url}" alt="Foto">`
         : `<div class="prod-img"></div>`;
@@ -2262,6 +2543,7 @@ async function salvarProducaoLote(){
 
   // INICIALIZAÇÃO
   aplicarPermissoes();
+  updateSearchPlaceholder();
   if (USER_ROLE === "admin") preencherTextosSite(SITE_CONTENT_DEFAULTS);
   carregarPedidos();
   setInterval(carregarPedidos, 30000);
