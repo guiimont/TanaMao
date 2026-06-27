@@ -225,6 +225,80 @@
       line-height: 1.45;
     }
 
+    .menu-tabs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 8px;
+      margin: 2px 0 12px;
+    }
+
+    .menu-tab {
+      border: 1px solid var(--borda);
+      background: #fff;
+      color: var(--texto);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: 0.2s ease;
+    }
+
+    .menu-tab span {
+      min-width: 24px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--fundo);
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-align: center;
+    }
+
+    .menu-tab.active {
+      border-color: var(--verde);
+      background: var(--verde);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(25, 135, 84, 0.16);
+    }
+
+    .menu-tab.active span {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .menu-note {
+      margin: -2px 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .product.recipe-card {
+      align-items: flex-start;
+    }
+
+    .product.recipe-card .product-left {
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .recipe-badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      background: #eef8f2;
+      color: var(--verde);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 5px 10px;
+    }
+
     #produtos-container {
       display: flex;
       flex-direction: column;
@@ -863,7 +937,7 @@
     </a>
     <nav class="site-nav" aria-label="Navegação principal">
       <span class="site-pill" data-content="headerBadge">Produção sob encomenda</span>
-      <a href="#produtos-container">Cardápio</a>
+      <a href="#cardapio">Cardápio</a>
       <a href="#resumo-lista">Pedido</a>
     </nav>
   </div>
@@ -897,8 +971,10 @@
       </div>
     </div>
 
-    <div class="section">
+    <div class="section" id="cardapio">
       <span class="section-title">Cardápio</span>
+      <div class="menu-tabs" id="menu-tabs" aria-label="Categorias do cardápio"></div>
+      <div class="menu-note" id="menu-note"></div>
       <div id="produtos-container">
         <div class="erro-cardapio">
           <p>Carregando cardápio...</p>
@@ -1074,7 +1150,9 @@
     }
 
     let PRODS = [];
+    let RECEITAS = [];
     let qtds = {};
+    let menuCategoriaAtual = "doce";
     let pagSel = null;
     let clienteAtual = null;
     let isSubmittingCheckout = false;
@@ -1265,15 +1343,84 @@
       return p.image_url;
     }
 
+    const MENU_CATEGORIES = [
+      { id: "doce", label: "Doces", note: "Sobremesas e doces prontos para encomenda." },
+      { id: "salgado", label: "Salgados", note: "Itens salgados para rotina, trabalho e pós-treino." },
+      { id: "kit-semanal", label: "Kits", note: "Combos pensados para organizar a alimentação da semana." },
+      { id: "receitas", label: "Receitas simples", note: "Ideias saudáveis para fazer em casa. Não entram no carrinho." }
+    ];
+
+    function normalizeSellableCategory(p) {
+      const category = String(p?.category || "").toLowerCase();
+      if (category === "doce") return "doce";
+      if (category === "kit-semanal") return "kit-semanal";
+      return "salgado";
+    }
+
+    function isSellableProduct(p) {
+      return p && p.active !== false && p.is_sellable !== false;
+    }
+
+    function isRecipeItem(p) {
+      const category = String(p?.category || "").toLowerCase();
+      return p && p.active !== false && p.is_sellable === false && (p.is_gift_recipe === true || category === "brinde");
+    }
+
+    function getMenuCounts() {
+      const counts = { doce: 0, salgado: 0, "kit-semanal": 0, receitas: RECEITAS.length };
+      PRODS.forEach(p => {
+        const category = normalizeSellableCategory(p);
+        counts[category] = (counts[category] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function escolherCategoriaInicial() {
+      const counts = getMenuCounts();
+      if (counts[menuCategoriaAtual] > 0) return;
+      const next = MENU_CATEGORIES.find(cat => counts[cat.id] > 0);
+      menuCategoriaAtual = next ? next.id : "doce";
+    }
+
+    function renderMenuTabs() {
+      const tabs = document.getElementById("menu-tabs");
+      const note = document.getElementById("menu-note");
+      if (!tabs) return;
+      const counts = getMenuCounts();
+      tabs.innerHTML = MENU_CATEGORIES.map(cat => `
+        <button class="menu-tab ${menuCategoriaAtual === cat.id ? "active" : ""}" type="button" onclick="setMenuCategoria('${cat.id}')">
+          ${escapeHtml(cat.label)} <span>${counts[cat.id] || 0}</span>
+        </button>
+      `).join("");
+      const active = MENU_CATEGORIES.find(cat => cat.id === menuCategoriaAtual);
+      if (note) note.textContent = active ? active.note : "";
+    }
+
+    function setMenuCategoria(category) {
+      if (!MENU_CATEGORIES.some(cat => cat.id === category)) return;
+      menuCategoriaAtual = category;
+      renderProdutos();
+    }
+
+    function aplicarProdutosCarregados(products) {
+      const activeProducts = (products || []).filter(p => p.active !== false);
+      PRODS = activeProducts.filter(isSellableProduct);
+      RECEITAS = activeProducts.filter(isRecipeItem);
+
+      const cartSalvo = carregarCarrinho();
+      qtds = {};
+      PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
+
+      escolherCategoriaInicial();
+      renderProdutos();
+    }
+
     // ✅ LÓGICA DE CARREGAMENTO OTIMIZADA (Stale-While-Revalidate)
     async function carregarProdutos() {
       // 1. Tenta carregar do Cache (IndexedDB) primeiro para renderização instantânea
       const cachedProducts = await getCachedProducts();
       if (cachedProducts && cachedProducts.length > 0) {
-        PRODS = cachedProducts.filter(p => p.active !== false && p.is_sellable !== false);
-        const cartSalvo = carregarCarrinho();
-        PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
-        renderProdutos();
+        aplicarProdutosCarregados(cachedProducts);
         
         const pagamentoSalvo = carregarPagamento();
         if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
@@ -1297,19 +1444,7 @@
         await saveProductsToCache(fetchedProds);
 
         // Atualiza a interface com os dados frescos
-        PRODS = fetchedProds.filter(p => p.active !== false && p.is_sellable !== false);
-        
-        if (!PRODS.length) {
-          document.getElementById("produtos-container").innerHTML =
-            '<div class="erro-cardapio"><p>Cardápio vazio.</p></div>';
-          atualizarResumo();
-          return;
-        }
-
-        const cartSalvo = carregarCarrinho();
-        PRODS.forEach(p => { qtds[p.id] = Number(cartSalvo[p.id] || 0); });
-        
-        renderProdutos();
+        aplicarProdutosCarregados(fetchedProds);
 
         const pagamentoSalvo = carregarPagamento();
         if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
@@ -1320,7 +1455,7 @@
       } catch (e) {
         console.error("ERRO AO CARREGAR PRODUTOS DA API:", e);
         // Só mostra erro se o cache também estiver vazio
-        if (!PRODS.length) {
+        if (!PRODS.length && !RECEITAS.length) {
           document.getElementById("produtos-container").innerHTML = `
             <div class="erro-cardapio">
               <p>Erro ao carregar cardápio.</p>
@@ -1352,6 +1487,14 @@
 
     function getProductDetails(p) {
       const details = [];
+      if (isRecipeItem(p)) {
+        if (p.serving_size) details.push(["Rendimento", p.serving_size]);
+        if (p.weekly_guide_note) details.push(["Dica de organização", p.weekly_guide_note]);
+        if (p.storage_instructions) details.push(["Conservação", p.storage_instructions]);
+        if (!details.length) details.push(["Como usar", "Receita simples para apoiar uma rotina mais saudável."]);
+        return details;
+      }
+
       if (p.serving_size) details.push(["Porção", p.serving_size]);
       if (p.shelf_life_days) details.push(["Validade", `${p.shelf_life_days} dia(s)`]);
       if (p.lead_time_hours) details.push(["Encomenda", `${p.lead_time_hours}h antes`]);
@@ -1372,7 +1515,7 @@
     }
 
     function abrirDetalhesProduto(id) {
-      const p = PRODS.find(item => String(item.id) === String(id));
+      const p = [...PRODS, ...RECEITAS].find(item => String(item.id) === String(id));
       const body = document.getElementById("product-details-body");
       const overlay = document.getElementById("product-details-overlay");
       if (!p || !body || !overlay) return;
@@ -1384,7 +1527,7 @@
           <div>
             <h3>${escapeHtml(p.name || "")}</h3>
             <p class="m-subtitulo">${escapeHtml(p.description || "")}</p>
-            <div class="details-price">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
+            <div class="details-price">${isSellableProduct(p) ? fmt(p.price) : "Receita simples"}</div>
           </div>
         </div>
         <div class="details-list">${renderProductDetails(p)}</div>
@@ -1397,42 +1540,76 @@
       if (overlay) overlay.classList.remove("on");
     }
     function renderProdutos() {
-  const container = document.getElementById("produtos-container");
+      const container = document.getElementById("produtos-container");
+      renderMenuTabs();
+      if (!container) return;
 
-  if (!PRODS.length) {
-    container.innerHTML = '<div class="erro-cardapio"><p>Cardápio em atualização. Volte em breve!</p></div>';
-    return;
-  }
+      if (menuCategoriaAtual === "receitas") {
+        if (!RECEITAS.length) {
+          container.innerHTML = '<div class="erro-cardapio"><p>Nenhuma receita simples disponível no momento.</p></div>';
+          return;
+        }
 
-  container.innerHTML = PRODS.map(p => {
-    const imageSrc = getProductImageSrc(p);
+        container.innerHTML = RECEITAS.map(p => {
+          const imageSrc = getProductImageSrc(p);
+          const safeId = escapeHtml(p.id);
+          const safeName = escapeHtml(p.name || "");
+          const safeDesc = escapeHtml(p.description || "");
 
-    const safeId = escapeHtml(p.id);
-    const safeName = escapeHtml(p.name || "");
-    const safeDesc = escapeHtml(p.description || "");
+          return `
+            <div class="product recipe-card">
+              <div class="product-left">
+                ${imageSrc ? `<img src="${imageSrc}" alt="${safeName || "Receita"}">` : ""}
+                <div class="product-info">
+                  <div class="p-nome">${safeName}</div>
+                  <div class="p-desc">${safeDesc}</div>
+                  <div class="p-card-actions">
+                    <span class="recipe-badge">Receita simples</span>
+                    <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">Ver receita</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+        return;
+      }
 
-    return `
-      <div class="product">
-        <div class="product-left">
-          ${imageSrc ? `<img src="${imageSrc}" alt="${safeName || "Produto"}">` : ""}
-          <div class="product-info">
-            <div class="p-nome">${safeName}</div>
-            <div class="p-desc">${safeDesc}</div>
-            <div class="p-card-actions">
-              <div class="p-preco">R$ ${Number(p.price || 0).toFixed(2).replace(".", ",")}</div>
-              <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">Detalhes e dicas</button>
+      const produtosCategoria = PRODS.filter(p => normalizeSellableCategory(p) === menuCategoriaAtual);
+
+      if (!produtosCategoria.length) {
+        container.innerHTML = '<div class="erro-cardapio"><p>Nenhum item disponível nesta categoria no momento.</p></div>';
+        return;
+      }
+
+      container.innerHTML = produtosCategoria.map(p => {
+        const imageSrc = getProductImageSrc(p);
+        const safeId = escapeHtml(p.id);
+        const safeName = escapeHtml(p.name || "");
+        const safeDesc = escapeHtml(p.description || "");
+
+        return `
+          <div class="product">
+            <div class="product-left">
+              ${imageSrc ? `<img src="${imageSrc}" alt="${safeName || "Produto"}">` : ""}
+              <div class="product-info">
+                <div class="p-nome">${safeName}</div>
+                <div class="p-desc">${safeDesc}</div>
+                <div class="p-card-actions">
+                  <div class="p-preco">${fmt(p.price)}</div>
+                  <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">Detalhes e dicas</button>
+                </div>
+              </div>
+            </div>
+            <div class="qty-wrap">
+              <button type="button" onclick="qty('${safeId}', -1)">-</button>
+              <span class="qty-num" id="qtd-${safeId}">${qtds[p.id] || 0}</span>
+              <button type="button" onclick="qty('${safeId}', 1)">+</button>
             </div>
           </div>
-        </div>
-        <div class="qty-wrap">
-          <button type="button" onclick="qty('${safeId}', -1)">-</button>
-          <span class="qty-num" id="qtd-${safeId}">${qtds[p.id] || 0}</span>
-          <button type="button" onclick="qty('${safeId}', 1)">+</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
+        `;
+      }).join("");
+    }
 
     function qty(id, d) {
       qtds[id] = Math.max(0, (qtds[id] || 0) + d);
