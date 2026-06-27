@@ -133,7 +133,7 @@
       top: 0;
       z-index: 10;
       display:grid;
-      grid-template-columns: minmax(220px, 300px) minmax(260px, 1fr) auto;
+      grid-template-columns: minmax(260px, 1fr) auto;
       gap:12px;
       align-items:end;
       background:rgba(244,246,244,.94);
@@ -143,6 +143,42 @@
       margin-bottom:16px;
       backdrop-filter: blur(12px);
       box-shadow:0 10px 24px rgba(36,49,38,.06);
+    }
+
+    .workspace-tabs {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .workspace-tab {
+      min-height: 38px;
+      border: 1px solid #dbe4d8;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--verde-escuro);
+      padding: 0 12px;
+      font-family: 'Poppins', Arial, sans-serif;
+      font-size: .86rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .2s, border .2s, color .2s, box-shadow .2s;
+    }
+
+    .workspace-tab:hover {
+      border-color: rgba(60,110,71,.35);
+      background: rgba(60,110,71,.06);
+    }
+
+    .workspace-tab.active {
+      border-color: var(--verde);
+      background: var(--verde);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(60,110,71,.16);
     }
 
     .toolbar-field {
@@ -1013,17 +1049,14 @@
 
 <div class="wrap">
   <div class="workspace-toolbar">
-    <label class="toolbar-field">
-      <span>Área</span>
-      <select id="nav-select" onchange="abrirAbaSelecionada()">
-        <option value="aba-vendas">Vendas e produção</option>
-        <option value="aba-compras" data-role="admin">Compras</option>
-        <option value="aba-cardapio" data-role="admin">Cardápio e estoque</option>
-        <option value="aba-cadastro-produto" data-role="admin">Cadastro de produto</option>
-        <option value="aba-textos" data-role="admin">Textos do site</option>
-        <option value="aba-config" data-role="admin">Financeiro</option>
-      </select>
-    </label>
+    <div class="workspace-tabs" aria-label="Áreas do painel">
+      <button class="workspace-tab active" type="button" data-tab-target="aba-vendas" onclick="abrirAba('aba-vendas')" aria-selected="true">Vendas e produção</button>
+      <button class="workspace-tab" type="button" data-tab-target="aba-compras" data-role="admin" onclick="abrirAba('aba-compras')" aria-selected="false">Compras</button>
+      <button class="workspace-tab" type="button" data-tab-target="aba-cardapio" data-role="admin" onclick="abrirAba('aba-cardapio')" aria-selected="false">Cardápio e estoque</button>
+      <button class="workspace-tab" type="button" data-tab-target="aba-cadastro-produto" data-role="admin" onclick="abrirAba('aba-cadastro-produto')" aria-selected="false">Cadastro de produto</button>
+      <button class="workspace-tab" type="button" data-tab-target="aba-textos" data-role="admin" onclick="abrirAba('aba-textos')" aria-selected="false">Textos do site</button>
+      <button class="workspace-tab" type="button" data-tab-target="aba-config" data-role="admin" onclick="abrirAba('aba-config')" aria-selected="false">Financeiro</button>
+    </div>
     <label class="toolbar-field">
       <span>Pesquisar na área atual</span>
       <input id="global-search" type="search" placeholder="Buscar pedidos, produtos, compras ou textos..." oninput="handleGlobalSearch()">
@@ -1890,9 +1923,7 @@
         el.style.display = isAdmin ? "inline-block" : "none";
       }
     });
-    const navSelect = document.getElementById("nav-select");
-    if (navSelect && navSelect.selectedOptions[0]?.disabled) {
-      navSelect.value = "aba-vendas";
+    if (!isAdmin && getCurrentTabId() !== "aba-vendas") {
       abrirAba("aba-vendas");
     }
     const btnLogin = document.getElementById("btn-login-admin");
@@ -1945,7 +1976,8 @@
   }
 
   function abrirAbaSelecionada() {
-    abrirAba(document.getElementById("nav-select").value);
+    const select = document.getElementById("nav-select");
+    if (select) abrirAba(select.value);
   }
 
   function abrirAba(idAba) {
@@ -1960,8 +1992,11 @@
       if (searchInput) searchInput.value = "";
     }
 
-    const navSelect = document.getElementById("nav-select");
-    if (navSelect && navSelect.value !== idAba) navSelect.value = idAba;
+    document.querySelectorAll(".workspace-tab").forEach(btn => {
+      const isActive = btn.dataset.tabTarget === idAba;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-selected", String(isActive));
+    });
 
     updateSearchPlaceholder();
 
