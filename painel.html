@@ -326,6 +326,96 @@
       line-height: 1.5;
     }
 
+    .stock-low {
+      color: #c0392b;
+    }
+
+    .stock-ok {
+      color: var(--verde-escuro);
+    }
+
+    .replenishment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .finance-kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .finance-kpi {
+      border: 1px solid #e4eade;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .finance-kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 5px;
+    }
+
+    .finance-kpi strong {
+      color: var(--verde-escuro);
+      font-size: 1.12rem;
+    }
+
+    .finance-chart {
+      border: 1px solid #e4eade;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      min-height: 180px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: minmax(92px, 140px) 1fr minmax(86px, auto);
+      gap: 10px;
+      align-items: center;
+      font-size: .86rem;
+    }
+
+    .chart-label {
+      color: var(--texto);
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chart-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #eef2ec;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      height: 100%;
+      min-width: 3px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--verde), var(--dourado));
+    }
+
+    .chart-value {
+      color: var(--verde-escuro);
+      font-weight: 800;
+      text-align: right;
+    }
+
     .section-toolbar {
       display:flex;
       align-items:center;
@@ -1161,12 +1251,13 @@
               <th>Ativo</th>
               <th style="text-align:right;">Preço</th>
               <th style="text-align:right;">Estoque</th>
+              <th style="text-align:right;">Mínimo</th>
               <th style="text-align:right;">Ordem</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody id="tbody-produtos">
-            <tr><td colspan="7">Carregando...</td></tr>
+            <tr><td colspan="8">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -1174,6 +1265,33 @@
       <div class="small" style="margin-top:10px;">
         Ajuste de estoque: use delta (+/-). Ex.: <b>+10</b> para produzir 10 unidades, <b>-2</b> para perdas/ajustes.
       </div>
+
+      <div class="admin-card" style="margin-top:14px;">
+        <div class="section-toolbar">
+          <h3>Pedidos de reposição</h3>
+          <button class="btn-secondary" type="button" onclick="carregarPedidosReposicao()">Atualizar reposição</button>
+        </div>
+        <div class="table-status" id="reposicao-status">Nenhuma reposição carregada.</div>
+        <div class="table-wrap">
+          <table style="min-width: 860px;">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th style="text-align:right;">Estoque</th>
+                <th style="text-align:right;">Mínimo</th>
+                <th style="text-align:right;">Sugestão</th>
+                <th>Aberto em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-reposicao">
+              <tr><td colspan="6">Nenhum pedido de reposição aberto.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
     </div>
 
   </div>
@@ -1274,6 +1392,16 @@
           <label class="field">
             <span>Limite por dia</span>
             <input id="p-limite-dia" type="number" min="0" step="1" placeholder="Ex: 20">
+          </label>
+          <label class="field">
+            <span>Estoque mínimo</span>
+            <input id="p-estoque-minimo" type="number" min="0" step="1" placeholder="Ex: 6">
+            <small>Quando o estoque chegar aqui, o sistema abre reposição.</small>
+          </label>
+          <label class="field">
+            <span>Qtd. reposição</span>
+            <input id="p-reposicao-qtd" type="number" min="0" step="1" placeholder="Ex: 20">
+            <small>Quantidade sugerida para o pedido de reposição.</small>
           </label>
         </div>
         <label class="field" style="margin-top:12px;">
@@ -1566,15 +1694,79 @@
 
   <!-- ABA CONFIG -->
   <div id="aba-config" class="tab-content">
-    <div class="admin-card" style="max-width: 500px; margin: 0 auto; margin-bottom: 20px;">
-      <h3>Dashboard de Resultado Real</h3>
-      <p>Faturamento Bruto: <strong id="dash-bruto">R$ 0,00</strong></p>
-      <p>Taxas de Gateway: <strong id="dash-taxas" style="color: #c0392b;">R$ 0,00</strong></p>
-      <p>Custos Fixos: <strong id="dash-custos" style="color: #c0392b;">R$ 0,00</strong></p>
-      <p>Compras/Estoque: <strong id="dash-compras" style="color: #c0392b;">R$ 0,00</strong></p>
-      <hr>
-      <h4>Lucro Líquido: <strong id="dash-lucro" style="color: var(--verde); font-size: 1.5rem;">R$ 0,00</strong></h4>
-      <button onclick="atualizarDashboardFinanceiro()" style="margin-top: 15px;">Atualizar Dados</button>
+    <div class="admin-card">
+      <div class="card-heading">
+        <div>
+          <span class="eyebrow">Financeiro</span>
+          <h3>Resultado e vendas</h3>
+          <p>Filtre o período, acompanhe faturamento, custos e veja a curva de vendas por dia, mês ou período do dia.</p>
+        </div>
+      </div>
+
+      <div class="filters-grid">
+        <div>
+          <label>De</label>
+          <input id="dash-de" type="date">
+        </div>
+        <div>
+          <label>Até</label>
+          <input id="dash-ate" type="date">
+        </div>
+        <div>
+          <label>Agrupar vendas</label>
+          <select id="dash-agrupamento">
+            <option value="day">Por dia</option>
+            <option value="month">Por mês</option>
+            <option value="period">Por período do dia</option>
+          </select>
+        </div>
+        <div>
+          <label>Período do dia</label>
+          <select id="dash-periodo-dia">
+            <option value="all">Todos</option>
+            <option value="morning">Manhã</option>
+            <option value="afternoon">Tarde</option>
+            <option value="night">Noite</option>
+            <option value="dawn">Madrugada</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" type="button" onclick="setFinancePeriod('today')">Hoje</button>
+        <button class="btn-secondary" type="button" onclick="setFinancePeriod('month')">Mês atual</button>
+        <button class="btn-primary" type="button" onclick="atualizarDashboardFinanceiro()">Atualizar relatório</button>
+      </div>
+
+      <div class="finance-kpis">
+        <div class="finance-kpi"><span>Faturamento</span><strong id="dash-bruto">R$ 0,00</strong></div>
+        <div class="finance-kpi"><span>Pedidos</span><strong id="dash-pedidos">0</strong></div>
+        <div class="finance-kpi"><span>Ticket médio</span><strong id="dash-ticket">R$ 0,00</strong></div>
+        <div class="finance-kpi"><span>Taxas</span><strong id="dash-taxas">R$ 0,00</strong></div>
+        <div class="finance-kpi"><span>Custos fixos</span><strong id="dash-custos">R$ 0,00</strong></div>
+        <div class="finance-kpi"><span>Compras/estoque</span><strong id="dash-compras">R$ 0,00</strong></div>
+        <div class="finance-kpi"><span>Resultado</span><strong id="dash-lucro">R$ 0,00</strong></div>
+      </div>
+
+      <div class="finance-chart" id="sales-chart">
+        <div class="muted">Atualize o relatório para ver o gráfico.</div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table style="min-width: 820px;">
+          <thead>
+            <tr>
+              <th>Período</th>
+              <th style="text-align:right;">Pedidos</th>
+              <th style="text-align:right;">Unidades</th>
+              <th style="text-align:right;">Faturamento</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-vendas-periodo">
+            <tr><td colspan="4">Atualize o relatório.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="admin-card" style="max-width: 500px; margin: 0 auto;">
@@ -1586,14 +1778,6 @@
       <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
       <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
     </div>
-  </div>
-</div>
-
-
-<div class="panel-overlay" id="product-recipe-overlay">
-  <div class="panel-modal">
-    <button class="panel-modal-close" type="button" onclick="fecharFichaProduto()" aria-label="Fechar">×</button>
-    <div id="product-recipe-body"></div>
   </div>
 </div>
 
@@ -1631,6 +1815,7 @@
 
   // ====== ESTADO (Produtos Admin) ======
   let PRODUTOS_ADMIN = [];
+  let PEDIDOS_REPOSICAO = [];
 
   const SITE_CONTENT_DEFAULTS = {
     brandSubtitle: "Alimentação inteligente sob encomenda",
@@ -2593,6 +2778,8 @@
     getEl("p-validade").value = "";
     getEl("p-antecedencia").value = "24";
     getEl("p-limite-dia").value = "";
+    getEl("p-estoque-minimo").value = "";
+    getEl("p-reposicao-qtd").value = "";
     getEl("p-conservacao").value = "";
     getEl("p-vendavel").value = "true";
     getEl("p-brinde").value = "false";
@@ -2619,6 +2806,8 @@
     getEl("p-validade").value = p.shelf_life_days ?? "";
     getEl("p-antecedencia").value = p.lead_time_hours ?? 24;
     getEl("p-limite-dia").value = p.max_units_per_day ?? "";
+    getEl("p-estoque-minimo").value = p.reorder_min_quantity ?? "";
+    getEl("p-reposicao-qtd").value = p.reorder_quantity ?? "";
     getEl("p-conservacao").value = p.storage_instructions || "";
     getEl("p-vendavel").value = String(p.is_sellable !== false);
     getEl("p-brinde").value = String(!!p.is_gift_recipe);
@@ -2679,6 +2868,8 @@
       lead_time_hours: getEl("p-antecedencia").value || 24,
       available_days: allDaysSelected ? [] : selectedDays,
       max_units_per_day: getEl("p-limite-dia").value || null,
+      reorder_min_quantity: getEl("p-estoque-minimo").value || 0,
+      reorder_quantity: getEl("p-reposicao-qtd").value || 0,
       is_sellable: isSellable,
       is_gift_recipe: isGiftRecipe,
       weekly_guide_note: getEl("p-nota-semanal").value.trim() || null,
@@ -2710,7 +2901,7 @@
     const tbody = getEl("tbody-produtos");
     const status = getEl("produtos-status");
     if (status) status.innerText = "Carregando produtos...";
-    tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8">Carregando...</td></tr>`;
 
     try{
       const res = await fetch(API + "/products/admin", { cache: "no-store" });
@@ -2718,11 +2909,86 @@
       if(!res.ok || !data.ok) throw new Error(data.message || `Erro ${res.status} ao carregar produtos`);
       PRODUTOS_ADMIN = Array.isArray(data.products) ? data.products : [];
       renderProdutosAdmin();
+      await carregarPedidosReposicao();
     } catch(e){
       console.error(e);
       PRODUTOS_ADMIN = [];
       if (status) status.innerText = "Nao foi possivel carregar os produtos.";
-      tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar produtos: ${e.message || "falha desconhecida"}.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8">Erro ao carregar produtos: ${e.message || "falha desconhecida"}.</td></tr>`;
+    }
+  }
+
+
+  function formatDateTime(value){
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value).slice(0, 10);
+    return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  }
+
+  async function carregarPedidosReposicao(){
+    const tbody = getEl("tbody-reposicao");
+    const status = getEl("reposicao-status");
+    if (!tbody || !status) return;
+    status.textContent = "Carregando reposições...";
+    try {
+      const res = await fetch(API + "/products/replenishment?status=open", { cache: "no-store" });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao carregar reposições");
+      PEDIDOS_REPOSICAO = Array.isArray(data.requests) ? data.requests : [];
+      renderPedidosReposicao();
+    } catch (e) {
+      console.error(e);
+      PEDIDOS_REPOSICAO = [];
+      status.textContent = "Não foi possível carregar reposições.";
+      tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar reposições.</td></tr>`;
+    }
+  }
+
+  function renderPedidosReposicao(){
+    const tbody = getEl("tbody-reposicao");
+    const status = getEl("reposicao-status");
+    if (!tbody || !status) return;
+    const pedidos = PEDIDOS_REPOSICAO || [];
+    status.textContent = pedidos.length
+      ? `${pedidos.length} pedido(s) de reposição aberto(s).`
+      : "Nenhum pedido de reposição aberto.";
+
+    if (!pedidos.length) {
+      tbody.innerHTML = `<tr><td colspan="6">Nenhum pedido de reposição aberto.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = pedidos.map(item => `
+      <tr>
+        <td><strong>${escapeHtml(item.product_name || item.product_id || "")}</strong></td>
+        <td style="text-align:right;"><strong class="stock-low">${Number(item.current_stock || 0)}</strong></td>
+        <td style="text-align:right;">${Number(item.reorder_min_quantity || 0)}</td>
+        <td style="text-align:right;"><strong>${Number(item.suggested_quantity || 0)}</strong></td>
+        <td>${formatDateTime(item.created_at)}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-secondary" type="button" onclick="abrirAba('aba-compras')">Comprar</button>
+            <button class="btn-secondary" type="button" onclick="resolverReposicao('${item.id}')">Resolver</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function resolverReposicao(id){
+    if (!confirm("Marcar esta reposição como resolvida?")) return;
+    try {
+      const res = await fetch(API + "/products/replenishment/" + id, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "resolved" })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao resolver reposição");
+      await carregarPedidosReposicao();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao resolver reposição.");
     }
   }
 
@@ -2751,6 +3017,8 @@
         p.category,
         p.serving_size,
         p.storage_instructions,
+        p.reorder_min_quantity,
+        p.reorder_quantity,
         p.ingredients,
         p.preparation_method,
         p.active ? "ativo" : "inativo",
@@ -2767,8 +3035,8 @@
 
     if(!produtosFiltrados.length){
       tbody.innerHTML = query
-        ? `<tr><td colspan="7">Nenhum produto encontrado para esta busca. <button class="inline-action" type="button" onclick="limparBuscaProdutos()">Limpar busca</button></td></tr>`
-        : `<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>`;
+        ? `<tr><td colspan="8">Nenhum produto encontrado para esta busca. <button class="inline-action" type="button" onclick="limparBuscaProdutos()">Limpar busca</button></td></tr>`
+        : `<tr><td colspan="8">Nenhum produto cadastrado ainda.</td></tr>`;
       return;
     }
 
@@ -2780,6 +3048,9 @@
       const ativo = p.active ? `<span class="badge on">Ativo</span>` : `<span class="badge off">Inativo</span>`;
       const preco = fmt(Number(p.price || 0));
       const estoque = Number(p.stock_quantity || 0);
+      const minimo = Number(p.reorder_min_quantity || 0);
+      const reposicao = Number(p.reorder_quantity || 0);
+      const baixoEstoque = p.active !== false && p.is_sellable !== false && minimo > 0 && estoque <= minimo;
       const ordem = Number(p.sort_order || 0);
       const ficha = hasProductRecipe(p);
 
@@ -2796,6 +3067,8 @@
               Antecedência: ${Number(p.lead_time_hours || 0)}h<br>
               Disponível: ${formatProductDays(p.available_days)}
               ${p.max_units_per_day ? `<br>Limite/dia: ${p.max_units_per_day}` : ""}
+              ${minimo ? `<br>Reposição: mínimo ${minimo}${reposicao ? ` / sugerido ${reposicao}` : ""}` : ""}
+              ${baixoEstoque ? `<br><span class="stock-low">Reposição necessária</span>` : ""}
               ${ficha ? `<br>Ficha técnica cadastrada` : ""}
               ${p.is_gift_recipe ? `<br>Receita simples pública` : ""}
             </div>
@@ -2803,7 +3076,7 @@
           <td>${ativo}</td>
           <td style="text-align:right;"><strong>${preco}</strong></td>
           <td style="text-align:right;">
-            <strong>${estoque}</strong>
+            <strong class="${baixoEstoque ? "stock-low" : "stock-ok"}">${estoque}</strong>
             <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
               <input id="delta-${p.id}" type="number" step="1" placeholder="+/-" style="width:90px;padding:8px;border:1px solid #ddd;border-radius:10px;">
               <button class="btn-secondary" onclick="ajustarEstoque('${p.id}', ${estoque})">Aplicar</button>
@@ -2812,6 +3085,7 @@
               <input id="motivo-${p.id}" type="text" placeholder="Motivo (opcional)" style="width: 240px; max-width: 100%; padding:8px;border:1px solid #ddd;border-radius:10px;">
             </div>
           </td>
+          <td style="text-align:right;">${minimo || "-"}</td>
           <td style="text-align:right;">${ordem}</td>
           <td>
             <div class="actions">
@@ -2958,34 +3232,177 @@ async function salvarProducaoLote(){
     }
   }
 
+  function getSaleDate(order){
+    const raw = order.created_at || order.updated_at || order.scheduled_delivery_date || "";
+    return String(raw).slice(0, 10);
+  }
+
+  function getSaleHour(order){
+    const raw = order.created_at || order.updated_at || "";
+    const d = raw ? new Date(raw) : null;
+    return d && !Number.isNaN(d.getTime()) ? d.getHours() : 12;
+  }
+
+  function getDayPeriod(hour){
+    if (hour >= 5 && hour < 12) return "morning";
+    if (hour >= 12 && hour < 18) return "afternoon";
+    if (hour >= 18 && hour < 24) return "night";
+    return "dawn";
+  }
+
+  function formatDayPeriod(period){
+    const labels = { morning: "Manhã", afternoon: "Tarde", night: "Noite", dawn: "Madrugada" };
+    return labels[period] || "Sem período";
+  }
+
+  function periodLabel(key, grouping){
+    if (grouping === "month") {
+      const [year, month] = key.split("-");
+      return `${month}/${year}`;
+    }
+    if (grouping === "period") return formatDayPeriod(key);
+    return formatOrderDate(key);
+  }
+
+  function getEntryDate(entry){
+    return String(entry.entry_date || entry.created_at || "").slice(0, 10);
+  }
+
+  function ensureFinanceDefaultDates(){
+    const de = getEl("dash-de");
+    const ate = getEl("dash-ate");
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    if (de && !de.value) de.value = first;
+    if (ate && !ate.value) ate.value = today;
+  }
+
+  function setFinancePeriod(period){
+    const de = getEl("dash-de");
+    const ate = getEl("dash-ate");
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    if (period === "today") {
+      if (de) de.value = today;
+      if (ate) ate.value = today;
+    } else {
+      const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+      if (de) de.value = first;
+      if (ate) ate.value = today;
+    }
+    atualizarDashboardFinanceiro();
+  }
+
+  function getOrderUnits(order){
+    return (order.items_json || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  }
+
+  function groupSales(orders, grouping){
+    const map = new Map();
+    orders.forEach(order => {
+      const date = getSaleDate(order);
+      const key = grouping === "month"
+        ? date.slice(0, 7)
+        : grouping === "period"
+          ? getDayPeriod(getSaleHour(order))
+          : date;
+      if (!map.has(key)) map.set(key, { key, orders: 0, units: 0, total: 0 });
+      const row = map.get(key);
+      row.orders += 1;
+      row.units += getOrderUnits(order);
+      row.total += Number(order.total || 0);
+    });
+    return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
+  }
+
+  function renderSalesChart(rows, grouping){
+    const chart = getEl("sales-chart");
+    const tbody = getEl("tbody-vendas-periodo");
+    if (!chart || !tbody) return;
+    if (!rows.length) {
+      chart.innerHTML = '<div class="muted">Sem vendas aprovadas para o filtro selecionado.</div>';
+      tbody.innerHTML = '<tr><td colspan="4">Sem vendas no período.</td></tr>';
+      return;
+    }
+    const max = Math.max(...rows.map(row => row.total), 1);
+    chart.innerHTML = rows.map(row => {
+      const pct = Math.max(3, Math.round((row.total / max) * 100));
+      return `
+        <div class="chart-row">
+          <div class="chart-label" title="${periodLabel(row.key, grouping)}">${periodLabel(row.key, grouping)}</div>
+          <div class="chart-track"><div class="chart-bar" style="width:${pct}%"></div></div>
+          <div class="chart-value">${fmt(row.total)}</div>
+        </div>
+      `;
+    }).join("");
+    tbody.innerHTML = rows.map(row => `
+      <tr>
+        <td><strong>${periodLabel(row.key, grouping)}</strong></td>
+        <td style="text-align:right;">${row.orders}</td>
+        <td style="text-align:right;">${row.units}</td>
+        <td style="text-align:right;"><strong>${fmt(row.total)}</strong></td>
+      </tr>
+    `).join("");
+  }
+
   // ================= DASHBOARD FINANCEIRO =================
   async function atualizarDashboardFinanceiro() {
-    const resOrders = await fetch(API + "/operations/orders");
-    const dataOrders = await resOrders.json();
+    ensureFinanceDefaultDates();
+    const dateFrom = getEl("dash-de")?.value || "";
+    const dateTo = getEl("dash-ate")?.value || "";
+    const grouping = getEl("dash-agrupamento")?.value || "day";
+    const dayPeriod = getEl("dash-periodo-dia")?.value || "all";
 
-    let bruto = 0, taxas = 0;
-    (dataOrders.orders || []).forEach(p => {
-      if (p.payment_status === "approved") {
-        bruto += Number(p.total || 0);
-        taxas += Number(p.gateway_fee || 0);
-      }
+    const [resOrders, resCosts, resStock] = await Promise.all([
+      fetch(API + "/operations/orders"),
+      fetch(API + "/costs"),
+      fetch(API + "/stock")
+    ]);
+
+    const dataOrders = await resOrders.json();
+    const dataCosts = await resCosts.json();
+    const dataStock = await resStock.json();
+
+    const approvedOrders = (dataOrders.orders || []).filter(order => {
+      if (order.payment_status !== "approved") return false;
+      const date = getSaleDate(order);
+      if (dateFrom && date < dateFrom) return false;
+      if (dateTo && date > dateTo) return false;
+      if (dayPeriod !== "all" && getDayPeriod(getSaleHour(order)) !== dayPeriod) return false;
+      return true;
     });
 
-    const resCosts = await fetch(API + "/costs");
-    const dataCosts = await resCosts.json();
-    const custosFixos = (dataCosts.data || []).reduce((acc, c) => acc + Number(c.value), 0);
+    const costs = (dataCosts.data || []).filter(cost => {
+      const date = String(cost.created_at || "").slice(0, 10);
+      if (dateFrom && date && date < dateFrom) return false;
+      if (dateTo && date && date > dateTo) return false;
+      return true;
+    });
 
-    const resStock = await fetch(API + "/stock");
-    const dataStock = await resStock.json();
-    const compras = (dataStock.entries || []).reduce((acc, c) => acc + Number(c.total_value), 0);
+    const stockEntries = (dataStock.entries || []).filter(entry => {
+      const date = getEntryDate(entry);
+      if (dateFrom && date && date < dateFrom) return false;
+      if (dateTo && date && date > dateTo) return false;
+      return true;
+    });
 
+    const bruto = approvedOrders.reduce((acc, order) => acc + Number(order.total || 0), 0);
+    const taxas = approvedOrders.reduce((acc, order) => acc + Number(order.gateway_fee || 0), 0);
+    const custosFixos = costs.reduce((acc, cost) => acc + Number(cost.value || 0), 0);
+    const compras = stockEntries.reduce((acc, entry) => acc + Number(entry.total_value || 0), 0);
     const lucro = bruto - taxas - custosFixos - compras;
+    const ticket = approvedOrders.length ? bruto / approvedOrders.length : 0;
 
-    document.getElementById("dash-bruto").innerText = fmt(bruto);
-    document.getElementById("dash-taxas").innerText = fmt(taxas);
-    document.getElementById("dash-custos").innerText = fmt(custosFixos);
-    document.getElementById("dash-compras").innerText = fmt(compras);
-    document.getElementById("dash-lucro").innerText = fmt(lucro);
+    getEl("dash-bruto").innerText = fmt(bruto);
+    getEl("dash-pedidos").innerText = String(approvedOrders.length);
+    getEl("dash-ticket").innerText = fmt(ticket);
+    getEl("dash-taxas").innerText = fmt(taxas);
+    getEl("dash-custos").innerText = fmt(custosFixos);
+    getEl("dash-compras").innerText = fmt(compras);
+    getEl("dash-lucro").innerText = fmt(lucro);
+
+    renderSalesChart(groupSales(approvedOrders, grouping), grouping);
   }
 
   // INICIALIZAÇÃO
