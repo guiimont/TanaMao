@@ -419,6 +419,24 @@
       max-width:100%;
     }
 
+    .table-status{
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .inline-action{
+      border: none;
+      background: transparent;
+      color: var(--verde);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
     table{
       width: 100%;
       border-collapse: collapse;
@@ -1049,6 +1067,7 @@
   </div>
 </div>
 
+      <div class="table-status" id="produtos-status">Carregando produtos...</div>
       <div class="table-wrap">
         <table style="min-width: 1040px;">
           <thead>
@@ -1538,10 +1557,16 @@
   }
 
   function abrirAba(idAba) {
+    const previousTab = getCurrentTabId();
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     const tab = document.getElementById(idAba);
     if (!tab) return;
     tab.classList.add('active');
+
+    if (previousTab !== idAba) {
+      const searchInput = document.getElementById("global-search");
+      if (searchInput) searchInput.value = "";
+    }
 
     const navSelect = document.getElementById("nav-select");
     if (navSelect && navSelect.value !== idAba) navSelect.value = idAba;
@@ -1592,8 +1617,14 @@
     const tabId = getCurrentTabId();
     if (tabId === "aba-vendas") renderizar();
     if (tabId === "aba-compras") aplicarFiltrosCompras();
-    if (tabId === "aba-cardapio") renderProdutosAdmin();
+    if (tabId === "aba-cardapio" && Array.isArray(PRODUTOS_ADMIN)) renderProdutosAdmin();
     if (tabId === "aba-textos") filtrarCamposTextosSite();
+  }
+
+  function limparBuscaProdutos() {
+    const input = document.getElementById("global-search");
+    if (input) input.value = "";
+    renderProdutosAdmin();
   }
 
   function editarLimite() {
@@ -2349,16 +2380,21 @@
 
   async function carregarProdutosAdmin(){
     const tbody = getEl("tbody-produtos");
+    const status = getEl("produtos-status");
+    if (status) status.innerText = "Carregando produtos...";
     tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
 
     try{
-      const res = await fetch(API + "/products");
-      const data = await res.json();
-      PRODUTOS_ADMIN = data.products || [];
+      const res = await fetch(API + "/products", { cache: "no-store" });
+      const data = await readJsonResponse(res);
+      if(!res.ok || !data.ok) throw new Error(data.message || `Erro ${res.status} ao carregar produtos`);
+      PRODUTOS_ADMIN = Array.isArray(data.products) ? data.products : [];
       renderProdutosAdmin();
     } catch(e){
       console.error(e);
-      tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar produtos.</td></tr>`;
+      PRODUTOS_ADMIN = [];
+      if (status) status.innerText = "Nao foi possivel carregar os produtos.";
+      tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar produtos: ${e.message || "falha desconhecida"}.</td></tr>`;
     }
   }
 
@@ -2370,6 +2406,9 @@
 
   function renderProdutosAdmin(){
     const tbody = getEl("tbody-produtos");
+    const status = getEl("produtos-status");
+    const totalProdutos = (PRODUTOS_ADMIN || []).length;
+    const query = getGlobalSearch();
 
     const produtosFiltrados = (PRODUTOS_ADMIN || []).filter(p =>
       matchesGlobalSearch(
@@ -2384,8 +2423,16 @@
       )
     );
 
+    if (status) {
+      status.innerText = totalProdutos
+        ? `${produtosFiltrados.length} de ${totalProdutos} produto(s) exibido(s).`
+        : "Nenhum produto cadastrado ainda.";
+    }
+
     if(!produtosFiltrados.length){
-      tbody.innerHTML = `<tr><td colspan="7">Nenhum produto encontrado.</td></tr>`;
+      tbody.innerHTML = query
+        ? `<tr><td colspan="7">Nenhum produto encontrado para esta busca. <button class="inline-action" type="button" onclick="limparBuscaProdutos()">Limpar busca</button></td></tr>`
+        : `<tr><td colspan="7">Nenhum produto cadastrado ainda.</td></tr>`;
       return;
     }
 
