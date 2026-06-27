@@ -1007,7 +1007,7 @@
     </div>
 
     <div class="section" id="cardapio">
-      <span class="section-title">Cardápio</span>
+      <span class="section-title" data-content="menuTitle">Cardápio</span>
       <div class="menu-tabs" id="menu-tabs" aria-label="Categorias do cardápio"></div>
       <div class="menu-note" id="menu-note"></div>
       <div id="produtos-container">
@@ -1156,6 +1156,22 @@
       footerLine2: "Cardápio fixo, produção sob encomenda e organização semanal.",
       footerTag1: "Frescor",
       footerTag2: "Praticidade",
+      menuTitle: "Cardápio",
+      menuDocesLabel: "Doces",
+      menuDocesNote: "Sobremesas e doces prontos para encomenda.",
+      menuSalgadosLabel: "Salgados",
+      menuSalgadosNote: "Itens salgados para rotina, trabalho e pós-treino.",
+      menuKitsLabel: "Kits",
+      menuKitsNote: "Combos pensados para organizar a alimentação da semana.",
+      menuDiyLabel: "Faça você mesmo",
+      menuDiyNote: "Receitas saudáveis para fazer em casa. Não entram no carrinho.",
+      menuDiyEmpty: "Nenhuma receita disponível no momento.",
+      recipeBadgeLabel: "Faça você mesmo",
+      recipeButtonLabel: "Ver receita",
+      recipeDetailLabel: "Faça você mesmo",
+      recipeIngredientsTitle: "Ingredientes",
+      recipePreparationTitle: "Modo de preparo",
+      recipeEmptyText: "Conteúdo em atualização.",
       footerTag3: "Rotina saudável"
     };
 
@@ -1164,12 +1180,20 @@
       try { return JSON.parse(value); } catch { return {}; }
     }
 
+    let SITE_CONTENT = { ...SITE_CONTENT_DEFAULTS };
+
+    function siteText(key) {
+      return SITE_CONTENT[key] || SITE_CONTENT_DEFAULTS[key] || "";
+    }
+
     function aplicarTextosSite(content = {}) {
       const merged = { ...SITE_CONTENT_DEFAULTS, ...normalizeSiteContentValue(content) };
+      SITE_CONTENT = merged;
       document.querySelectorAll("[data-content]").forEach(el => {
         const key = el.dataset.content;
         if (typeof merged[key] === "string") el.textContent = merged[key];
       });
+      if (typeof renderMenuTabs === "function") renderMenuTabs();
     }
 
     async function carregarTextosSite() {
@@ -1379,10 +1403,10 @@
     }
 
     const MENU_CATEGORIES = [
-      { id: "doce", label: "Doces", note: "Sobremesas e doces prontos para encomenda." },
-      { id: "salgado", label: "Salgados", note: "Itens salgados para rotina, trabalho e pós-treino." },
-      { id: "kit-semanal", label: "Kits", note: "Combos pensados para organizar a alimentação da semana." },
-      { id: "receitas", label: "Receitas simples", note: "Ideias saudáveis para fazer em casa. Não entram no carrinho." }
+      { id: "doce", labelKey: "menuDocesLabel", noteKey: "menuDocesNote" },
+      { id: "salgado", labelKey: "menuSalgadosLabel", noteKey: "menuSalgadosNote" },
+      { id: "kit-semanal", labelKey: "menuKitsLabel", noteKey: "menuKitsNote" },
+      { id: "receitas", labelKey: "menuDiyLabel", noteKey: "menuDiyNote" }
     ];
 
     function normalizeSellableCategory(p) {
@@ -1424,11 +1448,11 @@
       const counts = getMenuCounts();
       tabs.innerHTML = MENU_CATEGORIES.map(cat => `
         <button class="menu-tab ${menuCategoriaAtual === cat.id ? "active" : ""}" type="button" onclick="setMenuCategoria('${cat.id}')">
-          ${escapeHtml(cat.label)} <span>${counts[cat.id] || 0}</span>
+          ${escapeHtml(siteText(cat.labelKey))} <span>${counts[cat.id] || 0}</span>
         </button>
       `).join("");
       const active = MENU_CATEGORIES.find(cat => cat.id === menuCategoriaAtual);
-      if (note) note.textContent = active ? active.note : "";
+      if (note) note.textContent = active ? siteText(active.noteKey) : "";
     }
 
     function setMenuCategoria(category) {
@@ -1546,7 +1570,7 @@
         .filter(Boolean);
 
       if (!lines.length) {
-        return '<p class="recipe-detail-empty">Conteúdo em atualização.</p>';
+        return `<p class="recipe-detail-empty">${escapeHtml(siteText("recipeEmptyText"))}</p>`;
       }
 
       const tag = ordered ? "ol" : "ul";
@@ -1556,11 +1580,11 @@
     function renderRecipePublicDetails(p) {
       return `
         <div class="recipe-detail-section">
-          <h4>Ingredientes</h4>
+          <h4>${escapeHtml(siteText("recipeIngredientsTitle"))}</h4>
           ${renderRecipeLines(p.ingredients, false)}
         </div>
         <div class="recipe-detail-section">
-          <h4>Modo de preparo</h4>
+          <h4>${escapeHtml(siteText("recipePreparationTitle"))}</h4>
           ${renderRecipeLines(p.preparation_method, true)}
         </div>
       `;
@@ -1591,7 +1615,7 @@
           <div>
             <h3>${escapeHtml(p.name || "")}</h3>
             <p class="m-subtitulo">${escapeHtml(p.description || "")}</p>
-            <div class="details-price">${isSellableProduct(p) ? fmt(p.price) : "Receita simples"}</div>
+            <div class="details-price">${isSellableProduct(p) ? fmt(p.price) : escapeHtml(siteText("recipeDetailLabel"))}</div>
           </div>
         </div>
         <div class="details-list">${renderProductDetails(p)}</div>
@@ -1610,7 +1634,7 @@
 
       if (menuCategoriaAtual === "receitas") {
         if (!RECEITAS.length) {
-          container.innerHTML = '<div class="erro-cardapio"><p>Nenhuma receita simples disponível no momento.</p></div>';
+          container.innerHTML = `<div class="erro-cardapio"><p>${escapeHtml(siteText("menuDiyEmpty"))}</p></div>`;
           return;
         }
 
@@ -1628,8 +1652,8 @@
                   <div class="p-nome">${safeName}</div>
                   <div class="p-desc">${safeDesc}</div>
                   <div class="p-card-actions">
-                    <span class="recipe-badge">Receita simples</span>
-                    <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">Ver receita</button>
+                    <span class="recipe-badge">${escapeHtml(siteText("recipeBadgeLabel"))}</span>
+                    <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">${escapeHtml(siteText("recipeButtonLabel"))}</button>
                   </div>
                 </div>
               </div>
