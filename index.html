@@ -455,6 +455,41 @@
       line-height: 1.45;
     }
 
+    .recipe-detail-section {
+      border: 1px solid var(--borda);
+      background: #fcfbf8;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .recipe-detail-section h4 {
+      margin: 0 0 8px;
+      color: var(--verde-escuro);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .recipe-detail-section ul,
+    .recipe-detail-section ol {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .recipe-detail-section li + li {
+      margin-top: 5px;
+    }
+
+    .recipe-detail-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
     .qty-wrap {
       display: flex;
       align-items: center;
@@ -1504,7 +1539,36 @@
       return details;
     }
 
+    function renderRecipeLines(value, ordered = false) {
+      const lines = String(value || "")
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      if (!lines.length) {
+        return '<p class="recipe-detail-empty">Conteúdo em atualização.</p>';
+      }
+
+      const tag = ordered ? "ol" : "ul";
+      return `<${tag}>${lines.map(line => `<li>${escapeHtml(line)}</li>`).join("")}</${tag}>`;
+    }
+
+    function renderRecipePublicDetails(p) {
+      return `
+        <div class="recipe-detail-section">
+          <h4>Ingredientes</h4>
+          ${renderRecipeLines(p.ingredients, false)}
+        </div>
+        <div class="recipe-detail-section">
+          <h4>Modo de preparo</h4>
+          ${renderRecipeLines(p.preparation_method, true)}
+        </div>
+      `;
+    }
+
     function renderProductDetails(p) {
+      if (isRecipeItem(p)) return renderRecipePublicDetails(p);
+
       return getProductDetails(p)
         .map(([label, value]) => `
           <div class="detail-row">

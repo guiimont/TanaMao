@@ -245,6 +245,87 @@
       text-align:left;
     }
 
+    .rule-note {
+      border: 1px solid rgba(60,110,71,.18);
+      background: rgba(60,110,71,.07);
+      color: var(--verde-escuro);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 30, 22, .5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .panel-overlay.on {
+      display: flex;
+    }
+
+    .panel-modal {
+      width: min(720px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--borda);
+      box-shadow: var(--sombra);
+      padding: 18px;
+      position: relative;
+    }
+
+    .panel-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: #f0f3ef;
+      color: var(--verde-escuro);
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .recipe-blocks {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .recipe-block {
+      border: 1px solid #e7ece5;
+      border-radius: 12px;
+      background: #fcfbf8;
+      padding: 12px;
+    }
+
+    .recipe-block h4 {
+      margin: 0 0 8px;
+      color: var(--verde-escuro);
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .recipe-block ul,
+    .recipe-block ol {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--texto);
+      line-height: 1.5;
+    }
+
     .section-toolbar {
       display:flex;
       align-items:center;
@@ -848,6 +929,7 @@
         <option value="aba-vendas">Vendas e produção</option>
         <option value="aba-compras" data-role="admin">Compras</option>
         <option value="aba-cardapio" data-role="admin">Cardápio e estoque</option>
+        <option value="aba-cadastro-produto" data-role="admin">Cadastro de produto</option>
         <option value="aba-textos" data-role="admin">Textos do site</option>
         <option value="aba-config" data-role="admin">Financeiro</option>
       </select>
@@ -1032,6 +1114,7 @@
         <details class="dropdown-actions">
           <summary>Ações</summary>
           <div class="dropdown-menu">
+            <button class="btn-secondary" type="button" onclick="novoProduto()">Novo produto</button>
             <button class="btn-secondary" type="button" onclick="carregarProdutosAdmin()">Atualizar produtos</button>
             <button class="btn-secondary" type="button" onclick="preencherTabelaProducao()">Carregar produção do dia</button>
           </div>
@@ -1052,16 +1135,17 @@
   </div>
 
   <div class="table-wrap">
-    <table style="min-width: 900px;">
+    <table style="min-width: 980px;">
       <thead>
         <tr>
           <th>Produto</th>
+          <th>Ficha interna</th>
           <th style="text-align:right;">Estoque atual</th>
           <th style="text-align:right;">Produzido hoje (+)</th>
         </tr>
       </thead>
       <tbody id="tbody-producao">
-        <tr><td colspan="3">Clique em “Carregar produtos”.</td></tr>
+        <tr><td colspan="4">Clique em “Carregar produtos”.</td></tr>
       </tbody>
     </table>
   </div>
@@ -1092,13 +1176,19 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+  <!-- ABA CADASTRO DE PRODUTO -->
+  <div id="aba-cadastro-produto" class="tab-content">
+  <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
     <!-- CADASTRAR/EDITAR -->
     <div class="admin-card product-editor-card">
       <div class="card-heading">
         <div>
-          <span class="eyebrow">Cadastro do cardápio</span>
+          <span class="eyebrow">Cadastro único</span>
           <h3 id="cardapio-form-title">Cadastrar produto</h3>
-          <p>Edite os dados que aparecem no site e os parâmetros que orientam produção, validade e agenda.</p>
+          <p>Use um cadastro só: produto vendável usa a receita como ficha interna; receita simples usa ingredientes e preparo como conteúdo público.</p>
         </div>
       </div>
 
@@ -1145,7 +1235,7 @@
           </label>
           <label class="field">
             <span>Categoria</span>
-            <select id="p-categoria">
+            <select id="p-categoria" onchange="syncProductBusinessRules('categoria')">
               <option value="">Selecione</option>
               <option value="salgado">Salgado pronto</option>
               <option value="doce">Doce pronto</option>
@@ -1209,20 +1299,20 @@
 
       <div class="form-section">
         <div class="form-section-head">
-          <strong>Venda e guia semanal</strong>
-          <span>Separe o que será vendido do que pode virar receita brinde ou orientação de rotina.</span>
+          <strong>Venda e conteúdo</strong>
+          <span>Defina se este cadastro será vendido, usado como receita simples pública ou apenas como orientação de rotina.</span>
         </div>
         <div class="choice-grid">
           <label class="field">
             <span>Produto vendável</span>
-            <select id="p-vendavel">
+            <select id="p-vendavel" onchange="syncProductBusinessRules('vendavel')">
               <option value="true">Sim, vender no site</option>
               <option value="false">Não vender</option>
             </select>
           </label>
           <label class="field">
-            <span>Receita brinde</span>
-            <select id="p-brinde">
+            <span>Receita simples pública</span>
+            <select id="p-brinde" onchange="syncProductBusinessRules('brinde')">
               <option value="false">Não</option>
               <option value="true">Sim</option>
             </select>
@@ -1234,12 +1324,32 @@
         </label>
       </div>
 
+
+      <div class="form-section">
+        <div class="form-section-head">
+          <strong>Receita e ficha técnica</strong>
+          <span>Produto vendável: informação interna da equipe. Receita simples: aparece no site para o cliente fazer em casa.</span>
+        </div>
+        <div class="form-grid">
+          <label class="field full">
+            <span>Ingredientes</span>
+            <textarea id="p-ingredientes" placeholder="Escreva um ingrediente por linha. Ex: 2 ovos, 1 xícara de aveia, 1 banana."></textarea>
+            <small>Para produto vendável, isso fica interno. Para receita simples gratuita, isso aparece para o cliente.</small>
+          </label>
+          <label class="field full">
+            <span>Modo de preparo</span>
+            <textarea id="p-preparo" placeholder="Escreva o passo a passo, de preferência um passo por linha."></textarea>
+            <small>Use uma linguagem objetiva para a equipe ou para o cliente, conforme o tipo do cadastro.</small>
+          </label>
+        </div>
+        <div class="rule-note" id="recipe-visibility-note">Produto vendável: ingredientes e modo de preparo ficam ocultos no site público.</div>
+      </div>
+
       <div class="form-actions">
         <button class="btn-primary" type="button" onclick="salvarProduto()">Salvar produto</button>
         <button class="btn-secondary" type="button" onclick="limparFormProduto()">Limpar formulário</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -1403,6 +1513,14 @@
       <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
       <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
     </div>
+  </div>
+</div>
+
+
+<div class="panel-overlay" id="product-recipe-overlay">
+  <div class="panel-modal">
+    <button class="panel-modal-close" type="button" onclick="fecharFichaProduto()" aria-label="Fechar">×</button>
+    <div id="product-recipe-body"></div>
   </div>
 </div>
 
@@ -1579,6 +1697,7 @@
     }
     if (idAba === 'aba-config') atualizarDashboardFinanceiro();
     if (idAba === 'aba-cardapio') carregarProdutosAdmin();
+    if (idAba === 'aba-cadastro-produto' && USER_ROLE === "admin" && !PRODUTOS_ADMIN.length) carregarProdutosAdmin();
     if (idAba === 'aba-textos') {
       carregarTextosSiteAdmin();
       filtrarCamposTextosSite();
@@ -1607,6 +1726,7 @@
       "aba-vendas": "Buscar cliente, produto, endereço ou total...",
       "aba-compras": "Buscar fornecedor, item, categoria ou data...",
       "aba-cardapio": "Buscar produto, categoria, descrição ou status...",
+      "aba-cadastro-produto": "Cadastro único de produto, ficha interna e receita simples...",
       "aba-textos": "Buscar campo ou conteúdo do site...",
       "aba-config": "Buscar nesta área..."
     };
@@ -2271,6 +2391,106 @@
     });
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function isSimpleRecipeProduct(p) {
+    const category = String(p?.category || "").toLowerCase();
+    return p?.is_sellable === false && (p?.is_gift_recipe === true || category === "brinde");
+  }
+
+  function hasProductRecipe(p) {
+    return !!String(p?.ingredients || p?.preparation_method || "").trim();
+  }
+
+  function syncProductBusinessRules(changedField = "") {
+    const categoryEl = getEl("p-categoria");
+    const sellableEl = getEl("p-vendavel");
+    const giftEl = getEl("p-brinde");
+    const note = getEl("recipe-visibility-note");
+    if (!categoryEl || !sellableEl || !giftEl) return;
+
+    if (changedField === "vendavel" && sellableEl.value === "true") {
+      giftEl.value = "false";
+      if (categoryEl.value === "brinde") categoryEl.value = "";
+    }
+
+    if (changedField === "brinde" && giftEl.value === "true") {
+      sellableEl.value = "false";
+      categoryEl.value = "brinde";
+    }
+
+    if (changedField === "categoria" && categoryEl.value === "brinde") {
+      sellableEl.value = "false";
+      giftEl.value = "true";
+    }
+
+    const isRecipe = giftEl.value === "true" && sellableEl.value === "false";
+    if (note) {
+      note.textContent = isRecipe
+        ? "Receita simples: ingredientes e modo de preparo aparecem no site público e não entram no carrinho."
+        : "Produto vendável: ingredientes e modo de preparo ficam ocultos no site público e servem como ficha interna.";
+    }
+  }
+
+  function novoProduto(){
+    limparFormProduto();
+    abrirAba("aba-cadastro-produto");
+    getEl("cardapio-form-title").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function formatRecipeTextForHtml(value, ordered = false) {
+    const lines = String(value || "")
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    if (!lines.length) return '<p class="muted">Sem informação cadastrada.</p>';
+
+    const tag = ordered ? "ol" : "ul";
+    return `<${tag}>${lines.map(line => `<li>${escapeHtml(line)}</li>`).join("")}</${tag}>`;
+  }
+
+  function abrirFichaProduto(id){
+    const p = (PRODUTOS_ADMIN || []).find(x => String(x.id) === String(id));
+    const overlay = getEl("product-recipe-overlay");
+    const body = getEl("product-recipe-body");
+    if (!p || !overlay || !body) return;
+
+    const tipo = isSimpleRecipeProduct(p) ? "Receita simples pública" : "Ficha interna de produção";
+    body.innerHTML = `
+      <div class="card-heading" style="padding-right:34px;">
+        <div>
+          <span class="eyebrow">${escapeHtml(tipo)}</span>
+          <h3>${escapeHtml(p.name || "Produto")}</h3>
+          <p>${escapeHtml(p.description || "")}</p>
+        </div>
+      </div>
+      <div class="recipe-blocks">
+        <div class="recipe-block">
+          <h4>Ingredientes</h4>
+          ${formatRecipeTextForHtml(p.ingredients, false)}
+        </div>
+        <div class="recipe-block">
+          <h4>Modo de preparo</h4>
+          ${formatRecipeTextForHtml(p.preparation_method, true)}
+        </div>
+      </div>
+    `;
+    overlay.classList.add("on");
+  }
+
+  function fecharFichaProduto(){
+    const overlay = getEl("product-recipe-overlay");
+    if (overlay) overlay.classList.remove("on");
+  }
+
   function limparFormProduto(){
     getEl("p-id").value = "";
     getEl("p-nome").value = "";
@@ -2288,6 +2508,9 @@
     getEl("p-vendavel").value = "true";
     getEl("p-brinde").value = "false";
     getEl("p-nota-semanal").value = "";
+    getEl("p-ingredientes").value = "";
+    getEl("p-preparo").value = "";
+    syncProductBusinessRules();
     setCheckedProductDays([]);
     getEl("cardapio-form-title").innerText = "Cadastrar produto";
   }
@@ -2311,8 +2534,12 @@
     getEl("p-vendavel").value = String(p.is_sellable !== false);
     getEl("p-brinde").value = String(!!p.is_gift_recipe);
     getEl("p-nota-semanal").value = p.weekly_guide_note || "";
+    getEl("p-ingredientes").value = p.ingredients || "";
+    getEl("p-preparo").value = p.preparation_method || "";
     setCheckedProductDays(p.available_days || []);
+    syncProductBusinessRules();
     getEl("cardapio-form-title").innerText = "Editar produto";
+    abrirAba("aba-cadastro-produto");
     getEl("cardapio-form-title").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -2323,12 +2550,22 @@
     const price = getEl("p-preco").value;
     const sort_order = getEl("p-ordem").value;
     const active = (getEl("p-ativo").value === "true");
+    syncProductBusinessRules();
+    const isSellable = getEl("p-vendavel").value === "true";
+    const isGiftRecipe = getEl("p-brinde").value === "true";
+    const ingredients = getEl("p-ingredientes").value.trim();
+    const preparationMethod = getEl("p-preparo").value.trim();
 
     if(!name) return alert("Nome obrigatório.");
 
     const parsedPrice = parseMoneyInput(price);
     if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
       alert("Preço inválido. Use 19,90 ou 19.90.");
+      return;
+    }
+
+    if (isGiftRecipe && (!ingredients || !preparationMethod)) {
+      alert("Para receita simples, preencha Ingredientes e Modo de preparo.");
       return;
     }
 
@@ -2353,9 +2590,11 @@
       lead_time_hours: getEl("p-antecedencia").value || 24,
       available_days: allDaysSelected ? [] : selectedDays,
       max_units_per_day: getEl("p-limite-dia").value || null,
-      is_sellable: getEl("p-vendavel").value === "true",
-      is_gift_recipe: getEl("p-brinde").value === "true",
-      weekly_guide_note: getEl("p-nota-semanal").value.trim() || null
+      is_sellable: isSellable,
+      is_gift_recipe: isGiftRecipe,
+      weekly_guide_note: getEl("p-nota-semanal").value.trim() || null,
+      ingredients: ingredients || null,
+      preparation_method: preparationMethod || null
     };
 
     try{
@@ -2385,7 +2624,7 @@
     tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
 
     try{
-      const res = await fetch(API + "/products", { cache: "no-store" });
+      const res = await fetch(API + "/products/admin", { cache: "no-store" });
       const data = await readJsonResponse(res);
       if(!res.ok || !data.ok) throw new Error(data.message || `Erro ${res.status} ao carregar produtos`);
       PRODUTOS_ADMIN = Array.isArray(data.products) ? data.products : [];
@@ -2405,7 +2644,8 @@
   }
 
   function isArchivedProduct(p) {
-    return p?.active === false && p?.is_sellable === false;
+    const category = String(p?.category || "").toLowerCase();
+    return p?.active === false && p?.is_sellable === false && p?.is_gift_recipe !== true && category !== "brinde";
   }
 
   function renderProdutosAdmin(){
@@ -2422,6 +2662,8 @@
         p.category,
         p.serving_size,
         p.storage_instructions,
+        p.ingredients,
+        p.preparation_method,
         p.active ? "ativo" : "inativo",
         p.is_gift_recipe ? "brinde receita" : "",
         formatProductDays(p.available_days)
@@ -2450,6 +2692,7 @@
       const preco = fmt(Number(p.price || 0));
       const estoque = Number(p.stock_quantity || 0);
       const ordem = Number(p.sort_order || 0);
+      const ficha = hasProductRecipe(p);
 
       return `
         <tr>
@@ -2464,7 +2707,8 @@
               Antecedência: ${Number(p.lead_time_hours || 0)}h<br>
               Disponível: ${formatProductDays(p.available_days)}
               ${p.max_units_per_day ? `<br>Limite/dia: ${p.max_units_per_day}` : ""}
-              ${p.is_gift_recipe ? `<br>Brinde/receita` : ""}
+              ${ficha ? `<br>Ficha técnica cadastrada` : ""}
+              ${p.is_gift_recipe ? `<br>Receita simples pública` : ""}
             </div>
           </td>
           <td>${ativo}</td>
@@ -2482,6 +2726,7 @@
           <td style="text-align:right;">${ordem}</td>
           <td>
             <div class="actions">
+              ${ficha ? `<button class="btn-secondary" onclick="abrirFichaProduto('${p.id}')">Ficha</button>` : ""}
               <button class="btn-secondary" onclick="preencherFormProdutoById('${p.id}')">Editar</button>
               <button class="btn-secondary" onclick="toggleAtivo('${p.id}', ${!!p.active})">${p.active ? "Desativar" : "Ativar"}</button>
               <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
@@ -2497,17 +2742,18 @@
   if (!tbody) return;
 
   if (!PRODUTOS_ADMIN || !PRODUTOS_ADMIN.length) {
-    tbody.innerHTML = `<tr><td colspan="3">Carregue os produtos primeiro (Atualizar).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4">Carregue os produtos primeiro (Atualizar).</td></tr>`;
     return;
   }
 
-  const ativos = PRODUTOS_ADMIN.filter(p => p.active);
+  const ativos = PRODUTOS_ADMIN.filter(p => p.active && p.is_sellable !== false);
 
   tbody.innerHTML = ativos.map(p => {
     const estoque = Number(p.stock_quantity || 0);
     return `
       <tr>
         <td><strong>${p.name || ""}</strong></td>
+        <td>${hasProductRecipe(p) ? `<button class="btn-secondary" onclick="abrirFichaProduto('${p.id}')">Ficha</button>` : `<span class="muted">Sem ficha</span>`}</td>
         <td style="text-align:right;">${estoque}</td>
         <td style="text-align:right;">
           <input id="prod-qty-${p.id}" type="number" step="1" min="0"
@@ -2658,6 +2904,9 @@ async function salvarProducaoLote(){
   updateSearchPlaceholder();
   if (USER_ROLE === "admin") preencherTextosSite(SITE_CONTENT_DEFAULTS);
   carregarPedidos();
+  document.addEventListener("click", (event) => {
+    if (event.target === getEl("product-recipe-overlay")) fecharFichaProduto();
+  });
   setInterval(carregarPedidos, 30000);
 </script>
 </body>
