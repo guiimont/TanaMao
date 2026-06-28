@@ -291,6 +291,75 @@
       font-weight: 700;
     }
 
+    .usage-context-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .usage-context-option {
+      display: grid;
+      grid-template-columns: 20px 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid #dfe8dc;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .usage-context-option input {
+      margin-top: 7px;
+    }
+
+    .usage-token {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 30px;
+      border-radius: 10px;
+      background: rgba(60,110,71,.1);
+      color: var(--verde-escuro);
+      font-size: .72rem;
+      font-weight: 800;
+    }
+
+    .usage-context-option strong {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: .9rem;
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+
+    .usage-context-option small {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .usage-chip-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .usage-chip-list span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(60,110,71,.16);
+      background: #f8fbf7;
+      color: var(--verde-escuro);
+      padding: 0 8px;
+      font-size: .72rem;
+      font-weight: 800;
+    }
+
     .panel-overlay {
       position: fixed;
       inset: 0;
@@ -1483,6 +1552,31 @@
           <span>Nota para organização semanal</span>
           <textarea id="p-nota-semanal" placeholder="Ex: Boa opção para lanche da tarde ou pré-treino."></textarea>
         </label>
+        <div style="margin-top:12px;">
+          <span class="field-label">Guia de ícones</span>
+          <div class="usage-context-grid">
+            <label class="usage-context-option">
+              <input type="checkbox" class="p-usage-context" value="breakfast">
+              <span class="usage-token">CM</span>
+              <span><strong>Café da manhã</strong><small>Para começar o dia com saciedade, energia e equilíbrio.</small></span>
+            </label>
+            <label class="usage-context-option">
+              <input type="checkbox" class="p-usage-context" value="work">
+              <span class="usage-token">TR</span>
+              <span><strong>Para levar para o trabalho</strong><small>Preparações práticas para trabalho, estudo ou dias fora de casa.</small></span>
+            </label>
+            <label class="usage-context-option">
+              <input type="checkbox" class="p-usage-context" value="lunch_dinner">
+              <span class="usage-token">AJ</span>
+              <span><strong>Almoço ou jantar</strong><small>Receitas e produtos para usar como refeição principal.</small></span>
+            </label>
+            <label class="usage-context-option">
+              <input type="checkbox" class="p-usage-context" value="quick_snack">
+              <span class="usage-token">LR</span>
+              <span><strong>Lanches rápidos</strong><small>Opções simples para dias corridos e poucos ingredientes.</small></span>
+            </label>
+          </div>
+        </div>
       </div>
 
 
@@ -1745,6 +1839,18 @@
           <label class="field">
             <span>Aba Faça você mesmo - descrição</span>
             <input id="txt-menuDiyNote">
+          </label>
+          <label class="field full">
+            <span>Faça você mesmo - título explicativo</span>
+            <input id="txt-diyIntroTitle">
+          </label>
+          <label class="field full">
+            <span>Faça você mesmo - texto explicativo</span>
+            <textarea id="txt-diyIntroText"></textarea>
+          </label>
+          <label class="field">
+            <span>Título do guia de ícones</span>
+            <input id="txt-recipeIconGuideTitle">
           </label>
           <label class="field full">
             <span>Mensagem sem receitas</span>
@@ -2021,6 +2127,9 @@
     menuKitsNote: "Combos pensados para organizar a alimentação da semana.",
     menuDiyLabel: "Faça você mesmo",
     menuDiyNote: "Receitas saudáveis para fazer em casa. Não entram no carrinho.",
+    diyIntroTitle: "Como usar o Faça você mesmo",
+    diyIntroText: "O Tá na Mão foi criado para facilitar sua rotina. Além das comidas prontas que você pode comprar para resolver o dia, também disponibilizamos receitas saudáveis e práticas para apoiar suas escolhas na semana.",
+    recipeIconGuideTitle: "Guia de ícones",
     menuDiyEmpty: "Nenhuma receita disponível no momento.",
     recipeBadgeLabel: "Faça você mesmo",
     recipeButtonLabel: "Ver receita",
@@ -2031,6 +2140,45 @@
     footerTag3: "Rotina saudável"
   };
   const SITE_CONTENT_FIELDS = Object.keys(SITE_CONTENT_DEFAULTS);
+
+  const USAGE_CONTEXTS = [
+    { id: "breakfast", icon: "CM", label: "Café da manhã" },
+    { id: "work", icon: "TR", label: "Para levar para o trabalho" },
+    { id: "lunch_dinner", icon: "AJ", label: "Almoço ou jantar" },
+    { id: "quick_snack", icon: "LR", label: "Lanches rápidos" }
+  ];
+  const USAGE_CONTEXT_BY_ID = new Map(USAGE_CONTEXTS.map(item => [item.id, item]));
+
+  function normalizeUsageContexts(value) {
+    if (!Array.isArray(value)) return [];
+    return [...new Set(value.map(item => String(item || "").trim()).filter(item => USAGE_CONTEXT_BY_ID.has(item)))];
+  }
+
+  function getCheckedUsageContexts() {
+    return Array.from(document.querySelectorAll(".p-usage-context:checked")).map(input => input.value);
+  }
+
+  function setCheckedUsageContexts(contexts = []) {
+    const selected = new Set(normalizeUsageContexts(contexts));
+    document.querySelectorAll(".p-usage-context").forEach(input => {
+      input.checked = selected.has(input.value);
+    });
+  }
+
+  function formatUsageContexts(contexts = []) {
+    const normalized = normalizeUsageContexts(contexts);
+    if (!normalized.length) return "Sem ícones";
+    return normalized.map(id => USAGE_CONTEXT_BY_ID.get(id)?.label || id).join(", ");
+  }
+
+  function renderUsageContextChips(contexts = []) {
+    const normalized = normalizeUsageContexts(contexts);
+    if (!normalized.length) return "";
+    return `<div class="usage-chip-list">${normalized.map(id => {
+      const item = USAGE_CONTEXT_BY_ID.get(id);
+      return `<span>${item.icon} · ${item.label}</span>`;
+    }).join("")}</div>`;
+  }
 
   // ================= ACESSO & SEGURANÇA =================
   const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
@@ -2958,6 +3106,7 @@
     getEl("p-vendavel").value = "true";
     getEl("p-brinde").value = "false";
     getEl("p-nota-semanal").value = "";
+    setCheckedUsageContexts([]);
     getEl("p-ingredientes").value = "";
     getEl("p-preparo").value = "";
     syncProductBusinessRules();
@@ -2986,6 +3135,7 @@
     getEl("p-vendavel").value = String(p.is_sellable !== false);
     getEl("p-brinde").value = String(!!p.is_gift_recipe);
     getEl("p-nota-semanal").value = p.weekly_guide_note || "";
+    setCheckedUsageContexts(p.usage_contexts || []);
     getEl("p-ingredientes").value = p.ingredients || "";
     getEl("p-preparo").value = p.preparation_method || "";
     setCheckedProductDays(p.available_days || []);
@@ -3047,6 +3197,7 @@
       is_sellable: isSellable,
       is_gift_recipe: isGiftRecipe,
       weekly_guide_note: getEl("p-nota-semanal").value.trim() || null,
+      usage_contexts: getCheckedUsageContexts(),
       ingredients: ingredients || null,
       preparation_method: preparationMethod || null
     };
@@ -3195,6 +3346,7 @@
         p.reorder_quantity,
         p.ingredients,
         p.preparation_method,
+        formatUsageContexts(p.usage_contexts),
         p.active ? "ativo" : "inativo",
         p.is_gift_recipe ? "brinde receita" : "",
         formatProductDays(p.available_days)
@@ -3245,6 +3397,7 @@
               ${baixoEstoque ? `<br><span class="stock-low">Reposição necessária</span>` : ""}
               ${ficha ? `<br>Ficha técnica cadastrada` : ""}
               ${p.is_gift_recipe ? `<br>Receita simples pública` : ""}
+              ${renderUsageContextChips(p.usage_contexts)}
             </div>
           </td>
           <td>${ativo}</td>

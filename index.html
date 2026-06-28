@@ -498,6 +498,110 @@
       padding: 5px 10px;
     }
 
+    .diy-intro {
+      border: 1px solid rgba(60,110,71,0.12);
+      background: #fcfbf8;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .diy-intro h3 {
+      color: var(--verde-escuro);
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .diy-intro p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .usage-guide-title {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .usage-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .usage-icon-item,
+    .usage-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .usage-icon-item {
+      border: 1px solid var(--borda);
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .usage-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: rgba(60,110,71,0.1);
+      color: var(--verde-escuro);
+      font-size: 0.72rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .usage-icon-item strong {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: 0.82rem;
+      line-height: 1.25;
+    }
+
+    .usage-icon-item span:last-child {
+      display: block;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+      margin-top: 2px;
+    }
+
+    .usage-chips {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .usage-chip {
+      width: fit-content;
+      border-radius: 999px;
+      border: 1px solid rgba(60,110,71,0.16);
+      background: #f8fbf7;
+      color: var(--verde-escuro);
+      padding: 4px 9px 4px 5px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .usage-chip .usage-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+    }
+
     #produtos-container {
       display: flex;
       flex-direction: column;
@@ -1465,6 +1569,9 @@
       menuKitsNote: "Combos pensados para organizar a alimentação da semana.",
       menuDiyLabel: "Faça você mesmo",
       menuDiyNote: "Receitas saudáveis para fazer em casa. Não entram no carrinho.",
+      diyIntroTitle: "Como usar o Faça você mesmo",
+      diyIntroText: "O Tá na Mão foi criado para facilitar sua rotina. Além das comidas prontas que você pode comprar para resolver o dia, também disponibilizamos receitas saudáveis e práticas para apoiar suas escolhas na semana.",
+      recipeIconGuideTitle: "Guia de ícones",
       menuDiyEmpty: "Nenhuma receita disponível no momento.",
       recipeBadgeLabel: "Faça você mesmo",
       recipeButtonLabel: "Ver receita",
@@ -1710,6 +1817,35 @@
       return p.image_url;
     }
 
+    const USAGE_CONTEXTS = [
+      {
+        id: "breakfast",
+        icon: "CM",
+        label: "Café da manhã",
+        description: "Para começar o dia com mais saciedade, energia e equilíbrio."
+      },
+      {
+        id: "work",
+        icon: "TR",
+        label: "Para levar para o trabalho",
+        description: "Preparações práticas para trabalho, estudos ou dias fora de casa."
+      },
+      {
+        id: "lunch_dinner",
+        icon: "AJ",
+        label: "Almoço ou jantar",
+        description: "Receitas e produtos para usar como refeição principal."
+      },
+      {
+        id: "quick_snack",
+        icon: "LR",
+        label: "Lanches rápidos",
+        description: "Opções simples para dias corridos e poucos ingredientes."
+      }
+    ];
+
+    const USAGE_CONTEXT_BY_ID = new Map(USAGE_CONTEXTS.map(item => [item.id, item]));
+
     const MENU_CATEGORIES = [
       { id: "doce", labelKey: "menuDocesLabel", noteKey: "menuDocesNote" },
       { id: "salgado", labelKey: "menuSalgadosLabel", noteKey: "menuSalgadosNote" },
@@ -1731,6 +1867,47 @@
     function isRecipeItem(p) {
       const category = String(p?.category || "").toLowerCase();
       return p && p.active !== false && p.is_sellable === false && (p.is_gift_recipe === true || category === "brinde");
+    }
+
+    function normalizeUsageContexts(value) {
+      if (!Array.isArray(value)) return [];
+      return [...new Set(value.map(item => String(item || "").trim()).filter(item => USAGE_CONTEXT_BY_ID.has(item)))];
+    }
+
+    function renderUsageContextChips(p) {
+      const contexts = normalizeUsageContexts(p?.usage_contexts);
+      if (!contexts.length) return "";
+      return `<div class="usage-chips" aria-label="Ícones do guia">${contexts.map(id => {
+        const item = USAGE_CONTEXT_BY_ID.get(id);
+        return `<span class="usage-chip"><span class="usage-icon">${escapeHtml(item.icon)}</span>${escapeHtml(item.label)}</span>`;
+      }).join("")}</div>`;
+    }
+
+    function renderUsageIconGuide() {
+      return `
+        <span class="usage-guide-title">${escapeHtml(siteText("recipeIconGuideTitle"))}</span>
+        <div class="usage-icon-grid">
+          ${USAGE_CONTEXTS.map(item => `
+            <div class="usage-icon-item">
+              <span class="usage-icon">${escapeHtml(item.icon)}</span>
+              <span>
+                <strong>${escapeHtml(item.label)}</strong>
+                <span>${escapeHtml(item.description)}</span>
+              </span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderDiyIntro() {
+      return `
+        <div class="diy-intro">
+          <h3>${escapeHtml(siteText("diyIntroTitle"))}</h3>
+          <p>${escapeHtml(siteText("diyIntroText"))}</p>
+          ${renderUsageIconGuide()}
+        </div>
+      `;
     }
 
     function getMenuCounts() {
@@ -1885,6 +2062,17 @@
       return `<${tag}>${lines.map(line => `<li>${escapeHtml(line)}</li>`).join("")}</${tag}>`;
     }
 
+    function renderUsageContextBlock(p) {
+      const chips = renderUsageContextChips(p);
+      if (!chips) return "";
+      return `
+        <div class="recipe-detail-section">
+          <h4>${escapeHtml(siteText("recipeIconGuideTitle"))}</h4>
+          ${chips}
+        </div>
+      `;
+    }
+
     function renderRecipePublicDetails(p) {
       return `
         <div class="recipe-detail-section">
@@ -1899,9 +2087,10 @@
     }
 
     function renderProductDetails(p) {
-      if (isRecipeItem(p)) return renderRecipePublicDetails(p);
+      const usageContextBlock = renderUsageContextBlock(p);
+      if (isRecipeItem(p)) return usageContextBlock + renderRecipePublicDetails(p);
 
-      return getProductDetails(p)
+      return usageContextBlock + getProductDetails(p)
         .map(([label, value]) => `
           <div class="detail-row">
             <strong>${escapeHtml(label)}</strong>
@@ -1941,12 +2130,13 @@
       if (!container) return;
 
       if (menuCategoriaAtual === "receitas") {
+        const diyIntro = renderDiyIntro();
         if (!RECEITAS.length) {
-          container.innerHTML = `<div class="erro-cardapio"><p>${escapeHtml(siteText("menuDiyEmpty"))}</p></div>`;
+          container.innerHTML = diyIntro + `<div class="erro-cardapio"><p>${escapeHtml(siteText("menuDiyEmpty"))}</p></div>`;
           return;
         }
 
-        container.innerHTML = RECEITAS.map(p => {
+        container.innerHTML = diyIntro + RECEITAS.map(p => {
           const imageSrc = getProductImageSrc(p);
           const safeId = escapeHtml(p.id);
           const safeName = escapeHtml(p.name || "");
@@ -1959,6 +2149,7 @@
                 <div class="product-info">
                   <div class="p-nome">${safeName}</div>
                   <div class="p-desc">${safeDesc}</div>
+                  ${renderUsageContextChips(p)}
                   <div class="p-card-actions">
                     <span class="recipe-badge">${escapeHtml(siteText("recipeBadgeLabel"))}</span>
                     <button class="p-detail-btn" type="button" onclick="abrirDetalhesProduto('${safeId}')">${escapeHtml(siteText("recipeButtonLabel"))}</button>
