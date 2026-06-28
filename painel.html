@@ -360,6 +360,47 @@
       font-weight: 800;
     }
 
+    .ingredient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ingredient-grid .field {
+      margin: 0;
+    }
+
+    .bom-builder {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.4fr) minmax(120px, .6fr) minmax(110px, .5fr) minmax(180px, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .shopping-summary {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .shopping-warning {
+      border: 1px solid #f0d9a7;
+      background: #fff9ec;
+      color: #7a5a15;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: .86rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .bom-builder {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .panel-overlay {
       position: fixed;
       inset: 0;
@@ -1201,6 +1242,76 @@
     </div>
 
     <div class="admin-card" style="margin-top: 20px;">
+      <div class="section-toolbar">
+        <div>
+          <h3>Insumos de produção</h3>
+          <p class="muted">Cadastre ingredientes e embalagens usados nas fichas técnicas dos produtos.</p>
+        </div>
+        <button class="btn-secondary" type="button" onclick="carregarInsumos()">Atualizar insumos</button>
+      </div>
+      <input type="hidden" id="ing-id">
+      <div class="ingredient-grid">
+        <label class="field">
+          <span>Insumo</span>
+          <input id="ing-nome" placeholder="Ex: Frango desfiado">
+        </label>
+        <label class="field">
+          <span>Unidade padrão</span>
+          <select id="ing-unidade">
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="ml">ml</option>
+            <option value="l">l</option>
+            <option value="un">un</option>
+            <option value="pct">pct</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Categoria</span>
+          <input id="ing-categoria" placeholder="Ex: Proteína, embalagem">
+        </label>
+        <label class="field">
+          <span>Fornecedor</span>
+          <select id="ing-fornecedor"><option value="">Sem fornecedor fixo</option></select>
+        </label>
+        <label class="field">
+          <span>Estoque atual</span>
+          <input id="ing-estoque" type="number" min="0" step="0.001" placeholder="0">
+        </label>
+        <label class="field">
+          <span>Estoque mínimo</span>
+          <input id="ing-minimo" type="number" min="0" step="0.001" placeholder="0">
+        </label>
+        <label class="field">
+          <span>Observação</span>
+          <input id="ing-notas" placeholder="Ex: comprar fresco">
+        </label>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" type="button" onclick="salvarInsumo()">Salvar insumo</button>
+        <button class="btn-secondary" type="button" onclick="limparFormInsumo()">Novo</button>
+      </div>
+      <div class="table-status" id="insumos-status">Carregando insumos...</div>
+      <div class="table-wrap">
+        <table style="min-width: 920px;">
+          <thead>
+            <tr>
+              <th>Insumo</th>
+              <th>Categoria</th>
+              <th>Fornecedor</th>
+              <th style="text-align:right;">Estoque</th>
+              <th style="text-align:right;">Mínimo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-insumos">
+            <tr><td colspan="6">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-card" style="margin-top: 20px;">
       <h3>Compras registradas</h3>
       <div class="summary-bar" style="margin-top: 12px;">
   <div class="muted"><strong>Relatórios do período</strong></div>
@@ -1323,8 +1434,12 @@
   <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:10px;">
     <input id="prod-note" placeholder="Observação (opcional, ex: Lote manhã)" style="max-width:420px;">
     <button class="btn-secondary" onclick="preencherTabelaProducao()">Carregar produtos</button>
+    <button class="btn-secondary" onclick="gerarListaComprasProducao(false)">Gerar lista de compras</button>
+    <button class="btn-secondary" onclick="gerarListaComprasProducao(true)">Salvar lista</button>
     <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="salvarProducaoLote()">Salvar lote</button>
   </div>
+
+  <div id="shopping-list-result" class="shopping-summary"></div>
 
   <div class="table-wrap">
     <table style="min-width: 980px;">
@@ -1597,6 +1712,53 @@
             <small>Use uma linguagem objetiva para a equipe ou para o cliente, conforme o tipo do cadastro.</small>
           </label>
         </div>
+        <div class="form-section">
+          <div class="form-section-head">
+            <strong>Ficha técnica estruturada</strong>
+            <span>Use esta grade para cálculo interno de compras. O texto de ingredientes acima continua servindo como leitura humana.</span>
+          </div>
+          <div class="rule-note" id="bom-product-note">Salve ou selecione um produto para montar a ficha técnica estruturada.</div>
+          <div class="bom-builder">
+            <label class="field">
+              <span>Insumo</span>
+              <select id="bom-ingredient"><option value="">Selecione um insumo</option></select>
+            </label>
+            <label class="field">
+              <span>Qtd. por unidade</span>
+              <input id="bom-quantity" type="number" min="0" step="0.0001" placeholder="Ex: 120">
+            </label>
+            <label class="field">
+              <span>Unidade</span>
+              <input id="bom-unit" placeholder="g, ml, un">
+            </label>
+            <label class="field">
+              <span>Observação</span>
+              <input id="bom-notes" placeholder="Opcional">
+            </label>
+            <button class="btn-secondary" type="button" onclick="adicionarInsumoFicha()">Adicionar</button>
+          </div>
+          <div class="table-wrap" style="margin-top:12px;">
+            <table style="min-width: 760px;">
+              <thead>
+                <tr>
+                  <th>Insumo</th>
+                  <th style="text-align:right;">Qtd./unidade</th>
+                  <th>Unidade</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-ficha-ingredientes">
+                <tr><td colspan="5">Nenhum insumo estruturado.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" type="button" onclick="salvarFichaTecnicaEstruturada()">Salvar ficha técnica</button>
+            <button class="btn-secondary" type="button" onclick="carregarFichaTecnicaProdutoAtual()">Recarregar ficha</button>
+          </div>
+        </div>
+
         <div class="rule-note" id="recipe-visibility-note">Produto vendável: ingredientes e modo de preparo ficam ocultos no site público.</div>
       </div>
 
@@ -2064,6 +2226,9 @@
 
   // ====== ESTADO (Compras) ======
   let COMPRAS_ENTRIES = [];
+  let FORNECEDORES = [];
+  let PRODUCTION_INGREDIENTS = [];
+  let FICHA_TECNICA_ATUAL = [];
 
   // ====== ESTADO (Produtos Admin) ======
   let PRODUTOS_ADMIN = [];
@@ -2290,10 +2455,12 @@
     if (idAba === 'aba-compras') {
       carregarFornecedores();
       carregarCompras();
+      carregarInsumos();
     }
     if (idAba === 'aba-config') atualizarDashboardFinanceiro();
     if (idAba === 'aba-cardapio') carregarProdutosAdmin();
     if (idAba === 'aba-cadastro-produto' && USER_ROLE === "admin" && !PRODUTOS_ADMIN.length) carregarProdutosAdmin();
+    if (idAba === 'aba-cadastro-produto' && USER_ROLE === "admin") carregarInsumos();
     if (idAba === 'aba-textos') {
       carregarTextosSiteAdmin();
       filtrarCamposTextosSite();
@@ -2332,7 +2499,10 @@
   function handleGlobalSearch() {
     const tabId = getCurrentTabId();
     if (tabId === "aba-vendas") renderizar();
-    if (tabId === "aba-compras") aplicarFiltrosCompras();
+    if (tabId === "aba-compras") {
+      aplicarFiltrosCompras();
+      renderInsumos();
+    }
     if (tabId === "aba-cardapio" && Array.isArray(PRODUTOS_ADMIN)) renderProdutosAdmin();
     if (tabId === "aba-textos") filtrarCamposTextosSite();
   }
@@ -2655,9 +2825,20 @@
     const select = document.getElementById("e-fornecedor");
     select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
     const suppliers = data.suppliers || [];
+    FORNECEDORES = suppliers;
     suppliers.forEach((f) => {
       select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
     });
+
+    const selInsumoFornecedor = document.getElementById("ing-fornecedor");
+    if (selInsumoFornecedor) {
+      const current = selInsumoFornecedor.value;
+      selInsumoFornecedor.innerHTML = '<option value="">Sem fornecedor fixo</option>';
+      suppliers.forEach((f) => {
+        selInsumoFornecedor.innerHTML += `<option value="${f.id}">${escapeHtml(f.name)}</option>`;
+      });
+      selInsumoFornecedor.value = current;
+    }
 
     // Select do filtro
     const selFiltro = document.getElementById("filtro-fornecedor");
@@ -3107,6 +3288,8 @@
     getEl("p-brinde").value = "false";
     getEl("p-nota-semanal").value = "";
     setCheckedUsageContexts([]);
+    FICHA_TECNICA_ATUAL = [];
+    renderFichaTecnicaEstruturada();
     getEl("p-ingredientes").value = "";
     getEl("p-preparo").value = "";
     syncProductBusinessRules();
@@ -3140,6 +3323,7 @@
     getEl("p-preparo").value = p.preparation_method || "";
     setCheckedProductDays(p.available_days || []);
     syncProductBusinessRules();
+    carregarFichaTecnicaProduto(p.id);
     getEl("cardapio-form-title").innerText = "Editar produto";
     abrirAba("aba-cadastro-produto");
     getEl("cardapio-form-title").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -3425,6 +3609,361 @@
         </tr>
       `;
     }).join("");
+  }
+
+
+  // ================= INSUMOS, FICHA TÉCNICA E LISTA DE COMPRAS =================
+  function parseDecimalInput(value, fallback = 0) {
+    const normalized = String(value ?? "").trim().replace(",", ".");
+    if (!normalized) return fallback;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function formatQty(value, unit = "") {
+    const num = Number(value || 0);
+    const formatted = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 4 }).format(num);
+    return unit ? `${formatted} ${unit}` : formatted;
+  }
+
+  function getIngredientById(id) {
+    return (PRODUCTION_INGREDIENTS || []).find(item => String(item.id) === String(id));
+  }
+
+  function preencherSelectInsumos() {
+    const select = getEl("bom-ingredient");
+    if (!select) return;
+    const current = select.value;
+    select.innerHTML = '<option value="">Selecione um insumo</option>';
+    (PRODUCTION_INGREDIENTS || []).forEach(item => {
+      select.innerHTML += `<option value="${item.id}">${escapeHtml(item.name)} (${escapeHtml(item.unit_type || "un")})</option>`;
+    });
+    select.value = current;
+  }
+
+  function limparFormInsumo() {
+    ["ing-id", "ing-nome", "ing-categoria", "ing-estoque", "ing-minimo", "ing-notas"].forEach(id => {
+      const el = getEl(id);
+      if (el) el.value = "";
+    });
+    if (getEl("ing-unidade")) getEl("ing-unidade").value = "g";
+    if (getEl("ing-fornecedor")) getEl("ing-fornecedor").value = "";
+  }
+
+  async function carregarInsumos() {
+    try {
+      const res = await fetch(API + "/operations/production/ingredients");
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao carregar insumos.");
+      PRODUCTION_INGREDIENTS = Array.isArray(data.ingredients) ? data.ingredients : [];
+      preencherSelectInsumos();
+      renderInsumos();
+    } catch (e) {
+      console.error(e);
+      const status = getEl("insumos-status");
+      const tbody = getEl("tbody-insumos");
+      if (status) status.textContent = "Não foi possível carregar insumos.";
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6">Erro ao carregar insumos.</td></tr>`;
+    }
+  }
+
+  function renderInsumos() {
+    const tbody = getEl("tbody-insumos");
+    const status = getEl("insumos-status");
+    if (!tbody || !status) return;
+    const query = getGlobalSearch();
+    const items = (PRODUCTION_INGREDIENTS || []).filter(item =>
+      matchesGlobalSearch(
+        item.name,
+        item.category,
+        item.unit_type,
+        item.suppliers?.name,
+        item.notes,
+        item.current_stock,
+        item.reorder_min_quantity
+      )
+    );
+
+    status.textContent = items.length
+      ? `${items.length} de ${PRODUCTION_INGREDIENTS.length} insumo(s) exibido(s).`
+      : "Nenhum insumo encontrado.";
+
+    if (!items.length) {
+      tbody.innerHTML = `<tr><td colspan="6">Nenhum insumo cadastrado.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map(item => `
+      <tr>
+        <td><strong>${escapeHtml(item.name)}</strong>${item.notes ? `<br><span class="small">${escapeHtml(item.notes)}</span>` : ""}</td>
+        <td>${escapeHtml(item.category || "-")}</td>
+        <td>${escapeHtml(item.suppliers?.name || "-")}</td>
+        <td style="text-align:right;">${formatQty(item.current_stock, item.unit_type)}</td>
+        <td style="text-align:right;">${formatQty(item.reorder_min_quantity, item.unit_type)}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-secondary" type="button" onclick="editarInsumo('${item.id}')">Editar</button>
+            <button class="btn-secondary" type="button" onclick="arquivarInsumo('${item.id}')">Arquivar</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function editarInsumo(id) {
+    const item = getIngredientById(id);
+    if (!item) return;
+    getEl("ing-id").value = item.id;
+    getEl("ing-nome").value = item.name || "";
+    getEl("ing-unidade").value = item.unit_type || "g";
+    getEl("ing-categoria").value = item.category || "";
+    getEl("ing-fornecedor").value = item.supplier_id || "";
+    getEl("ing-estoque").value = item.current_stock ?? "";
+    getEl("ing-minimo").value = item.reorder_min_quantity ?? "";
+    getEl("ing-notas").value = item.notes || "";
+  }
+
+  async function salvarInsumo() {
+    const id = getEl("ing-id")?.value || "";
+    const name = getEl("ing-nome")?.value.trim() || "";
+    if (!name) return alert("Nome do insumo obrigatório.");
+
+    const payload = {
+      name,
+      unit_type: getEl("ing-unidade")?.value || "un",
+      category: getEl("ing-categoria")?.value.trim() || null,
+      supplier_id: getEl("ing-fornecedor")?.value || null,
+      current_stock: parseDecimalInput(getEl("ing-estoque")?.value, 0),
+      reorder_min_quantity: parseDecimalInput(getEl("ing-minimo")?.value, 0),
+      notes: getEl("ing-notas")?.value.trim() || null,
+      active: true
+    };
+
+    try {
+      const res = await fetch(id ? API + "/operations/production/ingredients/" + id : API + "/operations/production/ingredients", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar insumo.");
+      limparFormInsumo();
+      await carregarInsumos();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao salvar insumo.");
+    }
+  }
+
+  async function arquivarInsumo(id) {
+    if (!confirm("Arquivar este insumo? Ele não aparecerá mais nas novas fichas.")) return;
+    try {
+      const res = await fetch(API + "/operations/production/ingredients/" + id, { method: "DELETE" });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao arquivar insumo.");
+      await carregarInsumos();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao arquivar insumo.");
+    }
+  }
+
+  function renderFichaTecnicaEstruturada() {
+    const tbody = getEl("tbody-ficha-ingredientes");
+    const note = getEl("bom-product-note");
+    const productId = getEl("p-id")?.value || "";
+    if (note) {
+      note.textContent = productId
+        ? "Defina quanto de cada insumo é usado para produzir 1 unidade deste produto."
+        : "Salve ou selecione um produto para montar a ficha técnica estruturada.";
+    }
+    if (!tbody) return;
+    if (!FICHA_TECNICA_ATUAL.length) {
+      tbody.innerHTML = `<tr><td colspan="5">Nenhum insumo estruturado.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = FICHA_TECNICA_ATUAL.map((item, index) => {
+      const ingredient = getIngredientById(item.ingredient_id) || item.production_ingredients || {};
+      const unit = item.unit_type || ingredient.unit_type || "un";
+      return `
+        <tr>
+          <td><strong>${escapeHtml(ingredient.name || item.ingredient_name || "Insumo")}</strong></td>
+          <td style="text-align:right;">${formatQty(item.quantity_per_unit)}</td>
+          <td>${escapeHtml(unit)}</td>
+          <td>${escapeHtml(item.notes || "-")}</td>
+          <td><button class="btn-secondary" type="button" onclick="removerInsumoFicha(${index})">Remover</button></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function carregarFichaTecnicaProdutoAtual() {
+    const productId = getEl("p-id")?.value || "";
+    if (!productId) {
+      FICHA_TECNICA_ATUAL = [];
+      renderFichaTecnicaEstruturada();
+      return;
+    }
+    await carregarFichaTecnicaProduto(productId);
+  }
+
+  async function carregarFichaTecnicaProduto(productId) {
+    try {
+      if (!PRODUCTION_INGREDIENTS.length) await carregarInsumos();
+      const res = await fetch(API + "/operations/production/products/" + productId + "/ingredients");
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao carregar ficha técnica.");
+      FICHA_TECNICA_ATUAL = (data.items || []).map(item => ({
+        ingredient_id: item.ingredient_id,
+        quantity_per_unit: Number(item.quantity_per_unit || 0),
+        unit_type: item.unit_type || item.production_ingredients?.unit_type || "un",
+        notes: item.notes || "",
+        production_ingredients: item.production_ingredients || null
+      }));
+      renderFichaTecnicaEstruturada();
+    } catch (e) {
+      console.error(e);
+      FICHA_TECNICA_ATUAL = [];
+      renderFichaTecnicaEstruturada();
+      alert(e.message || "Erro ao carregar ficha técnica.");
+    }
+  }
+
+  function adicionarInsumoFicha() {
+    const productId = getEl("p-id")?.value || "";
+    if (!productId) return alert("Salve ou selecione um produto antes de montar a ficha técnica.");
+    const ingredientId = getEl("bom-ingredient")?.value || "";
+    const ingredient = getIngredientById(ingredientId);
+    const qty = parseDecimalInput(getEl("bom-quantity")?.value, 0);
+    if (!ingredient) return alert("Selecione um insumo.");
+    if (!Number.isFinite(qty) || qty <= 0) return alert("Informe uma quantidade por unidade maior que zero.");
+
+    FICHA_TECNICA_ATUAL = FICHA_TECNICA_ATUAL.filter(item => item.ingredient_id !== ingredientId);
+    FICHA_TECNICA_ATUAL.push({
+      ingredient_id: ingredientId,
+      quantity_per_unit: qty,
+      unit_type: getEl("bom-unit")?.value.trim() || ingredient.unit_type || "un",
+      notes: getEl("bom-notes")?.value.trim() || "",
+      production_ingredients: ingredient
+    });
+
+    ["bom-ingredient", "bom-quantity", "bom-unit", "bom-notes"].forEach(id => {
+      const el = getEl(id);
+      if (el) el.value = "";
+    });
+    renderFichaTecnicaEstruturada();
+  }
+
+  function removerInsumoFicha(index) {
+    FICHA_TECNICA_ATUAL.splice(index, 1);
+    renderFichaTecnicaEstruturada();
+  }
+
+  async function salvarFichaTecnicaEstruturada() {
+    const productId = getEl("p-id")?.value || "";
+    if (!productId) return alert("Salve ou selecione um produto antes de salvar a ficha técnica.");
+    try {
+      const items = FICHA_TECNICA_ATUAL.map(item => ({
+        ingredient_id: item.ingredient_id,
+        quantity_per_unit: Number(item.quantity_per_unit || 0),
+        unit_type: item.unit_type || null,
+        notes: item.notes || null
+      }));
+      const res = await fetch(API + "/operations/production/products/" + productId + "/ingredients", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar ficha técnica.");
+      FICHA_TECNICA_ATUAL = data.items || FICHA_TECNICA_ATUAL;
+      await carregarFichaTecnicaProduto(productId);
+      alert("Ficha técnica salva.");
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao salvar ficha técnica.");
+    }
+  }
+
+  function coletarItensPlanejamentoProducao() {
+    const ativos = (PRODUTOS_ADMIN || []).filter(p => p.active && p.is_sellable !== false);
+    const items = [];
+    for (const p of ativos) {
+      const el = document.getElementById(`prod-qty-${p.id}`);
+      const quantity = Number(el?.value || 0);
+      if (Number.isFinite(quantity) && quantity > 0) {
+        items.push({ product_id: p.id, quantity });
+      }
+    }
+    return items;
+  }
+
+  async function gerarListaComprasProducao(save = false) {
+    const items = coletarItensPlanejamentoProducao();
+    const result = getEl("shopping-list-result");
+    if (!items.length) return alert("Preencha quantidades de produção maiores que zero.");
+    if (result) result.innerHTML = '<div class="muted">Gerando lista de compras...</div>';
+
+    try {
+      const title = (getEl("prod-note")?.value || "").trim() || "Planejamento de produção";
+      const res = await fetch(API + "/operations/production/shopping-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, save, title })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao gerar lista de compras.");
+      renderListaComprasProducao(data);
+      if (save && data.saved_list) alert("Lista de compras salva.");
+    } catch (e) {
+      console.error(e);
+      if (result) result.innerHTML = `<div class="shopping-warning">${escapeHtml(e.message || "Erro ao gerar lista de compras.")}</div>`;
+    }
+  }
+
+  function renderListaComprasProducao(data) {
+    const result = getEl("shopping-list-result");
+    if (!result) return;
+    const items = data.shopping_items || [];
+    const missing = data.missing_requirements || [];
+    const missingHtml = missing.length
+      ? `<div class="shopping-warning"><strong>Produtos sem ficha técnica:</strong> ${missing.map(item => escapeHtml(item.product_name)).join(", ")}. Cadastre os insumos para entrar no cálculo.</div>`
+      : "";
+
+    if (!items.length) {
+      result.innerHTML = missingHtml || '<div class="muted">Nenhum insumo calculado para a produção selecionada.</div>';
+      return;
+    }
+
+    result.innerHTML = `
+      ${missingHtml}
+      <div class="table-wrap">
+        <table style="min-width: 980px;">
+          <thead>
+            <tr>
+              <th>Insumo</th>
+              <th>Fornecedor</th>
+              <th style="text-align:right;">Necessário</th>
+              <th style="text-align:right;">Estoque</th>
+              <th style="text-align:right;">Comprar</th>
+              <th>Usado em</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td><strong>${escapeHtml(item.item_name)}</strong>${item.category ? `<br><span class="small">${escapeHtml(item.category)}</span>` : ""}</td>
+                <td>${escapeHtml(item.supplier_name || "-")}</td>
+                <td style="text-align:right;">${formatQty(item.required_quantity, item.unit_type)}</td>
+                <td style="text-align:right;">${formatQty(item.current_stock, item.unit_type)}</td>
+                <td style="text-align:right;"><strong>${formatQty(item.purchase_quantity, item.unit_type)}</strong></td>
+                <td class="small">${(item.products || []).map(p => `${escapeHtml(p.product_name)}: ${formatQty(p.required_quantity, item.unit_type)}`).join("<br>")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
   function preencherTabelaProducao(){
