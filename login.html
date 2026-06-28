@@ -27,9 +27,9 @@ style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
 14px;"
 >
     <h2>Acesso ao Sistema</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="Seu E-mail" required>
-      <input type="password" id="senha" placeholder="Sua Senha" required>
+    <form id="loginForm" autocomplete="on">
+      <input type="email" id="email" name="email" placeholder="Seu E-mail" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <input type="password" id="senha" name="password" placeholder="Sua Senha" autocomplete="current-password" required>
       <button type="submit" id="btn-login">Entrar</button>
       <div id="erroMsg" class="erro"></div>
     </form>

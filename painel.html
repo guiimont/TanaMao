@@ -1253,7 +1253,7 @@
       <div class="ingredient-grid">
         <label class="field">
           <span>Insumo</span>
-          <input id="ing-nome" placeholder="Ex: Frango desfiado">
+          <input id="ing-nome" name="production_ingredient_name" placeholder="Ex: Frango desfiado" autocomplete="off" spellcheck="false">
         </label>
         <label class="field">
           <span>Unidade padrão</span>
@@ -1268,7 +1268,7 @@
         </label>
         <label class="field">
           <span>Categoria</span>
-          <input id="ing-categoria" placeholder="Ex: Proteína, embalagem">
+          <input id="ing-categoria" name="production_ingredient_category" placeholder="Ex: Proteína, embalagem" autocomplete="off" spellcheck="false">
         </label>
         <label class="field">
           <span>Fornecedor</span>
@@ -1284,7 +1284,7 @@
         </label>
         <label class="field">
           <span>Observação</span>
-          <input id="ing-notas" placeholder="Ex: comprar fresco">
+          <input id="ing-notas" name="production_ingredient_notes" placeholder="Ex: comprar fresco" autocomplete="off" spellcheck="false">
         </label>
       </div>
       <div class="form-actions">
@@ -1721,7 +1721,7 @@
           <div class="bom-builder">
             <label class="field">
               <span>Insumo</span>
-              <input id="bom-ingredient-name" list="bom-ingredients-list" placeholder="Digite para buscar ou cadastrar" oninput="syncBomIngredientUnit()">
+              <input id="bom-ingredient-name" name="production_bom_ingredient_name" list="bom-ingredients-list" placeholder="Digite para buscar ou cadastrar" autocomplete="off" spellcheck="false" oninput="syncBomIngredientUnit()">
               <datalist id="bom-ingredients-list"></datalist>
               <small>Se não existir, será cadastrado ao adicionar.</small>
             </label>
@@ -1754,7 +1754,7 @@
             </label>
             <label class="field">
               <span>Observação</span>
-              <input id="bom-notes" placeholder="Opcional">
+              <input id="bom-notes" name="production_bom_notes" placeholder="Opcional" autocomplete="off" spellcheck="false">
             </label>
             <button class="btn-secondary" type="button" onclick="adicionarInsumoFicha()">Adicionar</button>
           </div>
@@ -2209,7 +2209,7 @@
       <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">
         Altere sua senha de acesso ao sistema.
       </p>
-      <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
+      <input type="password" id="nova-senha" name="new_password" placeholder="Digite sua nova senha" autocomplete="new-password">
       <button id="btn-trocar-senha" onclick="alterarMinhaSenha()">Atualizar Senha</button>
       <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
     </div>
