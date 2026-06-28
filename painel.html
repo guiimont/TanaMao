@@ -2221,6 +2221,13 @@
   <span>Atualize o cardápio no painel e valide o resultado no site público.</span>
 </footer>
 
+<div id="product-recipe-overlay" class="panel-overlay" role="dialog" aria-modal="true" aria-labelledby="product-recipe-title">
+  <div class="panel-modal">
+    <button class="panel-modal-close" type="button" onclick="fecharFichaProduto()" aria-label="Fechar ficha">×</button>
+    <div id="product-recipe-body"></div>
+  </div>
+</div>
+
 <script>
   const BACKEND_URL = "https://tanamao-backend.onrender.com";
   const API = BACKEND_URL + "/api";
@@ -3259,14 +3266,18 @@
     const p = (PRODUTOS_ADMIN || []).find(x => String(x.id) === String(id));
     const overlay = getEl("product-recipe-overlay");
     const body = getEl("product-recipe-body");
-    if (!p || !overlay || !body) return;
+    if (!p) return;
+    if (!overlay || !body) {
+      alert("A janela da ficha não está disponível nesta tela. Recarregue o painel e tente novamente.");
+      return;
+    }
 
     const tipo = isSimpleRecipeProduct(p) ? "Receita simples pública" : "Ficha interna de produção";
     body.innerHTML = `
       <div class="card-heading" style="padding-right:34px;">
         <div>
           <span class="eyebrow">${escapeHtml(tipo)}</span>
-          <h3>${escapeHtml(p.name || "Produto")}</h3>
+          <h3 id="product-recipe-title">${escapeHtml(p.name || "Produto")}</h3>
           <p>${escapeHtml(p.description || "")}</p>
         </div>
       </div>
