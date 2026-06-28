@@ -265,14 +265,57 @@
       min-height: 42px;
       border: 1px solid rgba(60,110,71,0.18);
       border-radius: 12px;
-      padding: 0 16px;
+      padding: 0 14px 0 10px;
       background: var(--verde);
       color: #fff;
+      font-family: inherit;
       font-size: 0.88rem;
       font-weight: 800;
       text-decoration: none;
       box-shadow: 0 8px 18px rgba(60,110,71,0.14);
       white-space: nowrap;
+      cursor: pointer;
+      gap: 8px;
+    }
+
+    .guide-action-icon {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      flex-shrink: 0;
+    }
+
+    .guide-action-icon::before,
+    .guide-action-icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 2px;
+      border-radius: 999px;
+      background: #fff;
+      transform: translate(-50%, -50%);
+      transition: 0.18s ease;
+    }
+
+    .guide-action-icon::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+
+    .guide-action[aria-expanded="true"] .guide-action-icon::after {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    .guide-details {
+      margin-top: 16px;
+    }
+
+    .guide-details[hidden] {
+      display: none;
     }
 
     .guide-grid {
@@ -1177,59 +1220,64 @@
       <div class="guide-heading">
         <div>
           <span class="section-title" data-content="weeklyGuideTitle">Guia da semana</span>
-          <h2 data-content="weeklyGuideHeading">Organize sua alimentação com leveza</h2>
-          <p data-content="weeklyGuideIntro">Um roteiro simples para combinar comida pronta, escolhas frescas e receitas fáceis sem depender de improviso todos os dias.</p>
+          <h2 data-content="weeklyGuideHeading">A organização começa pelas escolhas no mercado</h2>
+          <p data-content="weeklyGuideIntro">A forma como você compra alimentos define se comer bem será simples ou complicado durante a semana. O Tá na Mão entra para reduzir o improviso e deixar essa rotina mais leve.</p>
         </div>
-        <a class="guide-action" href="#cardapio" data-content="weeklyGuideButton">Ver opções da semana</a>
+        <button class="guide-action" type="button" aria-expanded="false" aria-controls="guia-semanal-detalhes" onclick="alternarGuiaSemanal(this)">
+          <span class="guide-action-icon" aria-hidden="true"></span>
+          <span data-content="weeklyGuideButton">Detalhes e dicas</span>
+        </button>
       </div>
 
-      <div class="guide-grid">
-        <article class="guide-card">
-          <span class="guide-number">01</span>
-          <h3 data-content="weeklyGuideCard1Title">Mapeie sua rotina</h3>
-          <p data-content="weeklyGuideCard1Text">Separe os dias mais corridos, horários de treino e momentos em que você costuma improvisar.</p>
-        </article>
-        <article class="guide-card">
-          <span class="guide-number">02</span>
-          <h3 data-content="weeklyGuideCard2Title">Escolha bases prontas</h3>
-          <p data-content="weeklyGuideCard2Text">Use itens do Tá na Mão para cobrir refeições-chave e ganhar previsibilidade durante a semana.</p>
-        </article>
-        <article class="guide-card">
-          <span class="guide-number">03</span>
-          <h3 data-content="weeklyGuideCard3Title">Complete com itens simples</h3>
-          <p data-content="weeklyGuideCard3Text">Frutas, folhas, ovos, iogurte, castanhas e legumes ajudam a fechar refeições sem complicar.</p>
-        </article>
-        <article class="guide-card">
-          <span class="guide-number">04</span>
-          <h3 data-content="weeklyGuideCard4Title">Tenha um plano B</h3>
-          <p data-content="weeklyGuideCard4Text">Deixe lanches saudáveis e receitas rápidas à mão para não depender de escolhas de última hora.</p>
-        </article>
-      </div>
-
-      <div class="guide-bottom">
-        <div class="guide-panel">
-          <h3 data-content="weeklyGuideRoutineTitle">Roteiro simples da semana</h3>
-          <ol class="guide-list">
-            <li data-step="1"><span data-content="weeklyGuideRoutine1">Defina quais refeições precisam estar resolvidas antes da semana começar.</span></li>
-            <li data-step="2"><span data-content="weeklyGuideRoutine2">Monte combinações com proteínas, acompanhamentos e opções frescas.</span></li>
-            <li data-step="3"><span data-content="weeklyGuideRoutine3">Reserve alternativas para lanches, pós-treino e dias fora do horário.</span></li>
-            <li data-step="4"><span data-content="weeklyGuideRoutine4">Reavalie no fim da semana o que funcionou e ajuste o próximo pedido.</span></li>
-          </ol>
+      <div class="guide-details" id="guia-semanal-detalhes" hidden>
+        <div class="guide-grid">
+          <article class="guide-card">
+            <span class="guide-number">01</span>
+            <h3 data-content="weeklyGuideCard1Title">Comece pelo mercado</h3>
+            <p data-content="weeklyGuideCard1Text">Monte uma lista com alimentos que realmente ajudam sua rotina: itens prontos, opções frescas e complementos fáceis de combinar.</p>
+          </article>
+          <article class="guide-card">
+            <span class="guide-number">02</span>
+            <h3 data-content="weeklyGuideCard2Title">Pense nos dias críticos</h3>
+            <p data-content="weeklyGuideCard2Text">Identifique os dias de trabalho, treino ou correria em que você mais precisa ter a refeição resolvida.</p>
+          </article>
+          <article class="guide-card">
+            <span class="guide-number">03</span>
+            <h3 data-content="weeklyGuideCard3Title">Compre para combinar</h3>
+            <p data-content="weeklyGuideCard3Text">Proteínas, legumes, frutas e lanches simples fazem os produtos prontos renderem melhor sem complicar.</p>
+          </article>
+          <article class="guide-card">
+            <span class="guide-number">04</span>
+            <h3 data-content="weeklyGuideCard4Title">Evite depender do improviso</h3>
+            <p data-content="weeklyGuideCard4Text">Quando a base está organizada, fica mais fácil comer bem mesmo quando a semana sai do plano.</p>
+          </article>
         </div>
-        <div class="guide-panel">
-          <h3 data-content="weeklyGuideShoppingTitle">Lista inteligente de compras</h3>
-          <p data-content="weeklyGuideShoppingIntro">Compre o que complementa a sua rotina, sem excesso e sem depender de improviso.</p>
-          <div class="guide-tags" aria-label="Itens da lista de compras">
-            <span data-content="weeklyGuideShopping1">Proteínas</span>
-            <span data-content="weeklyGuideShopping2">Verduras e legumes</span>
-            <span data-content="weeklyGuideShopping3">Frutas</span>
-            <span data-content="weeklyGuideShopping4">Lanches inteligentes</span>
-            <span data-content="weeklyGuideShopping5">Temperos e extras</span>
+
+        <div class="guide-bottom">
+          <div class="guide-panel">
+            <h3 data-content="weeklyGuideRoutineTitle">Como organizar a semana</h3>
+            <ol class="guide-list">
+              <li data-step="1"><span data-content="weeklyGuideRoutine1">Olhe a agenda e marque quais refeições precisam estar resolvidas antes.</span></li>
+              <li data-step="2"><span data-content="weeklyGuideRoutine2">Escolha no cardápio os itens prontos que vão cobrir esses momentos.</span></li>
+              <li data-step="3"><span data-content="weeklyGuideRoutine3">Complete a compra com alimentos simples para café, lanches e acompanhamentos.</span></li>
+              <li data-step="4"><span data-content="weeklyGuideRoutine4">No fim da semana, ajuste quantidades e escolhas para o próximo pedido.</span></li>
+            </ol>
+          </div>
+          <div class="guide-panel">
+            <h3 data-content="weeklyGuideShoppingTitle">Lista de compras inteligente</h3>
+            <p data-content="weeklyGuideShoppingIntro">A compra certa diminui desperdício, facilita combinações e deixa a alimentação equilibrada mais possível.</p>
+            <div class="guide-tags" aria-label="Itens da lista de compras">
+              <span data-content="weeklyGuideShopping1">Proteínas</span>
+              <span data-content="weeklyGuideShopping2">Verduras e legumes</span>
+              <span data-content="weeklyGuideShopping3">Frutas</span>
+              <span data-content="weeklyGuideShopping4">Lanches inteligentes</span>
+              <span data-content="weeklyGuideShopping5">Temperos e extras</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <p class="guide-note" data-content="weeklyGuideClosing">A ideia é simples: o Tá na Mão resolve parte da semana e você completa com escolhas possíveis para a sua rotina.</p>
+        <p class="guide-note" data-content="weeklyGuideClosing">O objetivo não é montar uma rotina perfeita. É deixar boas escolhas mais fáceis de repetir.</p>
+      </div>
     </div>
 
     <div class="section" id="cardapio">
@@ -1374,30 +1422,30 @@
       step3Text: "Produtos preparados sob demanda para facilitar alimentação e treino.",
       weeklyGuideNav: "Guia semanal",
       weeklyGuideTitle: "Guia da semana",
-      weeklyGuideHeading: "Organize sua alimentação com leveza",
-      weeklyGuideIntro: "Um roteiro simples para combinar comida pronta, escolhas frescas e receitas fáceis sem depender de improviso todos os dias.",
-      weeklyGuideButton: "Ver opções da semana",
-      weeklyGuideCard1Title: "Mapeie sua rotina",
-      weeklyGuideCard1Text: "Separe os dias mais corridos, horários de treino e momentos em que você costuma improvisar.",
-      weeklyGuideCard2Title: "Escolha bases prontas",
-      weeklyGuideCard2Text: "Use itens do Tá na Mão para cobrir refeições-chave e ganhar previsibilidade durante a semana.",
-      weeklyGuideCard3Title: "Complete com itens simples",
-      weeklyGuideCard3Text: "Frutas, folhas, ovos, iogurte, castanhas e legumes ajudam a fechar refeições sem complicar.",
-      weeklyGuideCard4Title: "Tenha um plano B",
-      weeklyGuideCard4Text: "Deixe lanches saudáveis e receitas rápidas à mão para não depender de escolhas de última hora.",
-      weeklyGuideRoutineTitle: "Roteiro simples da semana",
-      weeklyGuideRoutine1: "Defina quais refeições precisam estar resolvidas antes da semana começar.",
-      weeklyGuideRoutine2: "Monte combinações com proteínas, acompanhamentos e opções frescas.",
-      weeklyGuideRoutine3: "Reserve alternativas para lanches, pós-treino e dias fora do horário.",
-      weeklyGuideRoutine4: "Reavalie no fim da semana o que funcionou e ajuste o próximo pedido.",
-      weeklyGuideShoppingTitle: "Lista inteligente de compras",
-      weeklyGuideShoppingIntro: "Compre o que complementa a sua rotina, sem excesso e sem depender de improviso.",
+      weeklyGuideHeading: "A organização começa pelas escolhas no mercado",
+      weeklyGuideIntro: "A forma como você compra alimentos define se comer bem será simples ou complicado durante a semana. O Tá na Mão entra para reduzir o improviso e deixar essa rotina mais leve.",
+      weeklyGuideButton: "Detalhes e dicas",
+      weeklyGuideCard1Title: "Comece pelo mercado",
+      weeklyGuideCard1Text: "Monte uma lista com alimentos que realmente ajudam sua rotina: itens prontos, opções frescas e complementos fáceis de combinar.",
+      weeklyGuideCard2Title: "Pense nos dias críticos",
+      weeklyGuideCard2Text: "Identifique os dias de trabalho, treino ou correria em que você mais precisa ter a refeição resolvida.",
+      weeklyGuideCard3Title: "Compre para combinar",
+      weeklyGuideCard3Text: "Proteínas, legumes, frutas e lanches simples fazem os produtos prontos renderem melhor sem complicar.",
+      weeklyGuideCard4Title: "Evite depender do improviso",
+      weeklyGuideCard4Text: "Quando a base está organizada, fica mais fácil comer bem mesmo quando a semana sai do plano.",
+      weeklyGuideRoutineTitle: "Como organizar a semana",
+      weeklyGuideRoutine1: "Olhe a agenda e marque quais refeições precisam estar resolvidas antes.",
+      weeklyGuideRoutine2: "Escolha no cardápio os itens prontos que vão cobrir esses momentos.",
+      weeklyGuideRoutine3: "Complete a compra com alimentos simples para café, lanches e acompanhamentos.",
+      weeklyGuideRoutine4: "No fim da semana, ajuste quantidades e escolhas para o próximo pedido.",
+      weeklyGuideShoppingTitle: "Lista de compras inteligente",
+      weeklyGuideShoppingIntro: "A compra certa diminui desperdício, facilita combinações e deixa a alimentação equilibrada mais possível.",
       weeklyGuideShopping1: "Proteínas",
       weeklyGuideShopping2: "Verduras e legumes",
       weeklyGuideShopping3: "Frutas",
       weeklyGuideShopping4: "Lanches inteligentes",
       weeklyGuideShopping5: "Temperos e extras",
-      weeklyGuideClosing: "A ideia é simples: o Tá na Mão resolve parte da semana e você completa com escolhas possíveis para a sua rotina.",
+      weeklyGuideClosing: "O objetivo não é montar uma rotina perfeita. É deixar boas escolhas mais fáceis de repetir.",
       paymentTitle: "Forma de Pagamento",
       orderTitle: "Seu Pedido",
       ctaTitle: "Resolva sua semana agora",
@@ -1446,6 +1494,14 @@
         if (typeof merged[key] === "string") el.textContent = merged[key];
       });
       if (typeof renderMenuTabs === "function") renderMenuTabs();
+    }
+
+    function alternarGuiaSemanal(button) {
+      const details = document.getElementById("guia-semanal-detalhes");
+      if (!details || !button) return;
+      const willOpen = details.hasAttribute("hidden");
+      details.toggleAttribute("hidden", !willOpen);
+      button.setAttribute("aria-expanded", String(willOpen));
     }
 
     async function carregarTextosSite() {
