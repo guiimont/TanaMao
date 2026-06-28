@@ -1721,15 +1721,36 @@
           <div class="bom-builder">
             <label class="field">
               <span>Insumo</span>
-              <select id="bom-ingredient"><option value="">Selecione um insumo</option></select>
+              <input id="bom-ingredient-name" list="bom-ingredients-list" placeholder="Digite para buscar ou cadastrar" oninput="syncBomIngredientUnit()">
+              <datalist id="bom-ingredients-list"></datalist>
+              <small>Se não existir, será cadastrado ao adicionar.</small>
             </label>
             <label class="field">
-              <span>Qtd. por unidade</span>
+              <span>Compra/estoque em</span>
+              <select id="bom-stock-unit" onchange="syncBomRecipeUnitSuggestion()">
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="l">l</option>
+                <option value="ml">ml</option>
+                <option value="un">un</option>
+                <option value="pct">pct</option>
+              </select>
+              <small>Ex: compra em kg, usa g na receita.</small>
+            </label>
+            <label class="field">
+              <span>Qtd. usada por unidade</span>
               <input id="bom-quantity" type="number" min="0" step="0.0001" placeholder="Ex: 120">
             </label>
             <label class="field">
-              <span>Unidade</span>
-              <input id="bom-unit" placeholder="g, ml, un">
+              <span>Unidade da receita</span>
+              <select id="bom-unit" onchange="this.dataset.touched='true'">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="l">l</option>
+                <option value="un">un</option>
+                <option value="pct">pct</option>
+              </select>
             </label>
             <label class="field">
               <span>Observação</span>
@@ -3630,15 +3651,76 @@
     return (PRODUCTION_INGREDIENTS || []).find(item => String(item.id) === String(id));
   }
 
+  function normalizeIngredientText(value) {
+    return String(value || "")
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  function normalizeUnitInput(value, fallback = "un") {
+    const aliases = {
+      grama: "g", gramas: "g", g: "g",
+      kg: "kg", kilo: "kg", kilos: "kg", quilo: "kg", quilos: "kg",
+      ml: "ml", l: "l", litro: "l", litros: "l",
+      unidade: "un", unidades: "un", und: "un", un: "un",
+      pacote: "pct", pacotes: "pct", pct: "pct"
+    };
+    const unit = String(value || "").trim().toLowerCase();
+    return aliases[unit] || unit || fallback;
+  }
+
+  function findIngredientByName(name) {
+    const normalized = normalizeIngredientText(name);
+    return (PRODUCTION_INGREDIENTS || []).find(item => normalizeIngredientText(item.name) === normalized) || null;
+  }
+
+  function upsertIngredientState(ingredient) {
+    if (!ingredient?.id) return;
+    const normalized = { ...ingredient, unit_type: normalizeUnitInput(ingredient.unit_type) };
+    const index = PRODUCTION_INGREDIENTS.findIndex(item => String(item.id) === String(normalized.id));
+    if (index >= 0) PRODUCTION_INGREDIENTS[index] = normalized;
+    else PRODUCTION_INGREDIENTS.push(normalized);
+    PRODUCTION_INGREDIENTS.sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "pt-BR"));
+    preencherSelectInsumos();
+    renderInsumos();
+  }
+
+  function getSuggestedRecipeUnit(stockUnit) {
+    const unit = normalizeUnitInput(stockUnit);
+    if (unit === "kg") return "g";
+    if (unit === "l") return "ml";
+    return unit;
+  }
+
+  function syncBomRecipeUnitSuggestion() {
+    const stockUnit = normalizeUnitInput(getEl("bom-stock-unit")?.value || "un");
+    const recipeUnit = getEl("bom-unit");
+    if (recipeUnit && !recipeUnit.dataset.touched) recipeUnit.value = getSuggestedRecipeUnit(stockUnit);
+  }
+
+  function syncBomIngredientUnit() {
+    const input = getEl("bom-ingredient-name");
+    const ingredient = findIngredientByName(input?.value || "");
+    if (!ingredient) return;
+    const stockUnit = normalizeUnitInput(ingredient.unit_type || "un");
+    const stockEl = getEl("bom-stock-unit");
+    const recipeEl = getEl("bom-unit");
+    if (stockEl) stockEl.value = stockUnit;
+    if (recipeEl && !recipeEl.dataset.touched) recipeEl.value = getSuggestedRecipeUnit(stockUnit);
+  }
+
   function preencherSelectInsumos() {
-    const select = getEl("bom-ingredient");
-    if (!select) return;
-    const current = select.value;
-    select.innerHTML = '<option value="">Selecione um insumo</option>';
+    const list = getEl("bom-ingredients-list");
+    if (!list) return;
+    list.innerHTML = "";
     (PRODUCTION_INGREDIENTS || []).forEach(item => {
-      select.innerHTML += `<option value="${item.id}">${escapeHtml(item.name)} (${escapeHtml(item.unit_type || "un")})</option>`;
+      const option = document.createElement("option");
+      option.value = item.name || "";
+      option.label = `${item.name || ""} (${normalizeUnitInput(item.unit_type || "un")})`;
+      list.appendChild(option);
     });
-    select.value = current;
   }
 
   function limparFormInsumo() {
@@ -3652,7 +3734,7 @@
 
   async function carregarInsumos() {
     try {
-      const res = await fetch(API + "/operations/production/ingredients");
+      const res = await fetch(API + "/operations/production/ingredients", { cache: "no-store" });
       const data = await readJsonResponse(res);
       if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao carregar insumos.");
       PRODUCTION_INGREDIENTS = Array.isArray(data.ingredients) ? data.ingredients : [];
@@ -3774,7 +3856,7 @@
     const productId = getEl("p-id")?.value || "";
     if (note) {
       note.textContent = productId
-        ? "Defina quanto de cada insumo é usado para produzir 1 unidade deste produto."
+        ? "Defina quanto de cada insumo é usado para produzir 1 unidade deste produto. A lista converte para a unidade de compra automaticamente."
         : "Salve ou selecione um produto para montar a ficha técnica estruturada.";
     }
     if (!tbody) return;
@@ -3784,11 +3866,15 @@
     }
     tbody.innerHTML = FICHA_TECNICA_ATUAL.map((item, index) => {
       const ingredient = getIngredientById(item.ingredient_id) || item.production_ingredients || {};
-      const unit = item.unit_type || ingredient.unit_type || "un";
+      const unit = normalizeUnitInput(item.unit_type || ingredient.unit_type || "un");
+      const stockUnit = ingredient.unit_type ? normalizeUnitInput(ingredient.unit_type) : "";
+      const stockHint = stockUnit && stockUnit !== unit
+        ? `<br><span class="small">Compra/estoque em ${escapeHtml(stockUnit)}</span>`
+        : "";
       return `
         <tr>
           <td><strong>${escapeHtml(ingredient.name || item.ingredient_name || "Insumo")}</strong></td>
-          <td style="text-align:right;">${formatQty(item.quantity_per_unit)}</td>
+          <td style="text-align:right;">${formatQty(item.quantity_per_unit, unit)}${stockHint}</td>
           <td>${escapeHtml(unit)}</td>
           <td>${escapeHtml(item.notes || "-")}</td>
           <td><button class="btn-secondary" type="button" onclick="removerInsumoFicha(${index})">Remover</button></td>
@@ -3810,13 +3896,13 @@
   async function carregarFichaTecnicaProduto(productId) {
     try {
       if (!PRODUCTION_INGREDIENTS.length) await carregarInsumos();
-      const res = await fetch(API + "/operations/production/products/" + productId + "/ingredients");
+      const res = await fetch(API + "/operations/production/products/" + productId + "/ingredients", { cache: "no-store" });
       const data = await readJsonResponse(res);
       if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao carregar ficha técnica.");
       FICHA_TECNICA_ATUAL = (data.items || []).map(item => ({
         ingredient_id: item.ingredient_id,
         quantity_per_unit: Number(item.quantity_per_unit || 0),
-        unit_type: item.unit_type || item.production_ingredients?.unit_type || "un",
+        unit_type: normalizeUnitInput(item.unit_type || item.production_ingredients?.unit_type || "un"),
         notes: item.notes || "",
         production_ingredients: item.production_ingredients || null
       }));
@@ -3825,33 +3911,63 @@
       console.error(e);
       FICHA_TECNICA_ATUAL = [];
       renderFichaTecnicaEstruturada();
-      alert(e.message || "Erro ao carregar ficha técnica.");
+      const note = getEl("bom-product-note");
+      if (note) note.textContent = e.message || "Não foi possível carregar a ficha técnica agora.";
     }
   }
 
-  function adicionarInsumoFicha() {
+  async function resolverInsumoFicha(name) {
+    const existing = findIngredientByName(name);
+    if (existing) return existing;
+
+    const stockUnit = normalizeUnitInput(getEl("bom-stock-unit")?.value || getEl("bom-unit")?.value || "un");
+    const res = await fetch(API + "/operations/production/ingredients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        unit_type: stockUnit,
+        current_stock: 0,
+        reorder_min_quantity: 0,
+        active: true
+      })
+    });
+    const data = await readJsonResponse(res);
+    if (!res.ok || !data.ok || !data.ingredient) throw new Error(data.message || "Erro ao cadastrar insumo.");
+    upsertIngredientState(data.ingredient);
+    return data.ingredient;
+  }
+
+  async function adicionarInsumoFicha() {
     const productId = getEl("p-id")?.value || "";
     if (!productId) return alert("Salve ou selecione um produto antes de montar a ficha técnica.");
-    const ingredientId = getEl("bom-ingredient")?.value || "";
-    const ingredient = getIngredientById(ingredientId);
+
+    const name = getEl("bom-ingredient-name")?.value.trim() || "";
     const qty = parseDecimalInput(getEl("bom-quantity")?.value, 0);
-    if (!ingredient) return alert("Selecione um insumo.");
+    if (!name) return alert("Digite o nome do insumo.");
     if (!Number.isFinite(qty) || qty <= 0) return alert("Informe uma quantidade por unidade maior que zero.");
 
-    FICHA_TECNICA_ATUAL = FICHA_TECNICA_ATUAL.filter(item => item.ingredient_id !== ingredientId);
-    FICHA_TECNICA_ATUAL.push({
-      ingredient_id: ingredientId,
-      quantity_per_unit: qty,
-      unit_type: getEl("bom-unit")?.value.trim() || ingredient.unit_type || "un",
-      notes: getEl("bom-notes")?.value.trim() || "",
-      production_ingredients: ingredient
-    });
+    try {
+      const ingredient = await resolverInsumoFicha(name);
+      const ingredientId = ingredient.id;
+      FICHA_TECNICA_ATUAL = FICHA_TECNICA_ATUAL.filter(item => item.ingredient_id !== ingredientId);
+      FICHA_TECNICA_ATUAL.push({
+        ingredient_id: ingredientId,
+        quantity_per_unit: qty,
+        unit_type: normalizeUnitInput(getEl("bom-unit")?.value || ingredient.unit_type || "un"),
+        notes: getEl("bom-notes")?.value.trim() || "",
+        production_ingredients: ingredient
+      });
 
-    ["bom-ingredient", "bom-quantity", "bom-unit", "bom-notes"].forEach(id => {
-      const el = getEl(id);
-      if (el) el.value = "";
-    });
-    renderFichaTecnicaEstruturada();
+      ["bom-ingredient-name", "bom-quantity", "bom-notes"].forEach(id => {
+        const el = getEl(id);
+        if (el) el.value = "";
+      });
+      renderFichaTecnicaEstruturada();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao adicionar insumo.");
+    }
   }
 
   function removerInsumoFicha(index) {
@@ -3957,7 +4073,13 @@
                 <td style="text-align:right;">${formatQty(item.required_quantity, item.unit_type)}</td>
                 <td style="text-align:right;">${formatQty(item.current_stock, item.unit_type)}</td>
                 <td style="text-align:right;"><strong>${formatQty(item.purchase_quantity, item.unit_type)}</strong></td>
-                <td class="small">${(item.products || []).map(p => `${escapeHtml(p.product_name)}: ${formatQty(p.required_quantity, item.unit_type)}`).join("<br>")}</td>
+                <td class="small">${(item.products || []).map(p => {
+                  const sourceUnit = normalizeUnitInput(p.source_unit_type || p.unit_type || item.unit_type);
+                  const convertedHint = sourceUnit !== normalizeUnitInput(item.unit_type)
+                    ? ` (${formatQty(p.source_required_quantity, sourceUnit)})`
+                    : "";
+                  return `${escapeHtml(p.product_name)}: ${formatQty(p.required_quantity, item.unit_type)}${convertedHint}`;
+                }).join("<br>")}</td>
               </tr>
             `).join("")}
           </tbody>
