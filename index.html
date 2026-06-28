@@ -225,6 +225,162 @@
       line-height: 1.45;
     }
 
+
+    .guide-section {
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffffff 0%, #fbf8ef 52%, #eef7f0 100%);
+    }
+
+    .guide-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .guide-heading .section-title {
+      margin-bottom: 8px;
+    }
+
+    .guide-heading h2 {
+      color: var(--verde-escuro);
+      font-size: 1.45rem;
+      line-height: 1.18;
+      margin-bottom: 8px;
+    }
+
+    .guide-heading p,
+    .guide-panel p,
+    .guide-note {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .guide-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid rgba(60,110,71,0.18);
+      border-radius: 12px;
+      padding: 0 16px;
+      background: var(--verde);
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(60,110,71,0.14);
+      white-space: nowrap;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .guide-card,
+    .guide-panel {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(60,110,71,0.12);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .guide-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 28px;
+      border-radius: 10px;
+      background: rgba(201,168,106,0.16);
+      color: var(--dourado);
+      font-size: 0.78rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .guide-card h3,
+    .guide-panel h3 {
+      color: var(--verde-escuro);
+      font-size: 0.98rem;
+      line-height: 1.25;
+      margin-bottom: 7px;
+    }
+
+    .guide-card p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.48;
+    }
+
+    .guide-bottom {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .guide-list {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .guide-list li {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      align-items: start;
+      gap: 8px;
+      color: var(--texto);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .guide-list li::before {
+      content: attr(data-step);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(60,110,71,0.1);
+      color: var(--verde-escuro);
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .guide-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .guide-tags span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      border-radius: 999px;
+      padding: 0 11px;
+      background: #f7f4ec;
+      color: var(--verde-escuro);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .guide-note {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(60,110,71,0.12);
+    }
+
     .menu-tabs {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
@@ -923,6 +1079,16 @@
         grid-template-columns: 1fr;
       }
 
+      .guide-heading,
+      .guide-grid,
+      .guide-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .guide-action {
+        width: 100%;
+      }
+
       .pagamentos {
         grid-template-columns: 1fr;
       }
@@ -972,6 +1138,7 @@
     </a>
     <nav class="site-nav" aria-label="Navegação principal">
       <span class="site-pill" data-content="headerBadge">Produção sob encomenda</span>
+      <a href="#guia-semanal" data-content="weeklyGuideNav">Guia semanal</a>
       <a href="#cardapio">Cardápio</a>
       <a href="#resumo-lista">Pedido</a>
     </nav>
@@ -1004,6 +1171,65 @@
           <span data-content="step3Text">Produtos preparados sob demanda para facilitar alimentação e treino.</span>
         </div>
       </div>
+    </div>
+
+    <div class="section guide-section" id="guia-semanal">
+      <div class="guide-heading">
+        <div>
+          <span class="section-title" data-content="weeklyGuideTitle">Guia da semana</span>
+          <h2 data-content="weeklyGuideHeading">Organize sua alimentação com leveza</h2>
+          <p data-content="weeklyGuideIntro">Um roteiro simples para combinar comida pronta, escolhas frescas e receitas fáceis sem depender de improviso todos os dias.</p>
+        </div>
+        <a class="guide-action" href="#cardapio" data-content="weeklyGuideButton">Ver opções da semana</a>
+      </div>
+
+      <div class="guide-grid">
+        <article class="guide-card">
+          <span class="guide-number">01</span>
+          <h3 data-content="weeklyGuideCard1Title">Mapeie sua rotina</h3>
+          <p data-content="weeklyGuideCard1Text">Separe os dias mais corridos, horários de treino e momentos em que você costuma improvisar.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">02</span>
+          <h3 data-content="weeklyGuideCard2Title">Escolha bases prontas</h3>
+          <p data-content="weeklyGuideCard2Text">Use itens do Tá na Mão para cobrir refeições-chave e ganhar previsibilidade durante a semana.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">03</span>
+          <h3 data-content="weeklyGuideCard3Title">Complete com itens simples</h3>
+          <p data-content="weeklyGuideCard3Text">Frutas, folhas, ovos, iogurte, castanhas e legumes ajudam a fechar refeições sem complicar.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">04</span>
+          <h3 data-content="weeklyGuideCard4Title">Tenha um plano B</h3>
+          <p data-content="weeklyGuideCard4Text">Deixe lanches saudáveis e receitas rápidas à mão para não depender de escolhas de última hora.</p>
+        </article>
+      </div>
+
+      <div class="guide-bottom">
+        <div class="guide-panel">
+          <h3 data-content="weeklyGuideRoutineTitle">Roteiro simples da semana</h3>
+          <ol class="guide-list">
+            <li data-step="1"><span data-content="weeklyGuideRoutine1">Defina quais refeições precisam estar resolvidas antes da semana começar.</span></li>
+            <li data-step="2"><span data-content="weeklyGuideRoutine2">Monte combinações com proteínas, acompanhamentos e opções frescas.</span></li>
+            <li data-step="3"><span data-content="weeklyGuideRoutine3">Reserve alternativas para lanches, pós-treino e dias fora do horário.</span></li>
+            <li data-step="4"><span data-content="weeklyGuideRoutine4">Reavalie no fim da semana o que funcionou e ajuste o próximo pedido.</span></li>
+          </ol>
+        </div>
+        <div class="guide-panel">
+          <h3 data-content="weeklyGuideShoppingTitle">Lista inteligente de compras</h3>
+          <p data-content="weeklyGuideShoppingIntro">Compre o que complementa a sua rotina, sem excesso e sem depender de improviso.</p>
+          <div class="guide-tags" aria-label="Itens da lista de compras">
+            <span data-content="weeklyGuideShopping1">Proteínas</span>
+            <span data-content="weeklyGuideShopping2">Verduras e legumes</span>
+            <span data-content="weeklyGuideShopping3">Frutas</span>
+            <span data-content="weeklyGuideShopping4">Lanches inteligentes</span>
+            <span data-content="weeklyGuideShopping5">Temperos e extras</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="guide-note" data-content="weeklyGuideClosing">A ideia é simples: o Tá na Mão resolve parte da semana e você completa com escolhas possíveis para a sua rotina.</p>
     </div>
 
     <div class="section" id="cardapio">
@@ -1146,6 +1372,32 @@
       step2Text: "Informe a data e a janela de retirada ou entrega no fechamento do pedido.",
       step3Title: "3. Receba com previsibilidade",
       step3Text: "Produtos preparados sob demanda para facilitar alimentação e treino.",
+      weeklyGuideNav: "Guia semanal",
+      weeklyGuideTitle: "Guia da semana",
+      weeklyGuideHeading: "Organize sua alimentação com leveza",
+      weeklyGuideIntro: "Um roteiro simples para combinar comida pronta, escolhas frescas e receitas fáceis sem depender de improviso todos os dias.",
+      weeklyGuideButton: "Ver opções da semana",
+      weeklyGuideCard1Title: "Mapeie sua rotina",
+      weeklyGuideCard1Text: "Separe os dias mais corridos, horários de treino e momentos em que você costuma improvisar.",
+      weeklyGuideCard2Title: "Escolha bases prontas",
+      weeklyGuideCard2Text: "Use itens do Tá na Mão para cobrir refeições-chave e ganhar previsibilidade durante a semana.",
+      weeklyGuideCard3Title: "Complete com itens simples",
+      weeklyGuideCard3Text: "Frutas, folhas, ovos, iogurte, castanhas e legumes ajudam a fechar refeições sem complicar.",
+      weeklyGuideCard4Title: "Tenha um plano B",
+      weeklyGuideCard4Text: "Deixe lanches saudáveis e receitas rápidas à mão para não depender de escolhas de última hora.",
+      weeklyGuideRoutineTitle: "Roteiro simples da semana",
+      weeklyGuideRoutine1: "Defina quais refeições precisam estar resolvidas antes da semana começar.",
+      weeklyGuideRoutine2: "Monte combinações com proteínas, acompanhamentos e opções frescas.",
+      weeklyGuideRoutine3: "Reserve alternativas para lanches, pós-treino e dias fora do horário.",
+      weeklyGuideRoutine4: "Reavalie no fim da semana o que funcionou e ajuste o próximo pedido.",
+      weeklyGuideShoppingTitle: "Lista inteligente de compras",
+      weeklyGuideShoppingIntro: "Compre o que complementa a sua rotina, sem excesso e sem depender de improviso.",
+      weeklyGuideShopping1: "Proteínas",
+      weeklyGuideShopping2: "Verduras e legumes",
+      weeklyGuideShopping3: "Frutas",
+      weeklyGuideShopping4: "Lanches inteligentes",
+      weeklyGuideShopping5: "Temperos e extras",
+      weeklyGuideClosing: "A ideia é simples: o Tá na Mão resolve parte da semana e você completa com escolhas possíveis para a sua rotina.",
       paymentTitle: "Forma de Pagamento",
       orderTitle: "Seu Pedido",
       ctaTitle: "Resolva sua semana agora",
