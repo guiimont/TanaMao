@@ -793,6 +793,14 @@
       line-height: 1.45;
     }
 
+    .recipe-video-player {
+      width: 100%;
+      max-height: 420px;
+      border-radius: 12px;
+      background: #111;
+      display: block;
+    }
+
     .qty-wrap {
       display: flex;
       align-items: center;
@@ -2073,8 +2081,20 @@
       `;
     }
 
+    function renderRecipeVideo(p) {
+      const url = String(p.preparation_video_url || "").trim();
+      if (!url) return "";
+      return `
+        <div class="recipe-detail-section">
+          <h4>Vídeo de preparo</h4>
+          <video class="recipe-video-player" controls preload="metadata" src="${escapeHtml(url)}"></video>
+        </div>
+      `;
+    }
+
     function renderRecipePublicDetails(p) {
       return `
+        ${renderRecipeVideo(p)}
         <div class="recipe-detail-section">
           <h4>${escapeHtml(siteText("recipeIngredientsTitle"))}</h4>
           ${renderRecipeLines(p.ingredients, false)}

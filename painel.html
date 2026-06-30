@@ -1711,6 +1711,20 @@
             <textarea id="p-preparo" placeholder="Escreva o passo a passo, de preferência um passo por linha."></textarea>
             <small>Use uma linguagem objetiva para a equipe ou para o cliente, conforme o tipo do cadastro.</small>
           </label>
+          <label class="field full">
+            <span>Vídeo de preparo</span>
+            <input id="p-video-url" type="url" placeholder="URL do vídeo ou envie um arquivo abaixo">
+            <small>Produto vendável: fica interno. Faça você mesmo: aparece na receita pública.</small>
+          </label>
+          <div class="field full">
+            <span>Enviar vídeo para teste</span>
+            <input id="p-video-file" type="file" accept="video/mp4,video/webm,video/quicktime">
+            <small>Use MP4, WebM ou MOV com até 45 MB. Salve ou selecione o produto antes de enviar.</small>
+            <div class="form-actions" style="justify-content:flex-start;margin-top:8px;">
+              <button class="btn-secondary" type="button" onclick="enviarVideoPreparo()">Enviar vídeo</button>
+              <span class="muted" id="p-video-status">Nenhum vídeo enviado.</span>
+            </div>
+          </div>
         </div>
         <div class="form-section">
           <div class="form-section-head">
@@ -3324,6 +3338,10 @@
     renderFichaTecnicaEstruturada();
     getEl("p-ingredientes").value = "";
     getEl("p-preparo").value = "";
+    getEl("p-video-url").value = "";
+    getEl("p-video-file").value = "";
+    const videoStatus = getEl("p-video-status");
+    if (videoStatus) videoStatus.textContent = "Nenhum vídeo enviado.";
     syncProductBusinessRules();
     setCheckedProductDays([]);
     getEl("cardapio-form-title").innerText = "Cadastrar produto";
@@ -3353,12 +3371,54 @@
     setCheckedUsageContexts(p.usage_contexts || []);
     getEl("p-ingredientes").value = p.ingredients || "";
     getEl("p-preparo").value = p.preparation_method || "";
+    getEl("p-video-url").value = p.preparation_video_url || "";
+    getEl("p-video-file").value = "";
+    const videoStatus = getEl("p-video-status");
+    if (videoStatus) videoStatus.textContent = p.preparation_video_url ? "Vídeo cadastrado." : "Nenhum vídeo enviado.";
     setCheckedProductDays(p.available_days || []);
     syncProductBusinessRules();
     carregarFichaTecnicaProduto(p.id);
     getEl("cardapio-form-title").innerText = "Editar produto";
     abrirAba("aba-cadastro-produto");
     getEl("cardapio-form-title").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function enviarVideoPreparo(){
+    const productId = getEl("p-id")?.value.trim();
+    const file = getEl("p-video-file")?.files?.[0];
+    const status = getEl("p-video-status");
+
+    if (!productId) return alert("Salve ou selecione um produto antes de enviar o vídeo.");
+    if (!file) return alert("Escolha um arquivo de vídeo.");
+    if (file.size > 45 * 1024 * 1024) return alert("Vídeo muito grande. Use até 45 MB para este teste.");
+
+    if (status) status.textContent = "Enviando vídeo...";
+
+    try {
+      const dataBase64 = await fileToBase64(file);
+      const res = await fetch(API + "/products/" + productId + "/preparation-video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file_name: file.name,
+          content_type: file.type,
+          data_base64: dataBase64
+        })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao enviar vídeo.");
+
+      getEl("p-video-url").value = data.video_url || "";
+      getEl("p-video-file").value = "";
+      const product = (PRODUTOS_ADMIN || []).find(p => String(p.id) === String(productId));
+      if (product) product.preparation_video_url = data.video_url || "";
+      if (status) status.textContent = "Vídeo enviado.";
+      alert("Vídeo enviado!");
+    } catch (e) {
+      console.error(e);
+      if (status) status.textContent = "Erro ao enviar vídeo.";
+      alert(e.message || "Erro ao enviar vídeo.");
+    }
   }
 
   async function salvarProduto(){
@@ -3373,6 +3433,7 @@
     const isGiftRecipe = getEl("p-brinde").value === "true";
     const ingredients = getEl("p-ingredientes").value.trim();
     const preparationMethod = getEl("p-preparo").value.trim();
+    const preparationVideoUrl = getEl("p-video-url").value.trim();
 
     if(!name) return alert("Nome obrigatório.");
 
@@ -3417,6 +3478,7 @@
       ingredients: ingredients || null,
       preparation_method: preparationMethod || null
     };
+    if (preparationVideoUrl) productPayload.preparation_video_url = preparationVideoUrl;
 
     try{
       if (file) productPayload.image_url = await fileToBase64(file);
