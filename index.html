@@ -1640,7 +1640,7 @@
     let isSubmittingCheckout = false;
 
     // ✅ LÓGICA DO INDEXEDDB (CACHE)
-    const DB_NAME = "TanamaoDB_v2";
+    const DB_NAME = "TanamaoDB_v3";
     const STORE_NAME = "produtos_cache";
 
     function initDB() {
@@ -1984,7 +1984,7 @@
 
       // 2. Faz a requisição em background para atualizar os dados
       try {
-        const res = await fetch(BACKEND_URL + "/api/products", { method: "GET" });
+        const res = await fetch(BACKEND_URL + "/api/products?t=" + Date.now(), { method: "GET", cache: "no-store" });
         if (!res.ok) throw new Error("erro http");
         const data = await res.json();
 
