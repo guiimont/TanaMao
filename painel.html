@@ -1275,7 +1275,7 @@
       <div class="section-toolbar">
         <div>
           <h3>Importar nota fiscal por XML ou PDF</h3>
-          <p class="muted">Envie o XML oficial ou o PDF/DANFE extraído do site do governo. Confira os itens lidos antes de registrar as compras.</p>
+          <p class="muted">Envie o XML oficial ou o PDF/DANFE extraído do site do governo. Confira os itens lidos antes de registrar as compras. Se o PDF vier quebrado, revise o texto extraído e reprocesse.</p>
         </div>
       </div>
       <div class="filters-grid">
@@ -1301,6 +1301,13 @@
         </div>
       </div>
       <div class="rule-note" id="nf-meta" style="display:none; margin-top:12px;"></div>
+      <details id="nf-raw-wrap" style="display:none; margin-top:12px;">
+        <summary>Texto extraído do PDF</summary>
+        <textarea id="nf-raw-text" rows="8" style="width:100%; margin-top:10px;" placeholder="Texto extraído do PDF para conferência"></textarea>
+        <div class="form-actions">
+          <button class="btn-secondary" type="button" onclick="reprocessarTextoNotaFiscal()">Reprocessar texto</button>
+        </div>
+      </details>
       <div class="table-wrap" id="nf-preview-wrap" style="display:none; margin-top:12px;">
         <table style="min-width: 980px;">
           <thead>
@@ -3317,44 +3324,82 @@
   function parsePdfItemLine(line) {
     const clean = String(line || "").replace(/R\$/g, "").replace(/\s+/g, " ").trim();
     if (!clean || /^(total|subtotal|valor total|desconto|acrescimo|forma de pagamento|tributos)/i.test(clean)) return null;
-    if (/descri[cç][aã]o|qtd|quantidade|vl\.?\s*unit|valor\s*unit/i.test(clean)) return null;
+    if (/descricao|descri[cç][aã]o|qtd|quantidade|vl\.?\s*unit|valor\s*unit/i.test(clean)) return null;
+
+    const units = new Set(["kg", "g", "l", "lt", "ml", "un", "und", "unid", "unid.", "pc", "pct", "pcte", "cx"]);
+
+    const nfcePattern = clean.match(/^(.+?)\s+(?:qtde\.?|quantidade)\s*:?\s*(\d+[,.]?\d*)\s+(?:un\.?|unid\.?)\s*:?\s*([a-z.]+)\s+(?:vl\.?\s*unit\.?|valor\s*unit(?:ario)?)\s*:?\s*(\d+[,.]?\d{0,4})\s+(?:vl\.?\s*total|valor\s*total)\s*:?\s*(\d+[,.]?\d{0,2})/i);
+    if (nfcePattern) {
+      const quantity = parsePdfMoney(nfcePattern[2]);
+      const unitCost = parsePdfMoney(nfcePattern[4]);
+      const totalValue = parsePdfMoney(nfcePattern[5]) || quantity * unitCost;
+      return {
+        enabled: true,
+        item_name: stripLeadingItemCode(nfcePattern[1].split(" ")).join(" ").trim(),
+        unit_type: normalizeInvoiceUnit(nfcePattern[3]),
+        quantity,
+        unit_cost: unitCost,
+        total_value: Number(totalValue.toFixed(2))
+      };
+    }
+
+    const xPattern = clean.match(/^(.+?)\s+(\d+[,.]?\d*)\s*(kg|g|l|lt|ml|un|und|unid|pc|pct|pcte|cx)\s+[xX]\s+(\d+[,.]?\d{0,4})\s+(\d+[,.]?\d{0,2})$/i);
+    if (xPattern) {
+      const quantity = parsePdfMoney(xPattern[2]);
+      const unitCost = parsePdfMoney(xPattern[4]);
+      const totalValue = parsePdfMoney(xPattern[5]) || quantity * unitCost;
+      return {
+        enabled: true,
+        item_name: stripLeadingItemCode(xPattern[1].split(" ")).join(" ").trim(),
+        unit_type: normalizeInvoiceUnit(xPattern[3]),
+        quantity,
+        unit_cost: unitCost,
+        total_value: Number(totalValue.toFixed(2))
+      };
+    }
 
     const tokens = clean.split(" ").filter(Boolean);
     if (tokens.length < 5) return null;
-    const units = new Set(["kg", "g", "l", "lt", "ml", "un", "und", "unid", "pc", "pct", "pcte", "cx"]);
 
     for (let unitIndex = tokens.length - 3; unitIndex >= 1; unitIndex--) {
       const unitToken = String(tokens[unitIndex] || "").toLowerCase().replace(/[.:]/g, "");
       if (!units.has(unitToken)) continue;
 
-      let quantityIndex = unitIndex - 1;
-      let quantity = parsePdfMoney(tokens[quantityIndex]);
-      let nameEnd = quantityIndex;
-
-      if (!quantity && looksLikePdfNumber(tokens[unitIndex + 1])) {
-        quantityIndex = unitIndex + 1;
-        quantity = parsePdfMoney(tokens[quantityIndex]);
-        nameEnd = unitIndex;
+      const numbersAfter = tokens.slice(unitIndex + 1).filter(looksLikePdfNumber).map(parsePdfMoney);
+      if (numbersAfter.length >= 2) {
+        const quantity = numbersAfter[0];
+        const unitCost = numbersAfter[1];
+        const totalValue = numbersAfter[2] || Number((quantity * unitCost).toFixed(2));
+        const name = normalizePdfProductName(tokens.slice(0, unitIndex));
+        if (name && quantity > 0 && unitCost >= 0) {
+          return {
+            enabled: true,
+            item_name: name,
+            unit_type: normalizeInvoiceUnit(unitToken),
+            quantity,
+            unit_cost: unitCost,
+            total_value: Number(totalValue.toFixed(2))
+          };
+        }
       }
 
-      const numbersAfter = tokens.slice(unitIndex + 1).filter(looksLikePdfNumber).map(parsePdfMoney);
-      if (!quantity || numbersAfter.length < 2) continue;
-
-      const totalValue = numbersAfter[numbersAfter.length - 1];
-      const unitCost = numbersAfter[numbersAfter.length - 2];
-      if (!totalValue && !unitCost) continue;
-
-      const name = stripLeadingItemCode(tokens.slice(0, nameEnd)).join(" ").trim();
-      if (!name || name.length < 2) continue;
-
-      return {
-        enabled: true,
-        item_name: name,
-        unit_type: normalizeInvoiceUnit(unitToken),
-        quantity,
-        unit_cost: unitCost,
-        total_value: Number((totalValue || quantity * unitCost).toFixed(2))
-      };
+      const quantityBefore = parsePdfMoney(tokens[unitIndex - 1]);
+      const numbersAfterBeforeUnit = tokens.slice(unitIndex + 1).filter(looksLikePdfNumber).map(parsePdfMoney);
+      if (quantityBefore > 0 && numbersAfterBeforeUnit.length >= 2) {
+        const unitCost = numbersAfterBeforeUnit[0];
+        const totalValue = numbersAfterBeforeUnit[1] || Number((quantityBefore * unitCost).toFixed(2));
+        const name = normalizePdfProductName(tokens.slice(0, unitIndex - 1));
+        if (name) {
+          return {
+            enabled: true,
+            item_name: name,
+            unit_type: normalizeInvoiceUnit(unitToken),
+            quantity: quantityBefore,
+            unit_cost: unitCost,
+            total_value: Number(totalValue.toFixed(2))
+          };
+        }
+      }
     }
 
     const pattern = clean.match(/^(.+?)\s+(\d+[,.]?\d*)\s*(kg|g|l|lt|ml|un|und|unid|pc|pct|pcte|cx)\s+(\d+[,.]?\d{0,4})\s+(\d+[,.]?\d{0,2})$/i);
@@ -3362,7 +3407,7 @@
       const quantity = parsePdfMoney(pattern[2]);
       const unitCost = parsePdfMoney(pattern[4]);
       const totalValue = parsePdfMoney(pattern[5]) || quantity * unitCost;
-      const name = stripLeadingItemCode(pattern[1].split(" ")).join(" ").trim();
+      const name = normalizePdfProductName(pattern[1].split(" "));
       if (name && quantity > 0) {
         return {
           enabled: true,
@@ -3376,6 +3421,16 @@
     }
 
     return null;
+  }
+
+  function normalizePdfProductName(tokens) {
+    const cleaned = stripLeadingItemCode(tokens).filter(Boolean);
+    let removed = 0;
+    while (cleaned.length > 1 && removed < 4 && /^\d{1,8}$/.test(cleaned[cleaned.length - 1])) {
+      cleaned.pop();
+      removed++;
+    }
+    return cleaned.join(" ").replace(/\s+/g, " ").trim();
   }
 
   function getPdfInvoiceMeta(text) {
@@ -3409,23 +3464,30 @@
       .filter(Boolean);
 
     const items = [];
+    const pushItem = (item) => {
+      if (item && item.item_name && item.quantity > 0) items.push(item);
+    };
+
     let pendingDescription = "";
-    lines.forEach(line => {
-      const item = parsePdfItemLine(line);
+    lines.forEach((line, index) => {
+      const combined = pendingDescription ? pendingDescription + " " + line : line;
+      const item = parsePdfItemLine(line) || (pendingDescription ? parsePdfItemLine(combined) : null);
       if (item) {
-        if ((!item.item_name || item.item_name.length < 4) && pendingDescription) {
-          item.item_name = pendingDescription;
-        }
-        items.push(item);
+        pushItem(item);
         pendingDescription = "";
         return;
       }
 
+      const pair = lines[index + 1] ? line + " " + lines[index + 1] : "";
+      const triple = lines[index + 2] ? pair + " " + lines[index + 2] : "";
+      pushItem(parsePdfItemLine(pair));
+      pushItem(parsePdfItemLine(triple));
+
       if (
         line.length >= 5 &&
-        line.length <= 90 &&
+        line.length <= 120 &&
         !looksLikePdfNumber(line) &&
-        !/danfe|documento auxiliar|nota fiscal|consumidor|chave de acesso|consulta|protocolo|total|valor|qtd|descri[cç][aã]o/i.test(line)
+        !/danfe|documento auxiliar|nota fiscal|consumidor|chave de acesso|consulta|protocolo|total|valor|qtd|descricao|descri[cç][aã]o/i.test(line)
       ) {
         pendingDescription = line;
       }
@@ -3446,6 +3508,26 @@
     }
 
     return { meta: getPdfInvoiceMeta(text), items: deduped };
+  }
+
+  function setNotaFiscalRawText(text, show = false) {
+    const wrap = document.getElementById("nf-raw-wrap");
+    const raw = document.getElementById("nf-raw-text");
+    if (!wrap || !raw) return;
+    raw.value = text || "";
+    wrap.style.display = text ? "" : "none";
+    wrap.open = !!show;
+  }
+
+  function reprocessarTextoNotaFiscal() {
+    const raw = document.getElementById("nf-raw-text")?.value || "";
+    if (!raw.trim()) return alert("Nao ha texto extraido para reprocessar.");
+    try {
+      aplicarNotaFiscalImportada(parsePdfInvoiceText(raw), "PDF reprocessado");
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao reprocessar texto da nota.");
+    }
   }
 
   function aplicarNotaFiscalImportada(parsed, sourceLabel) {
@@ -3478,10 +3560,16 @@
     try {
       const name = String(file.name || "").toLowerCase();
       const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
-      const parsed = isPdf
-        ? parsePdfInvoiceText(await extrairTextoPdf(file))
-        : parseXmlInvoiceItems(await file.text());
-      aplicarNotaFiscalImportada(parsed, isPdf ? "PDF lido" : "XML lido");
+      if (isPdf) {
+        const pdfText = await extrairTextoPdf(file);
+        setNotaFiscalRawText(pdfText, false);
+        const parsed = parsePdfInvoiceText(pdfText);
+        aplicarNotaFiscalImportada(parsed, "PDF lido");
+      } else {
+        setNotaFiscalRawText("", false);
+        const parsed = parseXmlInvoiceItems(await file.text());
+        aplicarNotaFiscalImportada(parsed, "XML lido");
+      }
     } catch (e) {
       console.error(e);
       alert(e.message || "Erro ao ler arquivo da nota fiscal.");
@@ -3539,6 +3627,7 @@
     NOTA_FISCAL_ITENS = [];
     NOTA_FISCAL_META = null;
     if (clearFile && document.getElementById("nf-xml")) document.getElementById("nf-xml").value = "";
+    setNotaFiscalRawText("", false);
     const meta = document.getElementById("nf-meta");
     if (meta) {
       meta.style.display = "none";
