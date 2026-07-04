@@ -1230,14 +1230,97 @@
         <h3>Lançar Compra / Entrada</h3>
         <select id="e-fornecedor"><option value="">Selecione o Fornecedor...</option></select>
         <input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
-        <input id="e-qtd" type="number" placeholder="Quantidade">
-        <input id="e-valor" type="number" placeholder="Valor Total (R$)">
-        <select id="e-cat">
-          <option value="Insumos">Insumos / Ingredientes</option>
-          <option value="Embalagens">Embalagens</option>
-          <option value="Outros">Outros</option>
-        </select>
+        <div class="ingredient-grid">
+          <label class="field">
+            <span>Data</span>
+            <input id="e-data" type="date">
+          </label>
+          <label class="field">
+            <span>Unidade da compra</span>
+            <select id="e-unidade" onchange="atualizarValorCompraManual()">
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="l">l</option>
+              <option value="ml">ml</option>
+              <option value="un">un</option>
+              <option value="pct">pct</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Quantidade / peso</span>
+            <input id="e-qtd" type="number" min="0" step="0.001" placeholder="Ex: 0,650" oninput="atualizarValorCompraManual()">
+          </label>
+          <label class="field">
+            <span>Valor por unidade</span>
+            <input id="e-unit-cost" type="number" min="0" step="0.0001" placeholder="Ex: R$/kg" oninput="atualizarValorCompraManual()">
+          </label>
+          <label class="field">
+            <span>Valor total calculado</span>
+            <input id="e-valor" type="number" min="0" step="0.01" placeholder="R$ 0,00" readonly>
+          </label>
+          <label class="field">
+            <span>Categoria</span>
+            <select id="e-cat">
+              <option value="Insumos">Insumos / Ingredientes</option>
+              <option value="Embalagens">Embalagens</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+        </div>
         <button onclick="salvarCompra()">Registrar Compra</button>
+      </div>
+    </div>
+
+    <div class="admin-card" style="margin-top: 20px;">
+      <div class="section-toolbar">
+        <div>
+          <h3>Importar nota fiscal por XML</h3>
+          <p class="muted">Envie o XML da NF-e/NFC-e, confira os itens lidos e registre tudo em compras com quantidade, unidade, custo unitário e total.</p>
+        </div>
+      </div>
+      <div class="filters-grid">
+        <div>
+          <label>Arquivo XML</label>
+          <input id="nf-xml" type="file" accept=".xml,text/xml,application/xml" onchange="lerXmlNotaFiscal(event)">
+        </div>
+        <div>
+          <label>Fornecedor</label>
+          <select id="nf-fornecedor"><option value="">Selecione o fornecedor...</option></select>
+        </div>
+        <div>
+          <label>Data da entrada</label>
+          <input id="nf-data" type="date">
+        </div>
+        <div>
+          <label>Categoria dos itens</label>
+          <select id="nf-cat">
+            <option value="Insumos">Insumos / Ingredientes</option>
+            <option value="Embalagens">Embalagens</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="rule-note" id="nf-meta" style="display:none; margin-top:12px;"></div>
+      <div class="table-wrap" id="nf-preview-wrap" style="display:none; margin-top:12px;">
+        <table style="min-width: 980px;">
+          <thead>
+            <tr>
+              <th>Lançar</th>
+              <th>Item lido</th>
+              <th>Unidade</th>
+              <th style="text-align:right;">Qtd / peso</th>
+              <th style="text-align:right;">Valor unit.</th>
+              <th style="text-align:right;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="nf-preview-body">
+            <tr><td colspan="6">Nenhum XML carregado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="nf-save-btn" type="button" onclick="registrarItensNotaFiscal()" disabled>Registrar itens da nota</button>
+        <button class="btn-secondary" type="button" onclick="limparNotaFiscalImportada()">Limpar nota</button>
       </div>
     </div>
 
@@ -2318,6 +2401,8 @@
   let FORNECEDORES = [];
   let PRODUCTION_INGREDIENTS = [];
   let FICHA_TECNICA_ATUAL = [];
+  let NOTA_FISCAL_ITENS = [];
+  let NOTA_FISCAL_META = null;
 
   // ====== ESTADO (Produtos Admin) ======
   let PRODUTOS_ADMIN = [];
@@ -2918,24 +3003,24 @@
     const res = await fetch(API + "/suppliers");
     const data = await res.json();
 
-    // Select do form
-    const select = document.getElementById("e-fornecedor");
-    select.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
     const suppliers = data.suppliers || [];
     FORNECEDORES = suppliers;
-    suppliers.forEach((f) => {
-      select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
-    });
+
+    const fillSupplierSelect = (select, emptyLabel) => {
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = `<option value="">${emptyLabel}</option>`;
+      suppliers.forEach((f) => {
+        select.innerHTML += `<option value="${f.id}">${escapeHtml(f.name || "")}</option>`;
+      });
+      select.value = current;
+    };
+
+    fillSupplierSelect(document.getElementById("e-fornecedor"), "Selecione o Fornecedor...");
+    fillSupplierSelect(document.getElementById("nf-fornecedor"), "Selecione o fornecedor...");
 
     const selInsumoFornecedor = document.getElementById("ing-fornecedor");
-    if (selInsumoFornecedor) {
-      const current = selInsumoFornecedor.value;
-      selInsumoFornecedor.innerHTML = '<option value="">Sem fornecedor fixo</option>';
-      suppliers.forEach((f) => {
-        selInsumoFornecedor.innerHTML += `<option value="${f.id}">${escapeHtml(f.name)}</option>`;
-      });
-      selInsumoFornecedor.value = current;
-    }
+    if (selInsumoFornecedor) fillSupplierSelect(selInsumoFornecedor, "Sem fornecedor fixo");
 
     // Select do filtro
     const selFiltro = document.getElementById("filtro-fornecedor");
@@ -2974,19 +3059,276 @@
     }
   }
 
+
+  function atualizarValorCompraManual() {
+    const qtd = parseDecimalInput(document.getElementById("e-qtd")?.value, NaN);
+    const unitCost = parseMoneyInput(document.getElementById("e-unit-cost")?.value);
+    const totalEl = document.getElementById("e-valor");
+    if (!totalEl) return;
+    if (Number.isFinite(qtd) && qtd > 0 && Number.isFinite(unitCost) && unitCost >= 0) {
+      totalEl.value = (qtd * unitCost).toFixed(2);
+    } else {
+      totalEl.value = "";
+    }
+  }
+
+  function onlyDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function normalizeXmlText(value) {
+    return String(value || "")
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  function xmlElements(root, name) {
+    return Array.from(root?.getElementsByTagName("*") || [])
+      .filter(el => String(el.localName || el.nodeName).toLowerCase() === String(name).toLowerCase());
+  }
+
+  function xmlFirst(root, name) {
+    return xmlElements(root, name)[0] || null;
+  }
+
+  function xmlText(root, name) {
+    const el = xmlFirst(root, name);
+    return el ? String(el.textContent || "").trim() : "";
+  }
+
+  function parseXmlNumber(value) {
+    const normalized = String(value || "").trim().replace(",", ".");
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function normalizeInvoiceUnit(unit) {
+    const raw = String(unit || "").trim().toLowerCase();
+    const aliases = {
+      kg: "kg", k: "kg", kilo: "kg", quilo: "kg",
+      g: "g", gr: "g", gram: "g",
+      l: "l", lt: "l", litro: "l",
+      ml: "ml",
+      un: "un", und: "un", unid: "un", unidade: "un",
+      pc: "pct", pct: "pct", pcte: "pct", pacote: "pct", cx: "pct"
+    };
+    return aliases[raw] || normalizeUnitInput(raw || "un");
+  }
+
+  function getInvoiceMeta(xmlDoc) {
+    const inf = xmlFirst(xmlDoc, "infNFe");
+    const ide = xmlFirst(xmlDoc, "ide");
+    const emit = xmlFirst(xmlDoc, "emit");
+    const dhEmi = xmlText(ide, "dhEmi") || xmlText(ide, "dEmi");
+    return {
+      key: String(inf?.getAttribute("Id") || "").replace(/^NFe/i, ""),
+      number: xmlText(ide, "nNF"),
+      series: xmlText(ide, "serie"),
+      date: dhEmi ? dhEmi.slice(0, 10) : "",
+      supplierName: xmlText(emit, "xNome"),
+      supplierDocument: xmlText(emit, "CNPJ") || xmlText(emit, "CPF")
+    };
+  }
+
+  function findSupplierForInvoice(meta) {
+    const doc = onlyDigits(meta?.supplierDocument);
+    const name = normalizeXmlText(meta?.supplierName);
+    if (!FORNECEDORES.length) return null;
+    if (doc) {
+      const byDoc = FORNECEDORES.find(f => {
+        const supplierDoc = onlyDigits(f.document);
+        return supplierDoc && (supplierDoc.endsWith(doc) || doc.endsWith(supplierDoc));
+      });
+      if (byDoc) return byDoc;
+    }
+    if (name) {
+      return FORNECEDORES.find(f => normalizeXmlText(f.name) === name || normalizeXmlText(f.name).includes(name) || name.includes(normalizeXmlText(f.name))) || null;
+    }
+    return null;
+  }
+
+  function parseInvoiceItems(xmlTextValue) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlTextValue, "application/xml");
+    if (xmlDoc.getElementsByTagName("parsererror").length) {
+      throw new Error("XML inválido. Envie o arquivo XML original da nota fiscal.");
+    }
+
+    const meta = getInvoiceMeta(xmlDoc);
+    const dets = xmlElements(xmlDoc, "det");
+    const items = dets.map((det, index) => {
+      const prod = xmlFirst(det, "prod") || det;
+      const quantity = parseXmlNumber(xmlText(prod, "qCom") || xmlText(prod, "qTrib"));
+      const unitCost = parseXmlNumber(xmlText(prod, "vUnCom") || xmlText(prod, "vUnTrib"));
+      const totalValue = parseXmlNumber(xmlText(prod, "vProd")) || Number((quantity * unitCost).toFixed(2));
+      return {
+        enabled: true,
+        item_name: xmlText(prod, "xProd") || "Item " + (index + 1),
+        unit_type: normalizeInvoiceUnit(xmlText(prod, "uCom") || xmlText(prod, "uTrib")),
+        quantity,
+        unit_cost: unitCost,
+        total_value: Number(totalValue.toFixed(2))
+      };
+    }).filter(item => item.item_name && item.quantity > 0);
+
+    if (!items.length) throw new Error("Nenhum item de produto foi encontrado no XML.");
+    return { meta, items };
+  }
+
+  function renderNotaFiscalPreview() {
+    const wrap = document.getElementById("nf-preview-wrap");
+    const tbody = document.getElementById("nf-preview-body");
+    const saveBtn = document.getElementById("nf-save-btn");
+    if (!wrap || !tbody || !saveBtn) return;
+
+    if (!NOTA_FISCAL_ITENS.length) {
+      wrap.style.display = "none";
+      saveBtn.disabled = true;
+      tbody.innerHTML = '<tr><td colspan="6">Nenhum XML carregado.</td></tr>';
+      return;
+    }
+
+    wrap.style.display = "";
+    saveBtn.disabled = false;
+    tbody.innerHTML = NOTA_FISCAL_ITENS.map((item, index) => {
+      const options = ["kg","g","l","ml","un","pct"].map(unit =>
+        '<option value="' + unit + '" ' + (item.unit_type === unit ? "selected" : "") + '>' + unit + '</option>'
+      ).join("");
+      return [
+        "<tr>",
+        '<td><input class="nf-row-enabled" data-index="' + index + '" type="checkbox" ' + (item.enabled ? "checked" : "") + "></td>",
+        '<td><input class="nf-item-name" data-index="' + index + '" value="' + escapeHtml(item.item_name) + '"></td>',
+        '<td><select class="nf-item-unit" data-index="' + index + '" onchange="atualizarItemNotaFiscal(' + index + ')">' + options + '</select></td>',
+        '<td style="text-align:right;"><input class="nf-item-qty" data-index="' + index + '" type="number" min="0" step="0.001" value="' + Number(item.quantity || 0) + '" oninput="atualizarItemNotaFiscal(' + index + ')"></td>',
+        '<td style="text-align:right;"><input class="nf-item-unit-cost" data-index="' + index + '" type="number" min="0" step="0.0001" value="' + Number(item.unit_cost || 0) + '" oninput="atualizarItemNotaFiscal(' + index + ')"></td>',
+        '<td style="text-align:right;"><input class="nf-item-total" data-index="' + index + '" type="number" min="0" step="0.01" value="' + Number(item.total_value || 0).toFixed(2) + '" readonly></td>',
+        "</tr>"
+      ].join("");
+    }).join("");
+  }
+
+  function atualizarItemNotaFiscal(index) {
+    const item = NOTA_FISCAL_ITENS[index];
+    if (!item) return;
+    const row = document.querySelector("#nf-preview-body tr:nth-child(" + (index + 1) + ")");
+    if (!row) return;
+    const qty = parseDecimalInput(row.querySelector(".nf-item-qty")?.value, 0);
+    const unitCost = parseMoneyInput(row.querySelector(".nf-item-unit-cost")?.value);
+    item.quantity = qty;
+    item.unit_cost = Number.isFinite(unitCost) ? unitCost : 0;
+    item.unit_type = row.querySelector(".nf-item-unit")?.value || item.unit_type || "un";
+    item.total_value = Number((item.quantity * item.unit_cost).toFixed(2));
+    const totalEl = row.querySelector(".nf-item-total");
+    if (totalEl) totalEl.value = item.total_value.toFixed(2);
+  }
+
+  async function lerXmlNotaFiscal(event) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseInvoiceItems(text);
+      NOTA_FISCAL_META = parsed.meta;
+      NOTA_FISCAL_ITENS = parsed.items;
+
+      const metaEl = document.getElementById("nf-meta");
+      if (metaEl) {
+        const parts = [];
+        if (NOTA_FISCAL_META.number) parts.push("NF " + escapeHtml(NOTA_FISCAL_META.number));
+        if (NOTA_FISCAL_META.series) parts.push("série " + escapeHtml(NOTA_FISCAL_META.series));
+        if (NOTA_FISCAL_META.supplierName) parts.push("Fornecedor: " + escapeHtml(NOTA_FISCAL_META.supplierName));
+        if (NOTA_FISCAL_META.supplierDocument) parts.push("Documento: " + escapeHtml(NOTA_FISCAL_META.supplierDocument));
+        metaEl.innerHTML = parts.join(" · ") || "XML lido com sucesso.";
+        metaEl.style.display = "";
+      }
+
+      const dateEl = document.getElementById("nf-data");
+      if (dateEl && NOTA_FISCAL_META.date) dateEl.value = NOTA_FISCAL_META.date;
+      const supplier = findSupplierForInvoice(NOTA_FISCAL_META);
+      const supplierEl = document.getElementById("nf-fornecedor");
+      if (supplierEl && supplier) supplierEl.value = supplier.id;
+
+      renderNotaFiscalPreview();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao ler XML da nota fiscal.");
+      limparNotaFiscalImportada(false);
+    }
+  }
+
+  function coletarItensNotaFiscalParaSalvar() {
+    const rows = Array.from(document.querySelectorAll("#nf-preview-body tr"));
+    return rows.map((row, index) => {
+      atualizarItemNotaFiscal(index);
+      const item = NOTA_FISCAL_ITENS[index];
+      if (!item || !row.querySelector(".nf-row-enabled")?.checked) return null;
+      const name = row.querySelector(".nf-item-name")?.value.trim() || item.item_name;
+      return {
+        item_name: name,
+        quantity: item.quantity,
+        unit_cost: item.unit_cost,
+        total_value: item.total_value,
+        unit_type: item.unit_type,
+        category: document.getElementById("nf-cat")?.value || "Insumos",
+        entry_date: document.getElementById("nf-data")?.value || null
+      };
+    }).filter(Boolean);
+  }
+
+  async function registrarItensNotaFiscal() {
+    const supplierId = document.getElementById("nf-fornecedor")?.value || "";
+    if (!supplierId) return alert("Selecione o fornecedor da nota.");
+    const entries = coletarItensNotaFiscalParaSalvar();
+    if (!entries.length) return alert("Selecione pelo menos um item da nota.");
+
+    try {
+      const res = await fetch(API + "/stock/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ supplier_id: supplierId, entries })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao registrar itens da nota.");
+      alert((data.count || entries.length) + " item(ns) da nota registrados em compras.");
+      limparNotaFiscalImportada();
+      await carregarCompras();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao registrar nota fiscal.");
+    }
+  }
+
+  function limparNotaFiscalImportada(clearFile = true) {
+    NOTA_FISCAL_ITENS = [];
+    NOTA_FISCAL_META = null;
+    if (clearFile && document.getElementById("nf-xml")) document.getElementById("nf-xml").value = "";
+    const meta = document.getElementById("nf-meta");
+    if (meta) {
+      meta.style.display = "none";
+      meta.innerHTML = "";
+    }
+    renderNotaFiscalPreview();
+  }
+
   async function salvarCompra() {
     const supplierId = document.getElementById("e-fornecedor").value;
     if (!supplierId) return alert("Selecione um fornecedor cadastrado!");
 
+    atualizarValorCompraManual();
     const body = {
       supplier_id: supplierId,
       item_name: document.getElementById("e-item").value.trim(),
       quantity: document.getElementById("e-qtd").value,
+      unit_cost: document.getElementById("e-unit-cost").value,
       total_value: document.getElementById("e-valor").value,
-      category: document.getElementById("e-cat").value
+      unit_type: document.getElementById("e-unidade").value,
+      category: document.getElementById("e-cat").value,
+      entry_date: document.getElementById("e-data").value || null
     };
 
-    if (!body.item_name || !body.total_value) return alert("Preencha os campos!");
+    if (!body.item_name || !body.quantity || !body.unit_cost || !body.total_value) return alert("Preencha item, quantidade e valor por unidade.");
 
     try {
       const res = await fetch(API + "/stock", {
@@ -3001,7 +3343,9 @@
         alert("Compra registrada!");
         document.getElementById("e-item").value = "";
         document.getElementById("e-qtd").value = "";
+        document.getElementById("e-unit-cost").value = "";
         document.getElementById("e-valor").value = "";
+        document.getElementById("e-data").value = "";
         document.getElementById("e-fornecedor").value = "";
 
         await carregarCompras();
@@ -3103,12 +3447,15 @@
   tbody.innerHTML = entries.map(e => {
     const dataFmt = e.entry_date ? new Date(e.entry_date).toLocaleString("pt-BR") : "—";
     const fornecedor = e.suppliers?.name || "—";
-    const qtd = (e.quantity ?? "—");
+    const unitType = normalizeUnitInput(e.unit_type || "", "");
+    const qtd = (e.quantity === null || typeof e.quantity === "undefined")
+      ? "—"
+      : formatQty(e.quantity, unitType);
     const valor = fmt(Number(e.total_value || 0));
 
     const unit = (e.unit_cost === null || typeof e.unit_cost === "undefined")
       ? "—"
-      : fmt(Number(e.unit_cost || 0));
+      : fmt(Number(e.unit_cost || 0)) + (unitType ? ` / ${escapeHtml(unitType)}` : "");
 
     return `
       <tr>
