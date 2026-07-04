@@ -1274,14 +1274,14 @@
     <div class="admin-card" style="margin-top: 20px;">
       <div class="section-toolbar">
         <div>
-          <h3>Importar nota fiscal por XML</h3>
-          <p class="muted">Envie o XML da NF-e/NFC-e, confira os itens lidos e registre tudo em compras com quantidade, unidade, custo unitário e total.</p>
+          <h3>Importar nota fiscal por XML ou PDF</h3>
+          <p class="muted">Envie o XML oficial ou o PDF/DANFE extraído do site do governo. Confira os itens lidos antes de registrar as compras.</p>
         </div>
       </div>
       <div class="filters-grid">
         <div>
-          <label>Arquivo XML</label>
-          <input id="nf-xml" type="file" accept=".xml,text/xml,application/xml" onchange="lerXmlNotaFiscal(event)">
+          <label>Arquivo XML ou PDF</label>
+          <input id="nf-xml" type="file" accept=".xml,.pdf,text/xml,application/xml,application/pdf" onchange="lerArquivoNotaFiscal(event)">
         </div>
         <div>
           <label>Fornecedor</label>
@@ -1314,7 +1314,7 @@
             </tr>
           </thead>
           <tbody id="nf-preview-body">
-            <tr><td colspan="6">Nenhum XML carregado.</td></tr>
+            <tr><td colspan="6">Nenhum arquivo carregado.</td></tr>
           </tbody>
         </table>
       </div>
@@ -2375,6 +2375,9 @@
 <script>
   const BACKEND_URL = "https://tanamao-backend.onrender.com";
   const API = BACKEND_URL + "/api";
+  const PDFJS_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+  const PDFJS_WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  let PDFJS_LOADING_PROMISE = null;
 
   let pedidos = [];
   let agendaFiltro = "all";
@@ -3149,7 +3152,7 @@
     return null;
   }
 
-  function parseInvoiceItems(xmlTextValue) {
+  function parseXmlInvoiceItems(xmlTextValue) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlTextValue, "application/xml");
     if (xmlDoc.getElementsByTagName("parsererror").length) {
@@ -3186,7 +3189,7 @@
     if (!NOTA_FISCAL_ITENS.length) {
       wrap.style.display = "none";
       saveBtn.disabled = true;
-      tbody.innerHTML = '<tr><td colspan="6">Nenhum XML carregado.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6">Nenhum arquivo carregado.</td></tr>';
       return;
     }
 
@@ -3224,38 +3227,270 @@
     if (totalEl) totalEl.value = item.total_value.toFixed(2);
   }
 
-  async function lerXmlNotaFiscal(event) {
+  function setupPdfJsWorker() {
+    if (window.pdfjsLib?.GlobalWorkerOptions) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    }
+  }
+
+  function carregarPdfJs() {
+    if (window.pdfjsLib) {
+      setupPdfJsWorker();
+      return Promise.resolve(window.pdfjsLib);
+    }
+    if (PDFJS_LOADING_PROMISE) return PDFJS_LOADING_PROMISE;
+    PDFJS_LOADING_PROMISE = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = PDFJS_URL;
+      script.onload = () => {
+        setupPdfJsWorker();
+        if (window.pdfjsLib) resolve(window.pdfjsLib);
+        else reject(new Error("Leitor de PDF nao foi carregado."));
+      };
+      script.onerror = () => reject(new Error("Nao foi possivel carregar o leitor de PDF."));
+      document.head.appendChild(script);
+    });
+    return PDFJS_LOADING_PROMISE;
+  }
+
+  function groupPdfTextLines(textItems) {
+    const rows = [];
+    textItems.forEach(item => {
+      const text = String(item.str || "").trim();
+      if (!text) return;
+      const x = Number(item.transform?.[4] || 0);
+      const y = Number(item.transform?.[5] || 0);
+      let row = rows.find(entry => Math.abs(entry.y - y) <= 2.5);
+      if (!row) {
+        row = { y, items: [] };
+        rows.push(row);
+      }
+      row.items.push({ x, text });
+    });
+    return rows
+      .sort((a, b) => b.y - a.y)
+      .map(row => row.items.sort((a, b) => a.x - b.x).map(item => item.text).join(" ").replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+  }
+
+  async function extrairTextoPdf(file) {
+    const pdfjs = await carregarPdfJs();
+    const data = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjs.getDocument({ data }).promise;
+    const lines = [];
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+      lines.push(...groupPdfTextLines(content.items || []));
+    }
+    return lines.join("\n");
+  }
+
+  function parseDateToInput(value) {
+    const match = String(value || "").match(/(\d{2})[\/]([0-1]?\d)[\/](\d{4})/);
+    if (!match) return "";
+    return match[3] + "-" + String(match[2]).padStart(2, "0") + "-" + String(match[1]).padStart(2, "0");
+  }
+
+  function parsePdfMoney(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return 0;
+    const normalized = raw.includes(",")
+      ? raw.replace(/\./g, "").replace(",", ".")
+      : raw;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function looksLikePdfNumber(value) {
+    return /^\d{1,6}(?:[.,]\d{1,4})?$/.test(String(value || "").trim());
+  }
+
+  function stripLeadingItemCode(tokens) {
+    const cleaned = [...tokens];
+    while (cleaned.length > 1 && /^(?:\d{1,6}|\d{8,14}|\d{3,}\w*)$/.test(cleaned[0])) {
+      cleaned.shift();
+    }
+    return cleaned;
+  }
+
+  function parsePdfItemLine(line) {
+    const clean = String(line || "").replace(/R\$/g, "").replace(/\s+/g, " ").trim();
+    if (!clean || /^(total|subtotal|valor total|desconto|acrescimo|forma de pagamento|tributos)/i.test(clean)) return null;
+    if (/descri[cç][aã]o|qtd|quantidade|vl\.?\s*unit|valor\s*unit/i.test(clean)) return null;
+
+    const tokens = clean.split(" ").filter(Boolean);
+    if (tokens.length < 5) return null;
+    const units = new Set(["kg", "g", "l", "lt", "ml", "un", "und", "unid", "pc", "pct", "pcte", "cx"]);
+
+    for (let unitIndex = tokens.length - 3; unitIndex >= 1; unitIndex--) {
+      const unitToken = String(tokens[unitIndex] || "").toLowerCase().replace(/[.:]/g, "");
+      if (!units.has(unitToken)) continue;
+
+      let quantityIndex = unitIndex - 1;
+      let quantity = parsePdfMoney(tokens[quantityIndex]);
+      let nameEnd = quantityIndex;
+
+      if (!quantity && looksLikePdfNumber(tokens[unitIndex + 1])) {
+        quantityIndex = unitIndex + 1;
+        quantity = parsePdfMoney(tokens[quantityIndex]);
+        nameEnd = unitIndex;
+      }
+
+      const numbersAfter = tokens.slice(unitIndex + 1).filter(looksLikePdfNumber).map(parsePdfMoney);
+      if (!quantity || numbersAfter.length < 2) continue;
+
+      const totalValue = numbersAfter[numbersAfter.length - 1];
+      const unitCost = numbersAfter[numbersAfter.length - 2];
+      if (!totalValue && !unitCost) continue;
+
+      const name = stripLeadingItemCode(tokens.slice(0, nameEnd)).join(" ").trim();
+      if (!name || name.length < 2) continue;
+
+      return {
+        enabled: true,
+        item_name: name,
+        unit_type: normalizeInvoiceUnit(unitToken),
+        quantity,
+        unit_cost: unitCost,
+        total_value: Number((totalValue || quantity * unitCost).toFixed(2))
+      };
+    }
+
+    const pattern = clean.match(/^(.+?)\s+(\d+[,.]?\d*)\s*(kg|g|l|lt|ml|un|und|unid|pc|pct|pcte|cx)\s+(\d+[,.]?\d{0,4})\s+(\d+[,.]?\d{0,2})$/i);
+    if (pattern) {
+      const quantity = parsePdfMoney(pattern[2]);
+      const unitCost = parsePdfMoney(pattern[4]);
+      const totalValue = parsePdfMoney(pattern[5]) || quantity * unitCost;
+      const name = stripLeadingItemCode(pattern[1].split(" ")).join(" ").trim();
+      if (name && quantity > 0) {
+        return {
+          enabled: true,
+          item_name: name,
+          unit_type: normalizeInvoiceUnit(pattern[3]),
+          quantity,
+          unit_cost: unitCost,
+          total_value: Number(totalValue.toFixed(2))
+        };
+      }
+    }
+
+    return null;
+  }
+
+  function getPdfInvoiceMeta(text) {
+    const lines = String(text || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const cnpjMatch = text.match(/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}/);
+    const numberMatch =
+      text.match(/(?:N[ºo°]\s*|Numero\s*|Número\s*)(\d{3,})/i) ||
+      text.match(/(?:NF-e|NFC-e)\s*(?:n[ºo°]?\s*)?(\d{3,})/i);
+    const dateMatch = text.match(/\d{2}\/\d{2}\/\d{4}/);
+    const supplierLine = lines.find(line =>
+      line.length > 4 &&
+      !/danfe|documento auxiliar|nota fiscal|consumidor|chave de acesso|consulta|protocolo|cnpj|cpf/i.test(line) &&
+      !/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}/.test(line)
+    );
+
+    return {
+      key: "",
+      number: numberMatch?.[1] || "",
+      series: "",
+      date: dateMatch ? parseDateToInput(dateMatch[0]) : "",
+      supplierName: supplierLine || "",
+      supplierDocument: cnpjMatch?.[0] || ""
+    };
+  }
+
+  function parsePdfInvoiceText(text) {
+    const lines = String(text || "")
+      .replace(/\u00a0/g, " ")
+      .split(/\r?\n/)
+      .map(line => line.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+
+    const items = [];
+    let pendingDescription = "";
+    lines.forEach(line => {
+      const item = parsePdfItemLine(line);
+      if (item) {
+        if ((!item.item_name || item.item_name.length < 4) && pendingDescription) {
+          item.item_name = pendingDescription;
+        }
+        items.push(item);
+        pendingDescription = "";
+        return;
+      }
+
+      if (
+        line.length >= 5 &&
+        line.length <= 90 &&
+        !looksLikePdfNumber(line) &&
+        !/danfe|documento auxiliar|nota fiscal|consumidor|chave de acesso|consulta|protocolo|total|valor|qtd|descri[cç][aã]o/i.test(line)
+      ) {
+        pendingDescription = line;
+      }
+    });
+
+    const deduped = [];
+    const seen = new Set();
+    items.forEach(item => {
+      const key = normalizeXmlText(item.item_name) + "|" + item.quantity + "|" + item.total_value;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(item);
+      }
+    });
+
+    if (!deduped.length) {
+      throw new Error("Nao encontrei itens no PDF. Confirme se o arquivo e um DANFE/PDF com texto, nao uma imagem escaneada.");
+    }
+
+    return { meta: getPdfInvoiceMeta(text), items: deduped };
+  }
+
+  function aplicarNotaFiscalImportada(parsed, sourceLabel) {
+    NOTA_FISCAL_META = parsed.meta || {};
+    NOTA_FISCAL_ITENS = parsed.items || [];
+
+    const metaEl = document.getElementById("nf-meta");
+    if (metaEl) {
+      const parts = [sourceLabel || "Arquivo lido"];
+      if (NOTA_FISCAL_META.number) parts.push("NF " + escapeHtml(NOTA_FISCAL_META.number));
+      if (NOTA_FISCAL_META.series) parts.push("série " + escapeHtml(NOTA_FISCAL_META.series));
+      if (NOTA_FISCAL_META.supplierName) parts.push("Fornecedor: " + escapeHtml(NOTA_FISCAL_META.supplierName));
+      if (NOTA_FISCAL_META.supplierDocument) parts.push("Documento: " + escapeHtml(NOTA_FISCAL_META.supplierDocument));
+      metaEl.innerHTML = parts.join(" · ") || "Arquivo lido com sucesso.";
+      metaEl.style.display = "";
+    }
+
+    const dateEl = document.getElementById("nf-data");
+    if (dateEl && NOTA_FISCAL_META.date) dateEl.value = NOTA_FISCAL_META.date;
+    const supplier = findSupplierForInvoice(NOTA_FISCAL_META);
+    const supplierEl = document.getElementById("nf-fornecedor");
+    if (supplierEl && supplier) supplierEl.value = supplier.id;
+
+    renderNotaFiscalPreview();
+  }
+
+  async function lerArquivoNotaFiscal(event) {
     const file = event.target?.files?.[0];
     if (!file) return;
     try {
-      const text = await file.text();
-      const parsed = parseInvoiceItems(text);
-      NOTA_FISCAL_META = parsed.meta;
-      NOTA_FISCAL_ITENS = parsed.items;
-
-      const metaEl = document.getElementById("nf-meta");
-      if (metaEl) {
-        const parts = [];
-        if (NOTA_FISCAL_META.number) parts.push("NF " + escapeHtml(NOTA_FISCAL_META.number));
-        if (NOTA_FISCAL_META.series) parts.push("série " + escapeHtml(NOTA_FISCAL_META.series));
-        if (NOTA_FISCAL_META.supplierName) parts.push("Fornecedor: " + escapeHtml(NOTA_FISCAL_META.supplierName));
-        if (NOTA_FISCAL_META.supplierDocument) parts.push("Documento: " + escapeHtml(NOTA_FISCAL_META.supplierDocument));
-        metaEl.innerHTML = parts.join(" · ") || "XML lido com sucesso.";
-        metaEl.style.display = "";
-      }
-
-      const dateEl = document.getElementById("nf-data");
-      if (dateEl && NOTA_FISCAL_META.date) dateEl.value = NOTA_FISCAL_META.date;
-      const supplier = findSupplierForInvoice(NOTA_FISCAL_META);
-      const supplierEl = document.getElementById("nf-fornecedor");
-      if (supplierEl && supplier) supplierEl.value = supplier.id;
-
-      renderNotaFiscalPreview();
+      const name = String(file.name || "").toLowerCase();
+      const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
+      const parsed = isPdf
+        ? parsePdfInvoiceText(await extrairTextoPdf(file))
+        : parseXmlInvoiceItems(await file.text());
+      aplicarNotaFiscalImportada(parsed, isPdf ? "PDF lido" : "XML lido");
     } catch (e) {
       console.error(e);
-      alert(e.message || "Erro ao ler XML da nota fiscal.");
+      alert(e.message || "Erro ao ler arquivo da nota fiscal.");
       limparNotaFiscalImportada(false);
     }
+  }
+
+  async function lerXmlNotaFiscal(event) {
+    return lerArquivoNotaFiscal(event);
   }
 
   function coletarItensNotaFiscalParaSalvar() {
