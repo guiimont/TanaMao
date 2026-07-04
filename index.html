@@ -874,6 +874,66 @@
       line-height: 1.4;
     }
 
+    .policy-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fbf8ef 100%);
+      border: 1px solid rgba(60,110,71,0.14);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .policy-card h3 {
+      color: var(--verde-escuro);
+      font-size: 1.08rem;
+      line-height: 1.28;
+      margin-bottom: 8px;
+    }
+
+    .policy-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+
+    .policy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .policy-item {
+      border: 1px solid var(--borda);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .policy-item strong {
+      display: block;
+      color: var(--verde-escuro);
+      font-size: 0.88rem;
+      margin-bottom: 5px;
+    }
+
+    .policy-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .policy-note {
+      margin-top: 12px;
+      color: #7b5a21;
+      background: rgba(201,168,106,0.12);
+      border: 1px solid rgba(201,168,106,0.24);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
     #resumo-lista {
       display: flex;
       flex-direction: column;
@@ -1244,7 +1304,8 @@
         width: 100%;
       }
 
-      .pagamentos {
+      .pagamentos,
+      .policy-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1404,24 +1465,25 @@
     </div>
 
     <div class="section">
-      <span class="section-title" data-content="paymentTitle">Forma de Pagamento</span>
-      <div class="pagamentos">
-        <div class="pag-item" id="pag-pix" onclick="selecionarPag('pix')">
-          <strong>Pix</strong>
-          <span>Pagamento instantâneo pelo Mercado Pago.</span>
+      <span class="section-title">Política comercial</span>
+      <div class="policy-card">
+        <h3>Quanto mais você organiza a semana, maior é o desconto</h3>
+        <p>O benefício é aplicado no total do carrinho. Você ganha desconto por volume de itens e um bônus quando monta uma seleção mais variada para a rotina.</p>
+        <div class="policy-grid">
+          <div class="policy-item">
+            <strong>Desconto por volume</strong>
+            <span>3 itens: 3% · 5 itens: 6% · 8 itens: 9% · 12 itens: 12%.</span>
+          </div>
+          <div class="policy-item">
+            <strong>Bônus por variedade</strong>
+            <span>3 produtos diferentes: +1%. 5 produtos diferentes: +2%.</span>
+          </div>
+          <div class="policy-item">
+            <strong>Limite saudável</strong>
+            <span>O desconto máximo é de 15%, preservando qualidade, frescor e produção sob encomenda.</span>
+          </div>
         </div>
-        <div class="pag-item" id="pag-debito" onclick="selecionarPag('debito')">
-          <strong>Débito</strong>
-          <span>Finalize com cartão de débito.</span>
-        </div>
-        <div class="pag-item" id="pag-credito" onclick="selecionarPag('credito')">
-          <strong>Crédito</strong>
-          <span>Pague com cartão de crédito sem desconto.</span>
-        </div>
-        <div class="pag-item" id="pag-vale" onclick="selecionarPag('vale')">
-          <strong>Vale Alimentação</strong>
-          <span>Use seu benefício para concluir o pedido.</span>
-        </div>
+        <div class="policy-note">O pagamento é finalizado com segurança pelo Mercado Pago, onde você escolhe Pix, cartão ou outros meios disponíveis no checkout.</div>
       </div>
     </div>
 
@@ -1529,6 +1591,7 @@
       maxRate: 0.15
     };
     const STORAGE_PAYMENT = "tanamao_payment_v1";
+    const CHECKOUT_PAYMENT_METHOD = "mercadopago";
     const STORAGE_CLIENT = "tanamao_cliente";
     const STORAGE_CHECKOUT_LOCK = "tanamao_checkout_lock_v1";
 
@@ -1648,7 +1711,7 @@
     let RECEITAS = [];
     let qtds = {};
     let menuCategoriaAtual = "doce";
-    let pagSel = null;
+    let pagSel = CHECKOUT_PAYMENT_METHOD;
     let clienteAtual = null;
     let isSubmittingCheckout = false;
 
@@ -1775,11 +1838,11 @@
     }
 
     function salvarPagamento() {
-      if (pagSel) localStorage.setItem(STORAGE_PAYMENT, pagSel);
+      localStorage.removeItem(STORAGE_PAYMENT);
     }
 
     function carregarPagamento() {
-      return localStorage.getItem(STORAGE_PAYMENT);
+      return CHECKOUT_PAYMENT_METHOD;
     }
 
     function salvarCliente(cliente) {
@@ -1987,12 +2050,7 @@
       if (cachedProducts && cachedProducts.length > 0) {
         aplicarProdutosCarregados(cachedProducts);
         
-        const pagamentoSalvo = carregarPagamento();
-        if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
-          selecionarPag(pagamentoSalvo, false);
-        } else {
-          atualizarResumo();
-        }
+        atualizarResumo();
       }
 
       // 2. Faz a requisição em background para atualizar os dados
@@ -2011,12 +2069,7 @@
         // Atualiza a interface com os dados frescos
         aplicarProdutosCarregados(fetchedProds);
 
-        const pagamentoSalvo = carregarPagamento();
-        if (pagamentoSalvo && ["pix", "debito", "credito", "vale"].includes(pagamentoSalvo)) {
-          selecionarPag(pagamentoSalvo, false);
-        } else {
-          atualizarResumo();
-        }
+        atualizarResumo();
       } catch (e) {
         console.error("ERRO AO CARREGAR PRODUTOS DA API:", e);
         // Só mostra erro se o cache também estiver vazio
@@ -2244,12 +2297,8 @@
       atualizarResumo();
     }
 
-    function selecionarPag(tipo, persist = true) {
-      pagSel = tipo;
-      document.querySelectorAll(".pag-item").forEach(el => el.classList.remove("ativo"));
-      const item = document.getElementById("pag-" + tipo);
-      if (item) item.classList.add("ativo");
-      if (persist) salvarPagamento();
+    function selecionarPag() {
+      pagSel = CHECKOUT_PAYMENT_METHOD;
       atualizarResumo();
     }
 
@@ -2351,19 +2400,7 @@
         return;
       }
 
-      if (!pagSel) {
-        alert("Escolha a forma de pagamento.");
-        return;
-      }
-
       const { sub, descRate, discount, total, quantityRate, diversityRate } = calcTotal();
-
-      const nomesPag = {
-        pix: "Pix",
-        debito: "Débito",
-        credito: "Crédito",
-        vale: "Vale Alimentação"
-      };
 
       let r = ativos.map(p =>
         `• ${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}`
@@ -2378,7 +2415,8 @@
         r += `<br><span style="color:#777;">${parts.join(" · ")}</span>`;
       }
 
-      r += `<br><strong>Pagamento: ${nomesPag[pagSel]}</strong>`;
+      r += `<br><strong>Pagamento: Mercado Pago</strong>`;
+      r += `<br><span style="color:#777;">Você escolhe Pix, cartão ou outro meio disponível na próxima etapa.</span>`;
 
       document.getElementById("m-resumo").innerHTML = r;
       document.getElementById("m-total").textContent = "Total: " + fmt(total);
@@ -2490,10 +2528,7 @@
     return;
   }
   
-  if (!pagSel) {
-    mostrarErro("Escolha a forma de pagamento.");
-    return;
-  }
+  pagSel = CHECKOUT_PAYMENT_METHOD;
 
   // 2. PERSISTÊNCIA DO CARRINHO
   localStorage.setItem("tanamao_carrinho_pendente", JSON.stringify(qtds));
@@ -2503,7 +2538,7 @@
       id: p.id,
       quantity: qtds[p.id]
     })),
-    paymentMethod: pagSel,
+    paymentMethod: CHECKOUT_PAYMENT_METHOD,
     customer: {
       nome: cliente.nome,
       telefone: cliente.tel || "",
