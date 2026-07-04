@@ -1419,27 +1419,34 @@
           <div class="dropdown-menu">
             <button class="btn-secondary" type="button" onclick="novoProduto()">Novo produto</button>
             <button class="btn-secondary" type="button" onclick="carregarProdutosAdmin()">Atualizar produtos</button>
-            <button class="btn-secondary" type="button" onclick="preencherTabelaProducao()">Carregar produção do dia</button>
+            <button class="btn-secondary" type="button" onclick="preencherTabelaProducao()">Planejar produção e compras</button>
           </div>
         </details>
       </div>
 
-      <div class="admin-card" style="margin-bottom:20px;">
-  <h3>Produção do dia (lote)</h3>
+      <div class="admin-card production-planning-card" style="margin-bottom:20px;">
+  <div class="section-toolbar">
+    <div>
+      <span class="eyebrow">Compras internas</span>
+      <h3>Planejamento de produção e lista de compras</h3>
+    </div>
+  </div>
 
-  <div class="muted" style="margin-bottom:10px;">
-    Preencha as quantidades produzidas e clique em “Salvar lote”. (Somente qty > 0 será lançado.)
+  <div class="rule-note" style="margin-bottom:10px;">
+    Como usar: carregue os produtos, preencha quanto pretende produzir e clique em “Gerar lista de compras”. O sistema soma os insumos da ficha técnica e converte medidas como g para kg automaticamente.
   </div>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:10px;">
-    <input id="prod-note" placeholder="Observação (opcional, ex: Lote manhã)" style="max-width:420px;">
-    <button class="btn-secondary" onclick="preencherTabelaProducao()">Carregar produtos</button>
-    <button class="btn-secondary" onclick="gerarListaComprasProducao(false)">Gerar lista de compras</button>
-    <button class="btn-secondary" onclick="gerarListaComprasProducao(true)">Salvar lista</button>
-    <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="salvarProducaoLote()">Salvar lote</button>
+    <input id="prod-note" placeholder="Nome do planejamento (ex: Produção segunda manhã)" style="max-width:420px;">
+    <button class="btn-secondary" onclick="preencherTabelaProducao()">1. Carregar produtos</button>
+    <button class="btn-secondary" onclick="gerarListaComprasProducao(false)">2. Gerar lista de compras</button>
+    <button class="btn-secondary" onclick="gerarListaComprasProducao(true)">Salvar lista gerada</button>
+    <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="salvarProducaoLote()">Salvar produção no estoque</button>
   </div>
 
-  <div id="shopping-list-result" class="shopping-summary"></div>
+  <div id="shopping-list-result" class="shopping-summary">
+    <div class="muted">A lista de compras aparecerá aqui depois que você preencher as quantidades de produção.</div>
+  </div>
 
   <div class="table-wrap">
     <table style="min-width: 980px;">
@@ -1452,7 +1459,7 @@
         </tr>
       </thead>
       <tbody id="tbody-producao">
-        <tr><td colspan="4">Clique em “Carregar produtos”.</td></tr>
+        <tr><td colspan="4">Clique em “1. Carregar produtos” para planejar produção e compras.</td></tr>
       </tbody>
     </table>
   </div>
@@ -4130,7 +4137,7 @@
   async function gerarListaComprasProducao(save = false) {
     const items = coletarItensPlanejamentoProducao();
     const result = getEl("shopping-list-result");
-    if (!items.length) return alert("Preencha quantidades de produção maiores que zero.");
+    if (!items.length) return alert("Preencha a quantidade que pretende produzir em pelo menos um produto.");
     if (result) result.innerHTML = '<div class="muted">Gerando lista de compras...</div>';
 
     try {

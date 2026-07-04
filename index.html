@@ -1407,12 +1407,12 @@
       <span class="section-title" data-content="paymentTitle">Forma de Pagamento</span>
       <div class="pagamentos">
         <div class="pag-item" id="pag-pix" onclick="selecionarPag('pix')">
-          <strong>Pix (10% OFF)</strong>
-          <span>Pagamento instantâneo com desconto automático.</span>
+          <strong>Pix</strong>
+          <span>Pagamento instantâneo pelo Mercado Pago.</span>
         </div>
         <div class="pag-item" id="pag-debito" onclick="selecionarPag('debito')">
-          <strong>Débito (10% OFF)</strong>
-          <span>Finalize com desconto direto no total.</span>
+          <strong>Débito</strong>
+          <span>Finalize com cartão de débito.</span>
         </div>
         <div class="pag-item" id="pag-credito" onclick="selecionarPag('credito')">
           <strong>Crédito</strong>
@@ -1515,6 +1515,19 @@
   <script>
     const BACKEND_URL = "https://tanamao-backend.onrender.com";
     const STORAGE_CART = "tanamao_cart_v1";
+    const CART_DISCOUNT_RULES = {
+      quantityTiers: [
+        { min: 3, rate: 0.03 },
+        { min: 5, rate: 0.06 },
+        { min: 8, rate: 0.09 },
+        { min: 12, rate: 0.12 }
+      ],
+      diversityTiers: [
+        { min: 3, rate: 0.01 },
+        { min: 5, rate: 0.02 }
+      ],
+      maxRate: 0.15
+    };
     const STORAGE_PAYMENT = "tanamao_payment_v1";
     const STORAGE_CLIENT = "tanamao_cliente";
     const STORAGE_CHECKOUT_LOCK = "tanamao_checkout_lock_v1";
@@ -2240,17 +2253,52 @@
       atualizarResumo();
     }
 
-    function calcTotal() {
-      let sub = 0;
-      PRODS.forEach(p => {
-        sub += (qtds[p.id] || 0) * Number(p.price || 0);
-      });
+    function getTierRate(count, tiers) {
+      return tiers.reduce((rate, tier) => count >= tier.min ? tier.rate : rate, 0);
+    }
 
-      const descRate = (pagSel === "pix" || pagSel === "debito") ? 0.1 : 0;
+    function formatPercent(rate) {
+      return Math.round(Number(rate || 0) * 100) + "%";
+    }
+
+    function getNextDiscountHint(totalItems, uniqueItems) {
+      const nextQuantity = CART_DISCOUNT_RULES.quantityTiers.find(tier => totalItems < tier.min);
+      if (nextQuantity) {
+        const missing = nextQuantity.min - totalItems;
+        return `Adicione mais ${missing} item(ns) para liberar ${formatPercent(nextQuantity.rate)} de desconto.`;
+      }
+      const nextDiversity = CART_DISCOUNT_RULES.diversityTiers.find(tier => uniqueItems < tier.min);
+      if (nextDiversity) {
+        const missing = nextDiversity.min - uniqueItems;
+        return `Varie mais ${missing} produto(s) para ganhar bônus de diversidade.`;
+      }
+      return "Você já está na melhor faixa de desconto deste carrinho.";
+    }
+
+    function calcTotal() {
+      const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+      const sub = Number(ativos.reduce((acc, p) => acc + (qtds[p.id] || 0) * Number(p.price || 0), 0).toFixed(2));
+      const totalItems = ativos.reduce((acc, p) => acc + Number(qtds[p.id] || 0), 0);
+      const uniqueItems = ativos.length;
+      const quantityRate = getTierRate(totalItems, CART_DISCOUNT_RULES.quantityTiers);
+      const diversityRate = getTierRate(uniqueItems, CART_DISCOUNT_RULES.diversityTiers);
+      const rawRate = quantityRate + diversityRate;
+      const descRate = Math.min(rawRate, CART_DISCOUNT_RULES.maxRate);
       const discount = Number((sub * descRate).toFixed(2));
       const total = Number((sub - discount).toFixed(2));
 
-      return { sub, descRate, discount, total };
+      return {
+        sub,
+        descRate,
+        discount,
+        total,
+        totalItems,
+        uniqueItems,
+        quantityRate,
+        diversityRate,
+        discountHint: getNextDiscountHint(totalItems, uniqueItems),
+        capped: rawRate > descRate
+      };
     }
 
     function atualizarResumo() {
@@ -2264,15 +2312,21 @@
         return;
       }
 
-      const { sub, descRate, discount, total } = calcTotal();
+      const { sub, descRate, discount, total, quantityRate, diversityRate, discountHint } = calcTotal();
 
       let html = ativos.map(p =>
         `<div>${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}</div>`
       ).join("");
 
+      html += `<div style="color:#888;font-size:.88em;margin-top:4px;">Subtotal: ${fmt(sub)}</div>`;
       if (descRate > 0) {
-        html += `<div style="color:#888;font-size:.88em;margin-top:4px;">Subtotal: ${fmt(sub)}</div>`;
-        html += `<div style="color:var(--verde);font-size:.9em;font-weight:800;">Desconto (10%): − ${fmt(discount)}</div>`;
+        const parts = [];
+        if (quantityRate > 0) parts.push(`volume ${formatPercent(quantityRate)}`);
+        if (diversityRate > 0) parts.push(`diversidade +${formatPercent(diversityRate)}`);
+        html += `<div style="color:var(--verde);font-size:.9em;font-weight:800;">Desconto progressivo (${formatPercent(descRate)}): − ${fmt(discount)}</div>`;
+        html += `<div style="color:#777;font-size:.82em;">${parts.join(" · ")}</div>`;
+      } else {
+        html += `<div style="color:#777;font-size:.82em;">${discountHint}</div>`;
       }
 
       rl.innerHTML = html;
@@ -2302,11 +2356,11 @@
         return;
       }
 
-      const { descRate, discount, total } = calcTotal();
+      const { sub, descRate, discount, total, quantityRate, diversityRate } = calcTotal();
 
       const nomesPag = {
-        pix: "Pix (10% OFF)",
-        debito: "Débito (10% OFF)",
+        pix: "Pix",
+        debito: "Débito",
         credito: "Crédito",
         vale: "Vale Alimentação"
       };
@@ -2315,8 +2369,13 @@
         `• ${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}`
       ).join("<br>");
 
+      r += `<br><span style="color:#777;">Subtotal: ${fmt(sub)}</span>`;
       if (descRate > 0) {
-        r += `<br><span style="color:var(--verde);font-weight:800;">Desconto: − ${fmt(discount)}</span>`;
+        const parts = [];
+        if (quantityRate > 0) parts.push(`volume ${formatPercent(quantityRate)}`);
+        if (diversityRate > 0) parts.push(`diversidade +${formatPercent(diversityRate)}`);
+        r += `<br><span style="color:var(--verde);font-weight:800;">Desconto progressivo (${formatPercent(descRate)}): − ${fmt(discount)}</span>`;
+        r += `<br><span style="color:#777;">${parts.join(" · ")}</span>`;
       }
 
       r += `<br><strong>Pagamento: ${nomesPag[pagSel]}</strong>`;
