@@ -1582,7 +1582,6 @@
               <option value="salgado">Salgado pronto</option>
               <option value="doce">Doce pronto</option>
               <option value="lanche">Lanche</option>
-              <option value="kit-semanal">Kit semanal / combo</option>
               <option value="brinde">Receita simples gratuita</option>
             </select>
           </label>
@@ -2004,6 +2003,59 @@
 
       <div class="form-section">
         <div class="form-section-head">
+          <strong>Política comercial</strong>
+          <span>Textos da área pública que explica descontos e fechamento do pagamento.</span>
+        </div>
+        <div class="form-grid">
+          <label class="field">
+            <span>Título da seção</span>
+            <input id="txt-policyTitle">
+          </label>
+          <label class="field full">
+            <span>Chamada principal</span>
+            <input id="txt-policyHeading">
+          </label>
+          <label class="field full">
+            <span>Texto de abertura</span>
+            <textarea id="txt-policyIntro"></textarea>
+          </label>
+          <label class="field">
+            <span>Botão de detalhes</span>
+            <input id="txt-policyButton">
+          </label>
+          <label class="field">
+            <span>Volume - título</span>
+            <input id="txt-policyVolumeTitle">
+          </label>
+          <label class="field full">
+            <span>Volume - texto</span>
+            <input id="txt-policyVolumeText">
+          </label>
+          <label class="field">
+            <span>Variedade - título</span>
+            <input id="txt-policyDiversityTitle">
+          </label>
+          <label class="field full">
+            <span>Variedade - texto</span>
+            <input id="txt-policyDiversityText">
+          </label>
+          <label class="field">
+            <span>Limite - título</span>
+            <input id="txt-policyLimitTitle">
+          </label>
+          <label class="field full">
+            <span>Limite - texto</span>
+            <input id="txt-policyLimitText">
+          </label>
+          <label class="field full">
+            <span>Nota sobre pagamento</span>
+            <textarea id="txt-policyPaymentNote"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-head">
           <strong>Cardápio público</strong>
           <span>Edite nomes das abas, descrições e textos da área de receitas/conteúdo.</span>
         </div>
@@ -2027,14 +2079,6 @@
           <label class="field">
             <span>Aba salgados - descrição</span>
             <input id="txt-menuSalgadosNote">
-          </label>
-          <label class="field">
-            <span>Aba kits - nome</span>
-            <input id="txt-menuKitsLabel">
-          </label>
-          <label class="field">
-            <span>Aba kits - descrição</span>
-            <input id="txt-menuKitsNote">
           </label>
           <label class="field">
             <span>Aba Faça você mesmo - nome</span>
@@ -2093,10 +2137,6 @@
           <span>Chamadas finais, nomes das seções e mensagens de fechamento.</span>
         </div>
         <div class="form-grid">
-          <label class="field">
-            <span>Título pagamento</span>
-            <input id="txt-paymentTitle">
-          </label>
           <label class="field">
             <span>Título pedido</span>
             <input id="txt-orderTitle">
@@ -2322,7 +2362,17 @@
     weeklyGuideShopping4: "Lanches inteligentes",
     weeklyGuideShopping5: "Temperos e extras",
     weeklyGuideClosing: "O objetivo não é montar uma rotina perfeita. É deixar boas escolhas mais fáceis de repetir.",
-    paymentTitle: "Forma de Pagamento",
+    policyTitle: "Política comercial",
+    policyHeading: "Quanto mais você organiza a semana, maior é o desconto",
+    policyIntro: "O benefício é aplicado no total do carrinho. Você ganha desconto por volume de itens e um bônus quando monta uma seleção mais variada para a rotina.",
+    policyButton: "Ver detalhes",
+    policyVolumeTitle: "Desconto por volume",
+    policyVolumeText: "3 itens: 3% · 5 itens: 6% · 8 itens: 9% · 12 itens: 12%.",
+    policyDiversityTitle: "Bônus por variedade",
+    policyDiversityText: "3 produtos diferentes: +1%. 5 produtos diferentes: +2%.",
+    policyLimitTitle: "Limite saudável",
+    policyLimitText: "O desconto máximo é de 15%, preservando qualidade, frescor e produção sob encomenda.",
+    policyPaymentNote: "O pagamento é finalizado com segurança pelo Mercado Pago, onde você escolhe Pix, cartão ou outros meios disponíveis no checkout.",
     orderTitle: "Seu Pedido",
     ctaTitle: "Resolva sua semana agora",
     ctaText: "Revise seu pedido e finalize com rapidez.",
@@ -2337,8 +2387,6 @@
     menuDocesNote: "Sobremesas e doces prontos para encomenda.",
     menuSalgadosLabel: "Salgados",
     menuSalgadosNote: "Itens salgados para rotina, trabalho e pós-treino.",
-    menuKitsLabel: "Kits",
-    menuKitsNote: "Combos pensados para organizar a alimentação da semana.",
     menuDiyLabel: "Faça você mesmo",
     menuDiyNote: "Receitas saudáveis para fazer em casa. Não entram no carrinho.",
     diyIntroTitle: "Como usar o Faça você mesmo",
