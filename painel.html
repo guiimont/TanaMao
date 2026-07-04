@@ -3358,6 +3358,21 @@
       };
     }
 
+    const rjDetailedPattern = clean.match(/^\d+\s+(.+?)\s+(\d+[,.]\d+)\s+(kg|g|l|lt|ml|un|und|unid|pc|pct|pcte|cx)\s+(\d+[,.]\d{2})$/i);
+    if (rjDetailedPattern) {
+      const quantity = parsePdfMoney(rjDetailedPattern[2]);
+      const totalValue = parsePdfMoney(rjDetailedPattern[4]);
+      const unitCost = quantity > 0 ? totalValue / quantity : 0;
+      return {
+        enabled: true,
+        item_name: normalizePdfProductName(rjDetailedPattern[1].split(" ")),
+        unit_type: normalizeInvoiceUnit(rjDetailedPattern[3]),
+        quantity,
+        unit_cost: Number(unitCost.toFixed(4)),
+        total_value: Number(totalValue.toFixed(2))
+      };
+    }
+
     const tokens = clean.split(" ").filter(Boolean);
     if (tokens.length < 5) return null;
 
