@@ -2056,10 +2056,15 @@
       return details;
     }
 
+    function normalizeOrderedRecipeLine(line, ordered = false) {
+      if (!ordered) return line;
+      return line.replace(/^\s*(?:\d+\s*[.)-]|[•*-])\s*/, "");
+    }
+
     function renderRecipeLines(value, ordered = false) {
       const lines = String(value || "")
         .split(/\r?\n/)
-        .map(line => line.trim())
+        .map(line => normalizeOrderedRecipeLine(line.trim(), ordered))
         .filter(Boolean);
 
       if (!lines.length) {
