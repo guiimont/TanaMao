@@ -3820,6 +3820,7 @@
 }
       
 
+  // Admin cleanup for old stock entries after invoice import validation.
   async function excluirComprasFiltradas() {
     const entries = (COMPRAS_FILTRADAS || []).filter(e => e.id);
     if (!entries.length) return alert("Nenhuma compra filtrada para apagar.");
