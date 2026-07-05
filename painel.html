@@ -3358,6 +3358,7 @@
       };
     }
 
+    // Fazenda/RJ detailed NFC-e exposes line total, so unit cost is total / quantity.
     const rjDetailedPattern = clean.match(/^\d+\s+(.+?)\s+(\d+[,.]\d+)\s+(kg|g|l|lt|ml|un|und|unid|pc|pct|pcte|cx)\s+(\d+[,.]\d{2})$/i);
     if (rjDetailedPattern) {
       const quantity = parsePdfMoney(rjDetailedPattern[2]);
