@@ -2,73 +2,320 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Tá na Mão!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tá na Mão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .login-box { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
-    .login-box h2 { text-align: center; color: #333; margin-bottom: 20px; }
-    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #27ae60; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-    button:disabled { background: #95a5a6; cursor: not-allowed; }
-    .erro { color: #e74c3c; font-size: 14px; text-align: center; display: none; margin-top: 10px; }
+    :root {
+      color-scheme: light;
+      --green: #0f7a4a;
+      --green-dark: #0b5f3a;
+      --gold: #c49a4a;
+      --ink: #1f2933;
+      --muted: #697586;
+      --line: #d9e2dc;
+      --paper: #fffaf1;
+      --surface: #ffffff;
+      --danger: #b42318;
+      --success: #087443;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: "Poppins", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(140deg, rgba(15, 122, 74, 0.12), rgba(196, 154, 74, 0.12)),
+        var(--paper);
+    }
+
+    .login-shell {
+      width: min(100%, 420px);
+      background: var(--surface);
+      border: 1px solid rgba(15, 122, 74, 0.12);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(31, 41, 51, 0.12);
+      overflow: hidden;
+    }
+
+    .brand-panel {
+      background: var(--green);
+      padding: 28px 28px 24px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .brand-panel img {
+      width: 86px;
+      height: 86px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 14px;
+    }
+
+    .brand-panel h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .brand-panel p {
+      margin: 8px 0 0;
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .panel-body { padding: 28px; }
+
+    .form-title {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .form-copy {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      outline: none;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(15, 122, 74, 0.14);
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--green);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+
+    .primary-btn:hover { background: var(--green-dark); }
+    .primary-btn:active { transform: translateY(1px); }
+    .primary-btn:disabled { background: #98a2b3; cursor: wait; transform: none; }
+
+    .link-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .text-btn {
+      border: 0;
+      background: transparent;
+      color: var(--green-dark);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .text-btn:hover { text-decoration: underline; }
+
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 13px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+    }
+
+    .feedback.error {
+      display: block;
+      color: var(--danger);
+      background: #fff1f0;
+      border-color: #fecdca;
+    }
+
+    .feedback.success {
+      display: block;
+      color: var(--success);
+      background: #ecfdf3;
+      border-color: #abefc6;
+    }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <main class="login-shell">
+    <section class="brand-panel">
+      <img src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
+      <h1>Painel Tá na Mão</h1>
+      <p>Gestão interna de vendas, produção e cardápio.</p>
+    </section>
 
+    <section class="panel-body" id="login-panel">
+      <h2 class="form-title">Entrar no sistema</h2>
+      <p class="form-copy">Use seu e-mail cadastrado e sua senha para acessar o painel.</p>
 
-  <div class="login-box">
-    <section class="hero">
-<img
-src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uplo
-ads/5681b1bf-2661-4360-9c01-6141cd6ff531.png"
-alt="Ícone Tá na Mão!"
-style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto
-14px;"
->
-    <h2>Acesso ao Sistema</h2>
-    <form id="loginForm" autocomplete="on">
-      <input type="email" id="email" name="email" placeholder="Seu E-mail" autocomplete="username" autocapitalize="none" spellcheck="false" required>
-      <input type="password" id="senha" name="password" placeholder="Sua Senha" autocomplete="current-password" required>
-      <button type="submit" id="btn-login">Entrar</button>
-      <div id="erroMsg" class="erro"></div>
-    </form>
-  </div>
+      <form id="loginForm" autocomplete="on">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="password" placeholder="Sua senha" autocomplete="current-password" required>
+
+        <button class="primary-btn" type="submit" id="btn-login">Entrar</button>
+        <div id="loginFeedback" class="feedback" role="alert"></div>
+      </form>
+
+      <div class="link-row">
+        <button class="text-btn" type="button" id="show-reset">Esqueci minha senha</button>
+      </div>
+    </section>
+
+    <section class="panel-body hidden" id="reset-panel">
+      <h2 class="form-title">Recuperar senha</h2>
+      <p class="form-copy">Informe o e-mail cadastrado. Se ele existir no painel, enviaremos um link para criar uma nova senha.</p>
+
+      <form id="resetRequestForm" autocomplete="on">
+        <label for="reset-email">E-mail cadastrado</label>
+        <input type="email" id="reset-email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+
+        <button class="primary-btn" type="submit" id="btn-reset">Enviar link de recuperação</button>
+        <div id="resetFeedback" class="feedback" role="alert"></div>
+      </form>
+
+      <div class="link-row">
+        <button class="text-btn" type="button" id="back-login">Voltar para o login</button>
+      </div>
+    </section>
+  </main>
 
   <script>
+    const API = 'https://tanamao-backend.onrender.com/api';
+
+    const loginPanel = document.getElementById('login-panel');
+    const resetPanel = document.getElementById('reset-panel');
+    const loginFeedback = document.getElementById('loginFeedback');
+    const resetFeedback = document.getElementById('resetFeedback');
+    const emailInput = document.getElementById('email');
+    const resetEmailInput = document.getElementById('reset-email');
+
+    function showFeedback(el, message, type) {
+      el.textContent = message;
+      el.className = 'feedback ' + type;
+    }
+
+    function clearFeedback(el) {
+      el.textContent = '';
+      el.className = 'feedback';
+    }
+
+    document.getElementById('show-reset').addEventListener('click', () => {
+      resetEmailInput.value = emailInput.value;
+      clearFeedback(loginFeedback);
+      loginPanel.classList.add('hidden');
+      resetPanel.classList.remove('hidden');
+      resetEmailInput.focus();
+    });
+
+    document.getElementById('back-login').addEventListener('click', () => {
+      clearFeedback(resetFeedback);
+      resetPanel.classList.add('hidden');
+      loginPanel.classList.remove('hidden');
+      emailInput.focus();
+    });
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-login');
-      const erroEl = document.getElementById('erroMsg');
-      
+
       btn.disabled = true;
-      btn.innerText = "Autenticando...";
-      erroEl.style.display = "none";
+      btn.textContent = 'Autenticando...';
+      clearFeedback(loginFeedback);
 
       try {
-        const res = await fetch('https://tanamao-backend.onrender.com/api/auth/login', {
+        const res = await fetch(API + '/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: document.getElementById('email').value,
+            email: emailInput.value,
             password: document.getElementById('senha').value
           })
         });
-        
+
         const data = await res.json();
-        if (data.ok) {
-          localStorage.setItem('tnm_token', data.token);
-          localStorage.setItem('tnm_user', JSON.stringify(data.user));
-          if (data.user?.role) localStorage.setItem('tnm_role', data.user.role);
-          window.location.href = 'painel.html';
-        } else {
-          throw new Error(data.message || "Credenciais inválidas");
-        }
+        if (!data.ok) throw new Error(data.message || 'Credenciais inválidas.');
+
+        localStorage.setItem('tnm_token', data.token);
+        localStorage.setItem('tnm_user', JSON.stringify(data.user));
+        if (data.user && data.user.role) localStorage.setItem('tnm_role', data.user.role);
+        window.location.href = 'painel.html';
       } catch (err) {
-        erroEl.innerText = err.message;
-        erroEl.style.display = "block";
+        showFeedback(loginFeedback, err.message || 'Não foi possível entrar agora.', 'error');
         btn.disabled = false;
-        btn.innerText = "Entrar";
+        btn.textContent = 'Entrar';
+      }
+    });
+
+    document.getElementById('resetRequestForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-reset');
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      clearFeedback(resetFeedback);
+
+      try {
+        const res = await fetch(API + '/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: resetEmailInput.value })
+        });
+
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || 'Não foi possível solicitar a recuperação.');
+
+        showFeedback(resetFeedback, data.message || 'Se o e-mail estiver cadastrado, enviaremos o link.', 'success');
+      } catch (err) {
+        showFeedback(resetFeedback, err.message || 'Não foi possível solicitar a recuperação agora.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar link de recuperação';
       }
     });
   </script>
