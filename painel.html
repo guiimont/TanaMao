@@ -1468,6 +1468,7 @@
       <div class="filters-actions">
         <button class="btn-secondary" onclick="limparFiltrosCompras()">Limpar filtros</button>
         <button class="btn-secondary" onclick="carregarCompras()">Recarregar</button>
+        <button class="btn-danger" onclick="excluirComprasFiltradas()">Apagar compras filtradas</button>
       </div>
 
       <div class="summary-bar">
@@ -2408,6 +2409,7 @@
 
   // ====== ESTADO (Compras) ======
   let COMPRAS_ENTRIES = [];
+  let COMPRAS_FILTRADAS = [];
   let FORNECEDORES = [];
   let PRODUCTION_INGREDIENTS = [];
   let FICHA_TECNICA_ATUAL = [];
@@ -3219,7 +3221,7 @@
     }).join("");
   }
 
-  function atualizarItemNotaFiscal(index) {
+  function atualizarItemNotaFiscal(index, recalculateTotal = true) {
     const item = NOTA_FISCAL_ITENS[index];
     if (!item) return;
     const row = document.querySelector("#nf-preview-body tr:nth-child(" + (index + 1) + ")");
@@ -3229,9 +3231,14 @@
     item.quantity = qty;
     item.unit_cost = Number.isFinite(unitCost) ? unitCost : 0;
     item.unit_type = row.querySelector(".nf-item-unit")?.value || item.unit_type || "un";
-    item.total_value = Number((item.quantity * item.unit_cost).toFixed(2));
     const totalEl = row.querySelector(".nf-item-total");
-    if (totalEl) totalEl.value = item.total_value.toFixed(2);
+    if (recalculateTotal) {
+      item.total_value = Number((item.quantity * item.unit_cost).toFixed(2));
+      if (totalEl) totalEl.value = item.total_value.toFixed(2);
+    } else {
+      const total = parseMoneyInput(totalEl?.value);
+      if (Number.isFinite(total) && total >= 0) item.total_value = Number(total.toFixed(2));
+    }
   }
 
   function setupPdfJsWorker() {
@@ -3369,7 +3376,7 @@
         item_name: normalizePdfProductName(rjDetailedPattern[1].split(" ")),
         unit_type: normalizeInvoiceUnit(rjDetailedPattern[3]),
         quantity,
-        unit_cost: Number(unitCost.toFixed(4)),
+        unit_cost: Number(unitCost.toFixed(2)),
         total_value: Number(totalValue.toFixed(2))
       };
     }
@@ -3600,7 +3607,7 @@
   function coletarItensNotaFiscalParaSalvar() {
     const rows = Array.from(document.querySelectorAll("#nf-preview-body tr"));
     return rows.map((row, index) => {
-      atualizarItemNotaFiscal(index);
+      atualizarItemNotaFiscal(index, false);
       const item = NOTA_FISCAL_ITENS[index];
       if (!item || !row.querySelector(".nf-row-enabled")?.checked) return null;
       const name = row.querySelector(".nf-item-name")?.value.trim() || item.item_name;
@@ -3760,6 +3767,7 @@
   }
 
   function renderTabelaCompras(entries, filtros) {
+  COMPRAS_FILTRADAS = Array.isArray(entries) ? entries : [];
   const tbody = document.getElementById("tbody-compras");
   const resumo = document.getElementById("compras-resumo");
   const totalEl = document.getElementById("compras-total");
@@ -3811,6 +3819,35 @@
   }).join("");
 }
       
+
+  async function excluirComprasFiltradas() {
+    const entries = (COMPRAS_FILTRADAS || []).filter(e => e.id);
+    if (!entries.length) return alert("Nenhuma compra filtrada para apagar.");
+    const total = entries.reduce((acc, e) => acc + Number(e.total_value || 0), 0);
+    const ok = confirm(
+      "Apagar " + entries.length + " compra(s) filtrada(s), totalizando " + fmt(total) + "?\n\n" +
+      "Use os filtros antes para manter apenas os registros novos da nota."
+    );
+    if (!ok) return;
+    try {
+      const res = await fetch(API + "/stock/batch", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ids: entries.map(e => e.id),
+          confirm_token: "DELETE_STOCK_ENTRIES"
+        })
+      });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao apagar compras.");
+      alert((data.count || entries.length) + " compra(s) apagada(s).");
+      await carregarCompras();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Erro ao apagar compras filtradas.");
+    }
+  }
+
   function limparFiltrosCompras() {
     const f1 = document.getElementById("filtro-fornecedor");
     const f2 = document.getElementById("filtro-categoria");
