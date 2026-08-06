@@ -2389,14 +2389,38 @@
         <button class="btn-primary" type="button" onclick="atualizarDashboardFinanceiro()">Atualizar relatório</button>
       </div>
 
-      <div class="finance-kpis">
-        <div class="finance-kpi"><span>Faturamento</span><strong id="dash-bruto">R$ 0,00</strong></div>
-        <div class="finance-kpi"><span>Pedidos</span><strong id="dash-pedidos">0</strong></div>
-        <div class="finance-kpi"><span>Ticket médio</span><strong id="dash-ticket">R$ 0,00</strong></div>
-        <div class="finance-kpi"><span>Taxas</span><strong id="dash-taxas">R$ 0,00</strong></div>
-        <div class="finance-kpi"><span>Custos fixos</span><strong id="dash-custos">R$ 0,00</strong></div>
-        <div class="finance-kpi"><span>Compras/estoque</span><strong id="dash-compras">R$ 0,00</strong></div>
-        <div class="finance-kpi"><span>Resultado</span><strong id="dash-lucro">R$ 0,00</strong></div>
+      <div class="kpi-grid" style="margin-top: 20px;">
+        <div class="kpi-card">
+          <div class="kpi-value" id="dash-bruto">R$ 0,00</div>
+          <div class="kpi-label">Faturamento Bruto</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="dash-pedidos">0</div>
+          <div class="kpi-label">Pedidos Aprovados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="dash-ticket">R$ 0,00</div>
+          <div class="kpi-label">Ticket Médio</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value gold" id="dash-lucro">R$ 0,00</div>
+          <div class="kpi-label">Resultado Líquido</div>
+        </div>
+      </div>
+
+      <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+        <div class="kpi-card" style="padding:14px;">
+          <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);" id="dash-taxas">R$ 0,00</div>
+          <div class="kpi-label">Taxas Gateway</div>
+        </div>
+        <div class="kpi-card" style="padding:14px;">
+          <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);" id="dash-custos">R$ 0,00</div>
+          <div class="kpi-label">Custos Fixos</div>
+        </div>
+        <div class="kpi-card" style="padding:14px;">
+          <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);" id="dash-compras">R$ 0,00</div>
+          <div class="kpi-label">Compras & Estoque</div>
+        </div>
       </div>
 
       <div class="finance-chart" id="sales-chart">
@@ -4555,58 +4579,42 @@
 
     tbody.innerHTML = produtosFiltrados.map(p => {
       const img = p.image_url
-        ? `<img class="prod-img" src="${p.image_url}" alt="Foto">`
-        : `<div class="prod-img"></div>`;
+        ? `<img class="product-cell-img" src="${p.image_url}" alt="Foto">`
+        : `<div class="product-cell-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:1.2rem;">🍲</div>`;
 
-      const ativo = p.active ? `<span class="badge on">Ativo</span>` : `<span class="badge off">Inativo</span>`;
+      const ativo = p.active ? `<span class="status-pill pill-success">Ativo</span>` : `<span class="status-pill pill-danger">Inativo</span>`;
       const preco = fmt(Number(p.price || 0));
       const estoque = Number(p.stock_quantity || 0);
       const minimo = Number(p.reorder_min_quantity || 0);
-      const reposicao = Number(p.reorder_quantity || 0);
       const baixoEstoque = p.active !== false && p.is_sellable !== false && minimo > 0 && estoque <= minimo;
-      const ordem = Number(p.sort_order || 0);
       const ficha = hasProductRecipe(p);
 
       return `
         <tr>
           <td>${img}</td>
           <td>
-            <strong>${p.name || ""}</strong><br>
-            <span class="small">${(p.description || "").slice(0, 90)}${(p.description || "").length > 90 ? "..." : ""}</span>
-            <div class="small" style="margin-top:6px;line-height:1.45;">
-              ${p.category ? `Categoria: ${p.category}<br>` : ""}
-              ${p.serving_size ? `Porção: ${p.serving_size}<br>` : ""}
-              ${p.shelf_life_days ? `Validade: ${p.shelf_life_days} dia(s)<br>` : ""}
-              Antecedência: ${Number(p.lead_time_hours || 0)}h<br>
-              Disponível: ${formatProductDays(p.available_days)}
-              ${p.max_units_per_day ? `<br>Limite/dia: ${p.max_units_per_day}` : ""}
-              ${minimo ? `<br>Reposição: mínimo ${minimo}${reposicao ? ` / sugerido ${reposicao}` : ""}` : ""}
-              ${baixoEstoque ? `<br><span class="stock-low">Reposição necessária</span>` : ""}
-              ${ficha ? `<br>Ficha técnica cadastrada` : ""}
-              ${p.is_gift_recipe ? `<br>Receita simples pública` : ""}
-              ${renderUsageContextChips(p.usage_contexts)}
+            <div class="product-cell-info">
+              <span class="product-cell-title">${escapeHtml(p.name || "")}</span>
+              <span class="product-cell-desc">${escapeHtml(p.description || "Sem descrição")}</span>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                ${p.category ? `<span class="status-pill pill-gold">${escapeHtml(p.category)}</span>` : ""}
+                ${baixoEstoque ? `<span class="status-pill pill-danger">Reposição necessária</span>` : ""}
+              </div>
             </div>
           </td>
           <td>${ativo}</td>
-          <td style="text-align:right;"><strong>${preco}</strong></td>
+          <td style="text-align:right;"><strong style="color:var(--verde-dark); font-size:0.95rem;">${preco}</strong></td>
           <td style="text-align:right;">
-            <strong class="${baixoEstoque ? "stock-low" : "stock-ok"}">${estoque}</strong>
-            <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
-              <input id="delta-${p.id}" type="number" step="1" placeholder="+/-" style="width:90px;padding:8px;border:1px solid #ddd;border-radius:10px;">
-              <button class="btn-secondary" onclick="ajustarEstoque('${p.id}', ${estoque})">Aplicar</button>
-            </div>
-            <div style="margin-top:6px; display:flex; justify-content:flex-end;">
-              <input id="motivo-${p.id}" type="text" placeholder="Motivo (opcional)" style="width: 240px; max-width: 100%; padding:8px;border:1px solid #ddd;border-radius:10px;">
-            </div>
+            <span class="status-pill ${baixoEstoque ? 'pill-danger' : 'pill-info'}" style="font-size:0.85rem;">${estoque} un</span>
           </td>
           <td style="text-align:right;">${minimo || "-"}</td>
-          <td style="text-align:right;">${ordem}</td>
+          <td style="text-align:right;">${Number(p.sort_order || 0)}</td>
           <td>
-            <div class="actions">
-              ${ficha ? `<button class="btn-secondary" onclick="abrirFichaProduto('${p.id}')">Ficha</button>` : ""}
-              <button class="btn-secondary" onclick="preencherFormProdutoById('${p.id}')">Editar</button>
-              <button class="btn-secondary" onclick="toggleAtivo('${p.id}', ${!!p.active})">${p.active ? "Desativar" : "Ativar"}</button>
-              <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
+            <div style="display:flex; gap:6px; flex-wrap:nowrap; align-items:center;">
+              ${ficha ? `<button class="btn btn-secondary btn-sm" onclick="abrirFichaProduto('${p.id}')">📋 Ficha</button>` : ""}
+              <button class="btn btn-secondary btn-sm" onclick="preencherFormProdutoById('${p.id}')">✏️ Editar</button>
+              <button class="btn btn-secondary btn-sm" onclick="toggleAtivo('${p.id}', ${!!p.active})">${p.active ? "Desativar" : "Ativar"}</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--status-danger-text);" onclick="excluirProduto('${p.id}')">🗑️</button>
             </div>
           </td>
         </tr>
