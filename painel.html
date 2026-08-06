@@ -6,7 +6,9 @@
   <title>ERP Tá na Mão! - Operacional & Gestão</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/toast.js"></script>
   <script src="/auth.js"></script>
 
   <style>
@@ -1140,39 +1142,88 @@
 </head>
 
 <body>
-<header class="app-header">
-  <div class="app-header-inner">
-    <div class="app-brand">
-      <img src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
-      <div>
-        <small>Painel operacional</small>
-        <h1>Tá na Mão</h1>
-        <span>Pedidos, produção, cardápio, estoque e financeiro em um fluxo único.</span>
-      </div>
-    </div>
-    <div class="app-header-actions">
-      <span class="status-pill">Operação sob encomenda</span>
-      <button class="header-logout" type="button" onclick="logout()">Sair</button>
-    </div>
-  </div>
-</header>
+<div class="app-layout">
+  <!-- SIDEBAR LATERAL FIXA (SAAS / MAILFY STYLE) -->
+  <aside class="sidebar" id="app-sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-brand">
+        <img src="/TanaMao_Logo.jpg" alt="Tá na Mão!" onerror="this.src='https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png'">
+        <div class="sidebar-brand-info">
+          <span class="sidebar-brand-title">Tá na Mão!</span>
+          <span class="sidebar-brand-badge">ERP & OPERACIONAL</span>
+        </div>
+      </a>
 
-<div class="wrap">
-  <div class="workspace-toolbar">
-    <div class="workspace-tabs" aria-label="Áreas do painel">
-      <button class="workspace-tab active" type="button" data-tab-target="aba-vendas" onclick="abrirAba('aba-vendas')" aria-selected="true">Vendas e produção</button>
-      <button class="workspace-tab" type="button" data-tab-target="aba-compras" data-role="admin" onclick="abrirAba('aba-compras')" aria-selected="false">Compras</button>
-      <button class="workspace-tab" type="button" data-tab-target="aba-cardapio" data-role="admin" onclick="abrirAba('aba-cardapio')" aria-selected="false">Cardápio e estoque</button>
-      <button class="workspace-tab" type="button" data-tab-target="aba-cadastro-produto" data-role="admin" onclick="abrirAba('aba-cadastro-produto')" aria-selected="false">Cadastro de produto</button>
-      <button class="workspace-tab" type="button" data-tab-target="aba-textos" data-role="admin" onclick="abrirAba('aba-textos')" aria-selected="false">Textos do site</button>
-      <button class="workspace-tab" type="button" data-tab-target="aba-config" data-role="admin" onclick="abrirAba('aba-config')" aria-selected="false">Financeiro</button>
+      <div class="sidebar-nav-label">Painel Principal</div>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" data-tab-id="aba-config" onclick="selectSidebarTab('aba-config', this)">
+          <span class="nav-icon">📊</span>
+          <span>Visão Geral (Financeiro)</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-vendas" onclick="selectSidebarTab('aba-vendas', this)">
+          <span class="nav-icon">👨‍🍳</span>
+          <span>Cozinha & Pedidos</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-cardapio" data-role="admin" onclick="selectSidebarTab('aba-cardapio', this)">
+          <span class="nav-icon">🍲</span>
+          <span>Cardápio & Produtos</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-compras" data-role="admin" onclick="selectSidebarTab('aba-compras', this)">
+          <span class="nav-icon">📦</span>
+          <span>Estoque & Compras</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-cadastro-produto" data-role="admin" onclick="selectSidebarTab('aba-cadastro-produto', this)">
+          <span class="nav-icon">➕</span>
+          <span>Novo Produto</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-textos" data-role="admin" onclick="selectSidebarTab('aba-textos', this)">
+          <span class="nav-icon">⚙️</span>
+          <span>Configurações do Site</span>
+        </a>
+      </nav>
     </div>
-    <label class="toolbar-field">
-      <span>Pesquisar na área atual</span>
-      <input id="global-search" type="search" placeholder="Buscar pedidos, produtos, compras ou textos..." oninput="handleGlobalSearch()">
-    </label>
-    <span class="toolbar-status" id="btn-login-admin">Carregando...</span>
-  </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar" id="user-avatar-initial">G</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="user-display-name">Guilherme</span>
+          <span class="sidebar-user-role" id="btn-login-admin">Administrador</span>
+        </div>
+      </div>
+      <button class="sidebar-logout-btn" title="Sair do Sistema" onclick="logout()">
+        🚪
+      </button>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL DA APLICAÇÃO -->
+  <div class="main-wrapper">
+    <!-- TOPBAR SUPERIOR EXECUTIVA -->
+    <header class="app-topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="mobile-nav-toggle" type="button" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-breadcrumb">
+          <span>Tá na Mão!</span>
+          <span>/</span>
+          <span class="current" id="topbar-current-page">Visão Geral</span>
+        </div>
+      </div>
+
+      <div class="topbar-search">
+        <span>🔍</span>
+        <input id="global-search" type="search" placeholder="Buscar pedidos, produtos, compras..." oninput="handleGlobalSearch()">
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="location.href='index.html'">🛒 Ir para a Loja</button>
+        <button class="btn btn-primary btn-sm" data-role="admin" onclick="abrirAba('aba-cadastro-produto')">+ Cadastrar Produto</button>
+      </div>
+    </header>
+
+    <!-- CONTEÚDO DAS ABAS -->
+    <main class="app-content">
 
   <!-- ABA VENDAS -->
   <div id="aba-vendas" class="tab-content active">
@@ -1271,65 +1322,70 @@
       </div>
     </div>
 
-    <div class="admin-card" style="margin-top: 20px;">
-      <div class="section-toolbar">
-        <div>
-          <h3>Importar nota fiscal por XML ou PDF</h3>
-          <p class="muted">Envie o XML oficial ou o PDF/DANFE extraído do site do governo. Confira os itens lidos antes de registrar as compras. Se o PDF vier quebrado, revise o texto extraído e reprocesse.</p>
+    <!-- IMPORTAR NOTA FISCAL (RECOLHÍVEL) -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">🧾</span>
+          <span>Importar Nota Fiscal (XML ou PDF / DANFE)</span>
+        </div>
+        <span class="status-pill pill-info">Clique para expandir</span>
+      </summary>
+      <div class="accordion-body">
+        <p class="muted" style="margin-bottom:14px;">Envie o XML oficial ou o PDF/DANFE extraído do site do governo. Confira os itens lidos antes de registrar as compras.</p>
+        <div class="filters-grid">
+          <div>
+            <label class="form-label">Arquivo XML ou PDF</label>
+            <input id="nf-xml" class="form-control" type="file" accept=".xml,.pdf,text/xml,application/xml,application/pdf" onchange="lerArquivoNotaFiscal(event)">
+          </div>
+          <div>
+            <label class="form-label">Fornecedor</label>
+            <select id="nf-fornecedor" class="form-control"><option value="">Selecione o fornecedor...</option></select>
+          </div>
+          <div>
+            <label class="form-label">Data da entrada</label>
+            <input id="nf-data" class="form-control" type="date">
+          </div>
+          <div>
+            <label class="form-label">Categoria dos itens</label>
+            <select id="nf-cat" class="form-control">
+              <option value="Insumos">Insumos / Ingredientes</option>
+              <option value="Embalagens">Embalagens</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+        </div>
+        <div class="rule-note" id="nf-meta" style="display:none; margin-top:12px;"></div>
+        <details id="nf-raw-wrap" style="display:none; margin-top:12px;">
+          <summary>Texto extraído do PDF</summary>
+          <textarea id="nf-raw-text" class="form-control" rows="6" style="margin-top:10px;" placeholder="Texto extraído do PDF para conferência"></textarea>
+          <div class="form-actions" style="margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="reprocessarTextoNotaFiscal()">Reprocessar texto</button>
+          </div>
+        </details>
+        <div class="table-container" id="nf-preview-wrap" style="display:none; margin-top:14px;">
+          <table class="mailfy-table">
+            <thead>
+              <tr>
+                <th>Lançar</th>
+                <th>Item lido</th>
+                <th>Unidade</th>
+                <th style="text-align:right;">Qtd / Peso</th>
+                <th style="text-align:right;">Valor Unit.</th>
+                <th style="text-align:right;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="nf-preview-body">
+              <tr><td colspan="6" style="text-align:center;">Nenhum arquivo carregado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="form-actions" style="margin-top:14px; display:flex; gap:10px;">
+          <button class="btn btn-primary" id="nf-save-btn" type="button" onclick="registrarItensNotaFiscal()" disabled>Registrar itens da nota</button>
+          <button class="btn btn-secondary" type="button" onclick="limparNotaFiscalImportada()">Limpar nota</button>
         </div>
       </div>
-      <div class="filters-grid">
-        <div>
-          <label>Arquivo XML ou PDF</label>
-          <input id="nf-xml" type="file" accept=".xml,.pdf,text/xml,application/xml,application/pdf" onchange="lerArquivoNotaFiscal(event)">
-        </div>
-        <div>
-          <label>Fornecedor</label>
-          <select id="nf-fornecedor"><option value="">Selecione o fornecedor...</option></select>
-        </div>
-        <div>
-          <label>Data da entrada</label>
-          <input id="nf-data" type="date">
-        </div>
-        <div>
-          <label>Categoria dos itens</label>
-          <select id="nf-cat">
-            <option value="Insumos">Insumos / Ingredientes</option>
-            <option value="Embalagens">Embalagens</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </div>
-      </div>
-      <div class="rule-note" id="nf-meta" style="display:none; margin-top:12px;"></div>
-      <details id="nf-raw-wrap" style="display:none; margin-top:12px;">
-        <summary>Texto extraído do PDF</summary>
-        <textarea id="nf-raw-text" rows="8" style="width:100%; margin-top:10px;" placeholder="Texto extraído do PDF para conferência"></textarea>
-        <div class="form-actions">
-          <button class="btn-secondary" type="button" onclick="reprocessarTextoNotaFiscal()">Reprocessar texto</button>
-        </div>
-      </details>
-      <div class="table-wrap" id="nf-preview-wrap" style="display:none; margin-top:12px;">
-        <table style="min-width: 980px;">
-          <thead>
-            <tr>
-              <th>Lançar</th>
-              <th>Item lido</th>
-              <th>Unidade</th>
-              <th style="text-align:right;">Qtd / peso</th>
-              <th style="text-align:right;">Valor unit.</th>
-              <th style="text-align:right;">Total</th>
-            </tr>
-          </thead>
-          <tbody id="nf-preview-body">
-            <tr><td colspan="6">Nenhum arquivo carregado.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="form-actions">
-        <button class="btn-primary" id="nf-save-btn" type="button" onclick="registrarItensNotaFiscal()" disabled>Registrar itens da nota</button>
-        <button class="btn-secondary" type="button" onclick="limparNotaFiscalImportada()">Limpar nota</button>
-      </div>
-    </div>
+    </details>
 
     <div class="admin-card" style="margin-top: 20px;">
       <div class="section-toolbar">
@@ -1515,55 +1571,58 @@
         </details>
       </div>
 
-      <div class="admin-card production-planning-card" style="margin-bottom:20px;">
-  <div class="section-toolbar">
-    <div>
-      <span class="eyebrow">Compras internas</span>
-      <h3>Planejamento de produção e lista de compras</h3>
-    </div>
-  </div>
+      <!-- PLANEJAMENTO DE PRODUÇÃO (RECOLHÍVEL) -->
+      <details class="mailfy-accordion">
+        <summary>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="accordion-icon">📋</span>
+            <span>Planejamento de Produção & Lista de Compras Automática</span>
+          </div>
+          <span class="status-pill pill-gold">Clique para expandir</span>
+        </summary>
+        <div class="accordion-body">
+          <div class="rule-note" style="margin-bottom:12px;">
+            Carregue os produtos, preencha quanto pretende produzir e clique em “Gerar lista de compras”. O sistema soma os insumos da ficha técnica e converte unidades automaticamente.
+          </div>
 
-  <div class="rule-note" style="margin-bottom:10px;">
-    Como usar: carregue os produtos, preencha quanto pretende produzir e clique em “Gerar lista de compras”. O sistema soma os insumos da ficha técnica e converte medidas como g para kg automaticamente.
-  </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:14px;">
+            <input id="prod-note" class="form-control" placeholder="Nome do planejamento (ex: Produção Segunda Manhã)" style="max-width:420px;">
+            <button class="btn btn-secondary btn-sm" onclick="preencherTabelaProducao()">1. Carregar produtos</button>
+            <button class="btn btn-secondary btn-sm" onclick="gerarListaComprasProducao(false)">2. Gerar lista de compras</button>
+            <button class="btn btn-gold btn-sm" onclick="gerarListaComprasProducao(true)">Salvar lista gerada</button>
+            <button class="btn btn-primary btn-sm" onclick="salvarProducaoLote()">Salvar produção no estoque</button>
+          </div>
 
-  <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-bottom:10px;">
-    <input id="prod-note" placeholder="Nome do planejamento (ex: Produção segunda manhã)" style="max-width:420px;">
-    <button class="btn-secondary" onclick="preencherTabelaProducao()">1. Carregar produtos</button>
-    <button class="btn-secondary" onclick="gerarListaComprasProducao(false)">2. Gerar lista de compras</button>
-    <button class="btn-secondary" onclick="gerarListaComprasProducao(true)">Salvar lista gerada</button>
-    <button class="tab-btn" style="background: var(--dourado); color:white;" onclick="salvarProducaoLote()">Salvar produção no estoque</button>
-  </div>
+          <div id="shopping-list-result" class="shopping-summary" style="margin-bottom:14px;">
+            <div class="muted">A lista de compras aparecerá aqui depois que você preencher as quantidades.</div>
+          </div>
 
-  <div id="shopping-list-result" class="shopping-summary">
-    <div class="muted">A lista de compras aparecerá aqui depois que você preencher as quantidades de produção.</div>
-  </div>
-
-  <div class="table-wrap">
-    <table style="min-width: 980px;">
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Ficha interna</th>
-          <th style="text-align:right;">Estoque atual</th>
-          <th style="text-align:right;">Produzido hoje (+)</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-producao">
-        <tr><td colspan="4">Clique em “1. Carregar produtos” para planejar produção e compras.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+          <div class="table-container">
+            <table class="mailfy-table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Ficha Interna</th>
+                  <th style="text-align:right;">Estoque Atual</th>
+                  <th style="text-align:right;">Produzido Hoje (+)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-producao">
+                <tr><td colspan="4" style="text-align:center;">Clique em “1. Carregar produtos” para iniciar.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
 
       <div class="table-status" id="produtos-status">Carregando produtos...</div>
-      <div class="table-wrap">
-        <table style="min-width: 1040px;">
+      <div class="table-container" style="margin-bottom: 16px;">
+        <table class="mailfy-table">
           <thead>
             <tr>
               <th>Foto</th>
               <th>Produto</th>
-              <th>Ativo</th>
+              <th>Status</th>
               <th style="text-align:right;">Preço</th>
               <th style="text-align:right;">Estoque</th>
               <th style="text-align:right;">Mínimo</th>
@@ -1572,39 +1631,44 @@
             </tr>
           </thead>
           <tbody id="tbody-produtos">
-            <tr><td colspan="8">Carregando...</td></tr>
+            <tr><td colspan="8" style="text-align:center;">Carregando catálogo...</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="small" style="margin-top:10px;">
-        Ajuste de estoque: use delta (+/-). Ex.: <b>+10</b> para produzir 10 unidades, <b>-2</b> para perdas/ajustes.
-      </div>
-
-      <div class="admin-card" style="margin-top:14px;">
-        <div class="section-toolbar">
-          <h3>Pedidos de reposição</h3>
-          <button class="btn-secondary" type="button" onclick="carregarPedidosReposicao()">Atualizar reposição</button>
+      <!-- PEDIDOS DE REPOSIÇÃO (RECOLHÍVEL) -->
+      <details class="mailfy-accordion">
+        <summary>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="accordion-icon">📦</span>
+            <span>Pedidos de Reposição de Estoque</span>
+          </div>
+          <span class="status-pill pill-purple">Clique para expandir</span>
+        </summary>
+        <div class="accordion-body">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="carregarPedidosReposicao()">Atualizar reposição</button>
+          </div>
+          <div class="table-status" id="reposicao-status">Nenhuma reposição carregada.</div>
+          <div class="table-container">
+            <table class="mailfy-table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th style="text-align:right;">Estoque</th>
+                  <th style="text-align:right;">Mínimo</th>
+                  <th style="text-align:right;">Sugestão</th>
+                  <th>Aberto em</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-reposicao">
+                <tr><td colspan="6" style="text-align:center;">Nenhum pedido de reposição aberto.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="table-status" id="reposicao-status">Nenhuma reposição carregada.</div>
-        <div class="table-wrap">
-          <table style="min-width: 860px;">
-            <thead>
-              <tr>
-                <th>Produto</th>
-                <th style="text-align:right;">Estoque</th>
-                <th style="text-align:right;">Mínimo</th>
-                <th style="text-align:right;">Sugestão</th>
-                <th>Aberto em</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-reposicao">
-              <tr><td colspan="6">Nenhum pedido de reposição aberto.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </details>
 
 
     </div>
@@ -2616,14 +2680,33 @@
     }
   }
 
-  // ================= CONTROLE DAS ABAS =================
-  function getCurrentTabId() {
-    return document.querySelector(".tab-content.active")?.id || "aba-vendas";
+  // ================= CONTROLE DAS ABAS & SIDEBAR SAAS =================
+  const TAB_BREADCRUMBS = {
+    "aba-config": "Visão Geral (Financeiro)",
+    "aba-vendas": "Cozinha & Pedidos",
+    "aba-cardapio": "Cardápio & Produtos",
+    "aba-compras": "Estoque & Compras",
+    "aba-cadastro-produto": "Novo Produto",
+    "aba-textos": "Configurações do Site"
+  };
+
+  function selectSidebarTab(tabId, el) {
+    abrirAba(tabId);
+    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const sidebar = document.getElementById('app-sidebar');
+    if (sidebar && sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+    }
   }
 
-  function abrirAbaSelecionada() {
-    const select = document.getElementById("nav-select");
-    if (select) abrirAba(select.value);
+  function toggleSidebar() {
+    const sidebar = document.getElementById('app-sidebar');
+    if (sidebar) sidebar.classList.toggle('open');
+  }
+
+  function getCurrentTabId() {
+    return document.querySelector(".tab-content.active")?.id || "aba-config";
   }
 
   function abrirAba(idAba) {
@@ -2638,11 +2721,17 @@
       if (searchInput) searchInput.value = "";
     }
 
-    document.querySelectorAll(".workspace-tab").forEach(btn => {
-      const isActive = btn.dataset.tabTarget === idAba;
-      btn.classList.toggle("active", isActive);
-      btn.setAttribute("aria-selected", String(isActive));
+    // Atualiza links da sidebar
+    document.querySelectorAll(".sidebar-link").forEach(link => {
+      const isActive = link.dataset.tabId === idAba;
+      link.classList.toggle("active", isActive);
     });
+
+    // Atualiza Breadcrumb
+    const currentPageEl = document.getElementById("topbar-current-page");
+    if (currentPageEl && TAB_BREADCRUMBS[idAba]) {
+      currentPageEl.textContent = TAB_BREADCRUMBS[idAba];
+    }
 
     updateSearchPlaceholder();
 

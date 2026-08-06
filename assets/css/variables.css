@@ -1,0 +1,90 @@
+/* ==========================================
+   TÁ NA MÃO! - DESIGN SYSTEM TOKENS (MAILFY STYLE)
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* --- CORES DA MARCA (BRANDING) --- */
+  --verde-primary: #3c6e47;
+  --verde-hover: #335d3c;
+  --verde-dark: #223c28;
+  --verde-deep: #16291a;
+  --verde-light: #eaf3ec;
+  --verde-soft: #f1f7f2;
+  --verde-border: #cbe0ce;
+
+  --dourado-primary: #c9a86a;
+  --dourado-hover: #b59253;
+  --dourado-dark: #8c6c2e;
+  --dourado-light: #faf5ea;
+  --dourado-soft: #fcf8f0;
+  --dourado-border: #edd9b4;
+
+  /* --- CORES NEUTRAS & SURFACES --- */
+  --bg-app: #f7f9f7;
+  --bg-card: #ffffff;
+  --bg-subtle: #f0f4f1;
+  --bg-hover: #f3f7f4;
+
+  --border-subtle: #e5ece6;
+  --border-medium: #d4ded6;
+  --border-strong: #bacac9;
+
+  --text-main: #0f1a11;
+  --text-body: #2c3a2f;
+  --text-muted: #5d6d60;
+  --text-light: #839486;
+  --text-white: #ffffff;
+
+  /* --- STATUS PILLS & BADGES (MAILFY STYLE) --- */
+  /* Sucesso / Disponível */
+  --status-success-bg: #eaf8ee;
+  --status-success-text: #1b7a37;
+  --status-success-border: #bde8c7;
+
+  /* Aviso / Em Produção / Pendente */
+  --status-warning-bg: #fff9e6;
+  --status-warning-text: #946800;
+  --status-warning-border: #fce8a6;
+
+  /* Alerta / Estoque Baixo / Erro */
+  --status-danger-bg: #fdeeee;
+  --status-danger-text: #c02b2b;
+  --status-danger-border: #f9c2c2;
+
+  /* Informação / Retirada / Destaque */
+  --status-info-bg: #ebf3fe;
+  --status-info-text: #1d60c2;
+  --status-info-border: #bdd6fc;
+
+  /* Roxo / IA / Automação (estilo Mailfy) */
+  --status-purple-bg: #f3eefa;
+  --status-purple-text: #6b3ba7;
+  --status-purple-border: #dbcbf5;
+
+  /* --- TIPOGRAFIA --- */
+  --font-family: 'Manrope', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Manrope', 'Poppins', sans-serif;
+
+  /* --- BORDAS E RAIO (BORDER RADIUS) --- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* --- ELEVAÇÕES E SOMBRAS (SHADOWS) --- */
+  --shadow-xs: 0 1px 2px rgba(15, 26, 17, 0.04);
+  --shadow-sm: 0 4px 12px rgba(15, 26, 17, 0.05);
+  --shadow-md: 0 8px 24px rgba(15, 26, 17, 0.07);
+  --shadow-lg: 0 16px 36px rgba(15, 26, 17, 0.1);
+  --shadow-glow-green: 0 4px 20px rgba(60, 110, 71, 0.25);
+  --shadow-glow-gold: 0 4px 20px rgba(201, 168, 106, 0.3);
+
+  /* --- TRANSIÇÕES --- */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}

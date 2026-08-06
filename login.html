@@ -3,258 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Tá na Mão</title>
+  <title>Login - Tá na Mão!</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  
   <style>
-    :root {
-      color-scheme: light;
-      --green: #0f7a4a;
-      --green-dark: #0b5f3a;
-      --gold: #c49a4a;
-      --ink: #1f2933;
-      --muted: #697586;
-      --line: #d9e2dc;
-      --paper: #fffaf1;
-      --surface: #ffffff;
-      --danger: #b42318;
-      --success: #087443;
-    }
-
-    * { box-sizing: border-box; }
-
     body {
       min-height: 100vh;
-      margin: 0;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 24px;
-      font-family: "Poppins", Arial, sans-serif;
-      color: var(--ink);
-      background:
-        linear-gradient(140deg, rgba(15, 122, 74, 0.12), rgba(196, 154, 74, 0.12)),
-        var(--paper);
+      background: radial-gradient(circle at top left, var(--verde-light) 0%, var(--bg-app) 50%, var(--dourado-soft) 100%);
     }
 
     .login-shell {
-      width: min(100%, 420px);
-      background: var(--surface);
-      border: 1px solid rgba(15, 122, 74, 0.12);
-      border-radius: 18px;
-      box-shadow: 0 18px 50px rgba(31, 41, 51, 0.12);
+      width: min(100%, 430px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
       overflow: hidden;
     }
 
     .brand-panel {
-      background: var(--green);
-      padding: 28px 28px 24px;
+      background: linear-gradient(135deg, var(--verde-dark) 0%, var(--verde-primary) 100%);
+      padding: 36px 28px 28px;
       color: #fff;
       text-align: center;
+      position: relative;
     }
 
     .brand-panel img {
-      width: 86px;
-      height: 86px;
+      width: 76px;
+      height: 76px;
       object-fit: contain;
       display: block;
-      margin: 0 auto 14px;
+      margin: 0 auto 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .brand-panel h1 {
-      margin: 0;
-      font-size: 1.45rem;
-      font-weight: 700;
-      letter-spacing: 0;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
 
     .brand-panel p {
-      margin: 8px 0 0;
-      font-size: 0.92rem;
-      color: rgba(255,255,255,0.82);
+      margin-top: 6px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.85);
     }
 
-    .panel-body { padding: 28px; }
+    .panel-body { 
+      padding: 32px 28px; 
+    }
 
     .form-title {
-      margin: 0 0 6px;
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--verde-dark);
     }
 
     .form-copy {
-      margin: 0 0 20px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.5;
-    }
-
-    label {
-      display: block;
-      margin: 14px 0 7px;
-      font-size: 0.86rem;
-      font-weight: 600;
-      color: #334155;
-    }
-
-    input {
-      width: 100%;
-      height: 46px;
-      padding: 0 13px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      font: inherit;
-      outline: none;
-      background: #fff;
-      transition: border-color .2s, box-shadow .2s;
-    }
-
-    input:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(15, 122, 74, 0.14);
-    }
-
-    .primary-btn {
-      width: 100%;
-      min-height: 48px;
-      margin-top: 18px;
-      border: 0;
-      border-radius: 10px;
-      background: var(--green);
-      color: #fff;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .2s, transform .2s;
-    }
-
-    .primary-btn:hover { background: var(--green-dark); }
-    .primary-btn:active { transform: translateY(1px); }
-    .primary-btn:disabled { background: #98a2b3; cursor: wait; transform: none; }
-
-    .link-row {
-      display: flex;
-      justify-content: center;
-      margin-top: 16px;
-    }
-
-    .text-btn {
-      border: 0;
-      background: transparent;
-      color: var(--green-dark);
-      font: inherit;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 4px 6px;
-    }
-
-    .text-btn:hover { text-decoration: underline; }
-
-    .feedback {
-      display: none;
-      margin-top: 14px;
-      padding: 12px 13px;
-      border-radius: 10px;
+      margin: 4px 0 22px;
+      color: var(--text-muted);
       font-size: 0.88rem;
-      line-height: 1.45;
-      background: #f8fafc;
-      border: 1px solid var(--line);
     }
 
-    .feedback.error {
-      display: block;
-      color: var(--danger);
-      background: #fff1f0;
-      border-color: #fecdca;
-    }
-
-    .feedback.success {
-      display: block;
-      color: var(--success);
-      background: #ecfdf3;
-      border-color: #abefc6;
-    }
-
-    .hidden { display: none; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <main class="login-shell">
     <section class="brand-panel">
-      <img src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
-      <h1>Painel Tá na Mão</h1>
-      <p>Gestão interna de vendas, produção e cardápio.</p>
+      <img src="/TanaMao_Logo.jpg" alt="Tá na Mão!" onerror="this.src='https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png'">
+      <div class="micro-heading gold" style="color: var(--dourado-primary);">ERP & OPERACIONAL</div>
+      <h1>Painel Tá na Mão!</h1>
+      <p>Alimentação Inteligente & Gestão Saudável</p>
     </section>
 
     <section class="panel-body" id="login-panel">
-      <h2 class="form-title">Entrar no sistema</h2>
-      <p class="form-copy">Use seu e-mail cadastrado e sua senha para acessar o painel.</p>
+      <h2 class="form-title">Acessar a Plataforma</h2>
+      <p class="form-copy">Insira suas credenciais cadastradas para continuar.</p>
 
       <form id="loginForm" autocomplete="on">
-        <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <input type="email" class="form-control" id="email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        </div>
 
-        <label for="senha">Senha</label>
-        <input type="password" id="senha" name="password" placeholder="Sua senha" autocomplete="current-password" required>
+        <div class="form-group">
+          <label class="form-label" for="senha">Senha</label>
+          <input type="password" class="form-control" id="senha" name="password" placeholder="Sua senha de acesso" autocomplete="current-password" required>
+        </div>
 
-        <button class="primary-btn" type="submit" id="btn-login">Entrar</button>
-        <div id="loginFeedback" class="feedback" role="alert"></div>
+        <button class="btn btn-primary btn-lg" style="width: 100%; margin-top: 10px;" type="submit" id="btn-login">
+          Entrar no Sistema
+        </button>
       </form>
 
-      <div class="link-row">
-        <button class="text-btn" type="button" id="show-reset">Esqueci minha senha</button>
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="btn btn-ghost btn-sm" type="button" id="show-reset">Esqueci minha senha</button>
       </div>
     </section>
 
     <section class="panel-body hidden" id="reset-panel">
-      <h2 class="form-title">Recuperar senha</h2>
-      <p class="form-copy">Informe o e-mail cadastrado. Se ele existir no painel, enviaremos um link para criar uma nova senha.</p>
+      <h2 class="form-title">Recuperar Senha</h2>
+      <p class="form-copy">Informe seu e-mail para enviarmos o link de redefinição de senha.</p>
 
       <form id="resetRequestForm" autocomplete="on">
-        <label for="reset-email">E-mail cadastrado</label>
-        <input type="email" id="reset-email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <div class="form-group">
+          <label class="form-label" for="reset-email">E-mail cadastrado</label>
+          <input type="email" class="form-control" id="reset-email" name="email" placeholder="seuemail@exemplo.com" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        </div>
 
-        <button class="primary-btn" type="submit" id="btn-reset">Enviar link de recuperação</button>
-        <div id="resetFeedback" class="feedback" role="alert"></div>
+        <button class="btn btn-gold btn-lg" style="width: 100%; margin-top: 10px;" type="submit" id="btn-reset">
+          Enviar Link de Recuperação
+        </button>
       </form>
 
-      <div class="link-row">
-        <button class="text-btn" type="button" id="back-login">Voltar para o login</button>
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="btn btn-ghost btn-sm" type="button" id="back-login">Voltar para o Login</button>
       </div>
     </section>
   </main>
 
+  <script src="/assets/js/toast.js"></script>
   <script>
     const API = 'https://tanamao-backend.onrender.com/api';
 
     const loginPanel = document.getElementById('login-panel');
     const resetPanel = document.getElementById('reset-panel');
-    const loginFeedback = document.getElementById('loginFeedback');
-    const resetFeedback = document.getElementById('resetFeedback');
     const emailInput = document.getElementById('email');
     const resetEmailInput = document.getElementById('reset-email');
 
-    function showFeedback(el, message, type) {
-      el.textContent = message;
-      el.className = 'feedback ' + type;
-    }
-
-    function clearFeedback(el) {
-      el.textContent = '';
-      el.className = 'feedback';
-    }
-
     document.getElementById('show-reset').addEventListener('click', () => {
       resetEmailInput.value = emailInput.value;
-      clearFeedback(loginFeedback);
       loginPanel.classList.add('hidden');
       resetPanel.classList.remove('hidden');
       resetEmailInput.focus();
     });
 
     document.getElementById('back-login').addEventListener('click', () => {
-      clearFeedback(resetFeedback);
       resetPanel.classList.add('hidden');
       loginPanel.classList.remove('hidden');
       emailInput.focus();
@@ -264,9 +161,19 @@
       e.preventDefault();
       const btn = document.getElementById('btn-login');
 
+      // Limpa dados antigos de sessão
+      localStorage.removeItem('tnm_token');
+      localStorage.removeItem('tnm_user');
+      localStorage.removeItem('tnm_role');
+
       btn.disabled = true;
       btn.textContent = 'Autenticando...';
-      clearFeedback(loginFeedback);
+
+      // Alerta de inicialização para o Render (Cold Start)
+      const slowTimer = setTimeout(() => {
+        btn.textContent = 'Conectando ao servidor (Render)...';
+        Toast.info('O servidor está iniciando. Isso pode levar alguns segundos na primeira conexão.');
+      }, 3000);
 
       try {
         const res = await fetch(API + '/auth/login', {
@@ -278,17 +185,29 @@
           })
         });
 
+        clearTimeout(slowTimer);
         const data = await res.json();
-        if (!data.ok) throw new Error(data.message || 'Credenciais inválidas.');
+        if (!res.ok || !data.ok) {
+          throw new Error(data.message || 'Credenciais inválidas. Verifique seu e-mail e senha.');
+        }
 
         localStorage.setItem('tnm_token', data.token);
         localStorage.setItem('tnm_user', JSON.stringify(data.user));
         if (data.user && data.user.role) localStorage.setItem('tnm_role', data.user.role);
-        window.location.href = 'painel.html';
+        
+        Toast.success('Login efetuado com sucesso! Redirecionando...');
+        setTimeout(() => {
+          window.location.href = 'painel.html';
+        }, 800);
       } catch (err) {
-        showFeedback(loginFeedback, err.message || 'Não foi possível entrar agora.', 'error');
+        clearTimeout(slowTimer);
+        let msg = err.message || 'Não foi possível realizar o login.';
+        if (msg.includes('Failed to fetch')) {
+          msg = 'Erro de conexão com a API backend (Render). Verifique se o servidor está ativo ou tente novamente.';
+        }
+        Toast.error(msg);
         btn.disabled = false;
-        btn.textContent = 'Entrar';
+        btn.textContent = 'Entrar no Sistema';
       }
     });
 
@@ -298,7 +217,6 @@
 
       btn.disabled = true;
       btn.textContent = 'Enviando...';
-      clearFeedback(resetFeedback);
 
       try {
         const res = await fetch(API + '/auth/forgot-password', {
@@ -310,12 +228,12 @@
         const data = await res.json();
         if (!data.ok) throw new Error(data.message || 'Não foi possível solicitar a recuperação.');
 
-        showFeedback(resetFeedback, data.message || 'Se o e-mail estiver cadastrado, enviaremos o link.', 'success');
+        Toast.success(data.message || 'E-mail de recuperação enviado com sucesso!');
       } catch (err) {
-        showFeedback(resetFeedback, err.message || 'Não foi possível solicitar a recuperação agora.', 'error');
+        Toast.error(err.message || 'Falha ao solicitar recuperação.');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Enviar link de recuperação';
+        btn.textContent = 'Enviar Link de Recuperação';
       }
     });
   </script>
