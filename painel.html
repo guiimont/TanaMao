@@ -1266,63 +1266,63 @@
     </div>
   </div>
 
-  <!-- ABA COMPRAS -->
+  <!-- ABA COMPRAS E ESTOQUE (REESTRUTURADA - NÍVEL SAAS) -->
   <div id="aba-compras" class="tab-content">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-      <div class="admin-card">
-        <h3>Cadastrar Fornecedor</h3>
-        <input id="f-nome" placeholder="Nome do Fornecedor / Empresa">
-        <input id="f-contato" placeholder="Contato (WhatsApp / Email)">
-        <input id="f-doc" placeholder="CNPJ / CPF">
-        <button onclick="salvarFornecedor()">Salvar Fornecedor</button>
+    <!-- KPIS DE ESTOQUE E SUPRIMENTOS -->
+    <div class="kpi-grid" style="margin-bottom: 20px;">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-insumos-total">0</div>
+        <div class="kpi-label">Insumos Cadastrados</div>
       </div>
-
-      <div class="admin-card">
-        <h3>Lançar Compra / Entrada</h3>
-        <select id="e-fornecedor"><option value="">Selecione o Fornecedor...</option></select>
-        <input id="e-item" placeholder="Item (Ex: Embalagens, Frango)">
-        <div class="ingredient-grid">
-          <label class="field">
-            <span>Data</span>
-            <input id="e-data" type="date">
-          </label>
-          <label class="field">
-            <span>Unidade da compra</span>
-            <select id="e-unidade" onchange="atualizarValorCompraManual()">
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="l">l</option>
-              <option value="ml">ml</option>
-              <option value="un">un</option>
-              <option value="pct">pct</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Quantidade / peso</span>
-            <input id="e-qtd" type="number" min="0" step="0.001" placeholder="Ex: 0,650" oninput="atualizarValorCompraManual()">
-          </label>
-          <label class="field">
-            <span>Valor por unidade</span>
-            <input id="e-unit-cost" type="number" min="0" step="0.0001" placeholder="Ex: R$/kg" oninput="atualizarValorCompraManual()">
-          </label>
-          <label class="field">
-            <span>Valor total calculado</span>
-            <input id="e-valor" type="number" min="0" step="0.01" placeholder="R$ 0,00" readonly>
-          </label>
-          <label class="field">
-            <span>Categoria</span>
-            <select id="e-cat">
-              <option value="Insumos">Insumos / Ingredientes</option>
-              <option value="Embalagens">Embalagens</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </label>
-        </div>
-        <button onclick="salvarCompra()">Registrar Compra</button>
+      <div class="kpi-card">
+        <div class="kpi-value danger" id="kpi-insumos-alerta">0</div>
+        <div class="kpi-label">Alerta de Reposição</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value gold" id="kpi-compras-mes">R$ 0,00</div>
+        <div class="kpi-label">Compras no Mês</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-fornecedores-total">0</div>
+        <div class="kpi-label">Fornecedores Ativos</div>
       </div>
     </div>
 
-    <!-- IMPORTAR NOTA FISCAL (RECOLHÍVEL) -->
+    <!-- TABELA PRINCIPAL DE INSUMOS DA PRODUÇÃO -->
+    <div class="admin-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; font-size:1.15rem; color:var(--verde-dark);">Insumos & Matéria-Prima</h3>
+          <p class="muted" style="margin:2px 0 0 0; font-size:0.84rem;">Gerencie os estoques de ingredientes e embalagens das suas receitas.</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="abrirModalFornecedor()">🤝 Cadastrar Fornecedor</button>
+          <button class="btn btn-gold btn-sm" onclick="abrirModalLancarCompra()">📦 Lançar Compra</button>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalNovoInsumo()">+ Novo Insumo</button>
+        </div>
+      </div>
+
+      <div class="table-status" id="insumos-status" style="margin-bottom:10px;">Carregando insumos...</div>
+      <div class="table-container">
+        <table class="mailfy-table">
+          <thead>
+            <tr>
+              <th>Insumo</th>
+              <th>Categoria</th>
+              <th>Fornecedor Padrão</th>
+              <th style="text-align:right;">Estoque Atual</th>
+              <th style="text-align:right;">Estoque Mínimo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-insumos">
+            <tr><td colspan="6" style="text-align:center;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IMPORTAR NOTA FISCAL (XML / PDF - RECOLHÍVEL) -->
     <details class="mailfy-accordion">
       <summary>
         <div style="display:flex; align-items:center; gap:10px;">
@@ -1387,157 +1387,236 @@
       </div>
     </details>
 
-    <div class="admin-card" style="margin-top: 20px;">
-      <div class="section-toolbar">
-        <div>
-          <h3>Insumos de produção</h3>
-          <p class="muted">Cadastre ingredientes e embalagens usados nas fichas técnicas dos produtos.</p>
+    <!-- HISTÓRICO DE COMPRAS REGISTRADAS (RECOLHÍVEL) -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">📊</span>
+          <span>Histórico & Relatório de Compras</span>
         </div>
-        <button class="btn-secondary" type="button" onclick="carregarInsumos()">Atualizar insumos</button>
+        <span class="status-pill pill-gold">Clique para expandir</span>
+      </summary>
+      <div class="accordion-body">
+        <div class="summary-bar" style="margin-bottom: 14px;">
+          <div class="muted"><strong>Relatório consolidado</strong></div>
+          <div><strong>Total:</strong> <span id="rel-total" style="color:var(--verde-dark); font-weight:800;">R$ 0,00</span></div>
+        </div>
+
+        <div class="filters-grid" style="margin-bottom:16px;">
+          <div>
+            <label class="form-label">Fornecedor</label>
+            <select id="filtro-fornecedor" class="form-control" onchange="aplicarFiltrosCompras()">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Categoria</label>
+            <select id="filtro-categoria" class="form-control" onchange="aplicarFiltrosCompras()">
+              <option value="">Todas</option>
+              <option value="Insumos">Insumos</option>
+              <option value="Embalagens">Embalagens</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">De (data)</label>
+            <input id="filtro-de" class="form-control" type="date" onchange="aplicarFiltrosCompras()">
+          </div>
+          <div>
+            <label class="form-label">Até (data)</label>
+            <input id="filtro-ate" class="form-control" type="date" onchange="aplicarFiltrosCompras()">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div class="muted" id="compras-resumo" style="font-size:0.84rem;">Carregando...</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="limparFiltrosCompras()">Limpar filtros</button>
+            <button class="btn btn-secondary btn-sm" onclick="carregarCompras()">Recarregar</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--status-danger-text);" onclick="excluirComprasFiltradas()">Apagar compras filtradas</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="mailfy-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Fornecedor</th>
+                <th>Categoria</th>
+                <th>Item</th>
+                <th style="text-align:right;">Qtd</th>
+                <th style="text-align:right;">Custo Unit.</th>
+                <th style="text-align:right;">Valor Total</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-compras">
+              <tr><td colspan="7" style="text-align:center;">Nenhuma compra encontrada.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+    </details>
+  </div>
+
+  <!-- MODAL: CADASTRAR / EDITAR INSUMO -->
+  <div id="modal-insumo-overlay" class="panel-overlay" role="dialog" aria-modal="true">
+    <div class="panel-modal" style="max-width: 520px; border-radius: var(--radius-lg); padding: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 id="modal-insumo-titulo" style="margin:0; color:var(--verde-dark);">Cadastrar Insumo</h3>
+        <button class="panel-modal-close" onclick="fecharModalNovoInsumo()">×</button>
+      </div>
+
       <input type="hidden" id="ing-id">
-      <div class="ingredient-grid">
-        <label class="field">
-          <span>Insumo</span>
-          <input id="ing-nome" name="production_ingredient_name" placeholder="Ex: Frango desfiado" autocomplete="off" spellcheck="false">
-        </label>
-        <label class="field">
-          <span>Unidade padrão</span>
-          <select id="ing-unidade">
-            <option value="g">g</option>
+      <div class="form-group">
+        <label class="form-label">Nome do Insumo *</label>
+        <input id="ing-nome" class="form-control" placeholder="Ex: Peito de Frango, Embalagem P">
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Unidade Padrão *</label>
+          <select id="ing-unidade" class="form-control">
+            <option value="g">g (gramas)</option>
+            <option value="kg">kg (quilos)</option>
+            <option value="ml">ml (militros)</option>
+            <option value="l">l (litros)</option>
+            <option value="un">un (unidades)</option>
+            <option value="pct">pct (pacotes)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <input id="ing-categoria" class="form-control" placeholder="Ex: Proteína, Embalagem">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fornecedor Padrão</label>
+        <select id="ing-fornecedor" class="form-control"><option value="">Sem fornecedor fixo</option></select>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Estoque Atual</label>
+          <input id="ing-estoque" class="form-control" type="number" step="0.001" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estoque Mínimo (Alerta)</label>
+          <input id="ing-minimo" class="form-control" type="number" step="0.001" placeholder="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Observações</label>
+        <input id="ing-notas" class="form-control" placeholder="Ex: Comprar resfriado no fornecedor X">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-secondary" onclick="fecharModalNovoInsumo()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarInsumo()">Salvar Insumo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LANÇAR COMPRA -->
+  <div id="modal-compra-overlay" class="panel-overlay" role="dialog" aria-modal="true">
+    <div class="panel-modal" style="max-width: 520px; border-radius: var(--radius-lg); padding: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; color:var(--verde-dark);">Lançar Entrada / Compra</h3>
+        <button class="panel-modal-close" onclick="fecharModalLancarCompra()">×</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fornecedor *</label>
+        <select id="e-fornecedor" class="form-control"><option value="">Selecione o Fornecedor...</option></select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Item / Descrição *</label>
+        <input id="e-item" class="form-control" placeholder="Ex: Peito de Frango, Caixas de Papelão">
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Data da Compra</label>
+          <input id="e-data" class="form-control" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unidade</label>
+          <select id="e-unidade" class="form-control" onchange="atualizarValorCompraManual()">
             <option value="kg">kg</option>
-            <option value="ml">ml</option>
+            <option value="g">g</option>
             <option value="l">l</option>
+            <option value="ml">ml</option>
             <option value="un">un</option>
             <option value="pct">pct</option>
           </select>
-        </label>
-        <label class="field">
-          <span>Categoria</span>
-          <input id="ing-categoria" name="production_ingredient_category" placeholder="Ex: Proteína, embalagem" autocomplete="off" spellcheck="false">
-        </label>
-        <label class="field">
-          <span>Fornecedor</span>
-          <select id="ing-fornecedor"><option value="">Sem fornecedor fixo</option></select>
-        </label>
-        <label class="field">
-          <span>Estoque atual</span>
-          <input id="ing-estoque" type="number" min="0" step="0.001" placeholder="0">
-        </label>
-        <label class="field">
-          <span>Estoque mínimo</span>
-          <input id="ing-minimo" type="number" min="0" step="0.001" placeholder="0">
-        </label>
-        <label class="field">
-          <span>Observação</span>
-          <input id="ing-notas" name="production_ingredient_notes" placeholder="Ex: comprar fresco" autocomplete="off" spellcheck="false">
-        </label>
-      </div>
-      <div class="form-actions">
-        <button class="btn-primary" type="button" onclick="salvarInsumo()">Salvar insumo</button>
-        <button class="btn-secondary" type="button" onclick="limparFormInsumo()">Novo</button>
-      </div>
-      <div class="table-status" id="insumos-status">Carregando insumos...</div>
-      <div class="table-wrap">
-        <table style="min-width: 920px;">
-          <thead>
-            <tr>
-              <th>Insumo</th>
-              <th>Categoria</th>
-              <th>Fornecedor</th>
-              <th style="text-align:right;">Estoque</th>
-              <th style="text-align:right;">Mínimo</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-insumos">
-            <tr><td colspan="6">Carregando...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="admin-card" style="margin-top: 20px;">
-      <h3>Compras registradas</h3>
-      <div class="summary-bar" style="margin-top: 12px;">
-  <div class="muted"><strong>Relatórios do período</strong></div>
-  <div><strong>Total:</strong> <span id="rel-total">R$ 0,00</span></div>
-</div>
-
-<div class="table-wrap" style="margin-bottom:14px;">
-  <table style="min-width: 820px;">
-    <thead>
-      <tr>
-        <th>Categoria</th>
-        <th style="text-align:right;">Total</th>
-      </tr>
-    </thead>
-    <tbody id="rel-categorias">
-      <tr><td colspan="2">Aguardando filtros...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="table-wrap" style="margin-bottom:14px;">
-  <table style="min-width: 820px;">
-    <thead>
-      <tr>
-        <th>Top Fornecedores</th>
-        <th style="text-align:right;">Total</th>
-      </tr>
-    </thead>
-    <tbody id="rel-fornecedores">
-      <tr><td colspan="2">Aguardando filtros...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-      <div class="filters-grid">
-        <div>
-          <label>Fornecedor</label>
-          <select id="filtro-fornecedor">
-            <option value="">Todos</option>
-          </select>
         </div>
+      </div>
 
-        <div>
-          <label>Categoria</label>
-          <select id="filtro-categoria">
-            <option value="">Todas</option>
-            <option value="Insumos">Insumos</option>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Quantidade / Peso *</label>
+          <input id="e-qtd" class="form-control" type="number" step="0.001" placeholder="Ex: 5" oninput="atualizarValorCompraManual()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor Unitário (R$) *</label>
+          <input id="e-unit-cost" class="form-control" type="number" step="0.0001" placeholder="Ex: 18,90" oninput="atualizarValorCompraManual()">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Valor Total (Calculado)</label>
+          <input id="e-valor" class="form-control" type="number" step="0.01" placeholder="R$ 0,00" readonly style="background:var(--bg-app); font-weight:800;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select id="e-cat" class="form-control">
+            <option value="Insumos">Insumos / Ingredientes</option>
             <option value="Embalagens">Embalagens</option>
             <option value="Outros">Outros</option>
           </select>
         </div>
-
-        <div>
-          <label>De (data)</label>
-          <input id="filtro-de" type="date">
-        </div>
-
-        <div>
-          <label>Até (data)</label>
-          <input id="filtro-ate" type="date">
-        </div>
       </div>
 
-      <div class="filters-actions">
-        <button class="btn-secondary" onclick="limparFiltrosCompras()">Limpar filtros</button>
-        <button class="btn-secondary" onclick="carregarCompras()">Recarregar</button>
-        <button class="btn-danger" onclick="excluirComprasFiltradas()">Apagar compras filtradas</button>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-secondary" onclick="fecharModalLancarCompra()">Cancelar</button>
+        <button class="btn btn-gold" onclick="salvarCompra()">Registrar Compra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR FORNECEDOR -->
+  <div id="modal-fornecedor-overlay" class="panel-overlay" role="dialog" aria-modal="true">
+    <div class="panel-modal" style="max-width: 460px; border-radius: var(--radius-lg); padding: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; color:var(--verde-dark);">Cadastrar Fornecedor</h3>
+        <button class="panel-modal-close" onclick="fecharModalFornecedor()">×</button>
       </div>
 
-      <div class="summary-bar">
-        <div class="muted" id="compras-resumo">Carregando...</div>
-        <div><strong>Total filtrado:</strong> <span id="compras-total">R$ 0,00</span></div>
+      <div class="form-group">
+        <label class="form-label">Nome do Fornecedor / Empresa *</label>
+        <input id="f-nome" class="form-control" placeholder="Ex: Distribuídora Alimentos Ltda">
       </div>
 
-      <div class="table-wrap">
-        <table style="min-width: 820px;">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Fornecedor</th>
+      <div class="form-group">
+        <label class="form-label">Contato (WhatsApp / E-mail)</label>
+        <input id="f-contato" class="form-control" placeholder="Ex: (11) 99999-9999">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CNPJ / CPF</label>
+        <input id="f-doc" class="form-control" placeholder="Ex: 00.000.000/0001-00">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-secondary" onclick="fecharModalFornecedor()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarFornecedor()">Salvar Fornecedor</button>
+      </div>
+    </div>
+  </div>
               <th>Categoria</th>
               <th>Item</th>
               <th style="text-align:right;">Qtd</th>
@@ -1676,670 +1755,492 @@
   </div>
 </div>
 
-  <!-- ABA CADASTRO DE PRODUTO -->
+  <!-- ABA CADASTRO DE PRODUTO (LAYOUT SAAS 2 COLUNAS) -->
   <div id="aba-cadastro-produto" class="tab-content">
-  <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-    <!-- CADASTRAR/EDITAR -->
-    <div class="admin-card product-editor-card">
-      <div class="card-heading">
-        <div>
-          <span class="eyebrow">Cadastro único</span>
-          <h3 id="cardapio-form-title">Cadastrar produto</h3>
-          <p>Use um cadastro só: produto vendável usa a receita como ficha interna; receita simples usa ingredientes e preparo como conteúdo público.</p>
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;">
+      
+      <!-- COLUNA DA ESQUERDA (DADOS PRINCIPAIS DO PRODUTO) -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <input type="hidden" id="p-id">
+
+        <!-- DADOS COMERCIAIS & PREÇO -->
+        <div class="admin-card" style="margin:0;">
+          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Informações do Produto & Preço</h3>
+          <div class="form-grid">
+            <label class="field full">
+              <span class="form-label">Nome do produto *</span>
+              <input id="p-nome" class="form-control" placeholder="Ex: Panqueca integral de frango">
+            </label>
+            <label class="field full">
+              <span class="form-label">Descrição</span>
+              <textarea id="p-desc" class="form-control" rows="3" placeholder="Explique sabor, composição e benefício principal."></textarea>
+            </label>
+            <label class="field">
+              <span class="form-label">Preço (R$) *</span>
+              <input id="p-preco" class="form-control" type="text" inputmode="decimal" placeholder="Ex: 19,90">
+            </label>
+            <label class="field">
+              <span class="form-label">Porção / unidade</span>
+              <input id="p-porcao" class="form-control" placeholder="Ex: 1 unidade, 250g, kit com 5">
+            </label>
+          </div>
         </div>
+
+        <!-- PRODUÇÃO SOB ENCOMENDA & VALIDADE -->
+        <div class="admin-card" style="margin:0;">
+          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Produção sob Encomenda & Validade</h3>
+          <div class="form-grid is-three">
+            <label class="field">
+              <span class="form-label">Validade (dias)</span>
+              <input id="p-validade" class="form-control" type="number" min="0" step="1" placeholder="Ex: 5">
+            </label>
+            <label class="field">
+              <span class="form-label">Antecedência mínima (h)</span>
+              <input id="p-antecedencia" class="form-control" type="number" min="0" step="1" value="24">
+            </label>
+            <label class="field">
+              <span class="form-label">Limite diário</span>
+              <input id="p-limite-dia" class="form-control" type="number" min="0" step="1" placeholder="Ex: 20">
+            </label>
+            <label class="field">
+              <span class="form-label">Estoque mínimo</span>
+              <input id="p-estoque-minimo" class="form-control" type="number" min="0" step="1" placeholder="Ex: 6">
+            </label>
+            <label class="field">
+              <span class="form-label">Qtd. reposição</span>
+              <input id="p-reposicao-qtd" class="form-control" type="number" min="0" step="1" placeholder="Ex: 20">
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <span class="form-label">Conservação</span>
+            <textarea id="p-conservacao" class="form-control" rows="2" placeholder="Ex: Manter refrigerado. Consumir em até 5 dias."></textarea>
+          </div>
+          <div style="margin-top:12px;">
+            <span class="form-label">Dias disponíveis para encomenda</span>
+            <div class="days-control">
+              <label class="day-option day-option-all"><input type="checkbox" id="p-todos-dias" onchange="toggleAllProductDays(this.checked)"> Todos os dias</label>
+              <div class="days-grid">
+                <label class="day-option"><input type="checkbox" class="p-dia" value="monday" onchange="syncAllDaysFromSelection()"> Seg</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="tuesday" onchange="syncAllDaysFromSelection()"> Ter</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="wednesday" onchange="syncAllDaysFromSelection()"> Qua</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="thursday" onchange="syncAllDaysFromSelection()"> Qui</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="friday" onchange="syncAllDaysFromSelection()"> Sex</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="saturday" onchange="syncAllDaysFromSelection()"> Sáb</label>
+                <label class="day-option"><input type="checkbox" class="p-dia" value="sunday" onchange="syncAllDaysFromSelection()"> Dom</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FICHA TÉCNICA E MODO DE PREPARO -->
+        <details class="mailfy-accordion" style="margin:0;">
+          <summary>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="accordion-icon">📋</span>
+              <span>Ficha Técnica & Receita (Ingredientes e Preparo)</span>
+            </div>
+            <span class="status-pill pill-gold">Clique para abrir</span>
+          </summary>
+          <div class="accordion-body">
+            <div class="form-group">
+              <label class="form-label">Ingredientes (um por linha)</label>
+              <textarea id="p-ingredientes" class="form-control" rows="4" placeholder="Ex: 2 ovos&#10;1 xícara de aveia&#10;1 banana"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modo de preparo (passo a passo)</label>
+              <textarea id="p-preparo" class="form-control" rows="4" placeholder="Ex: 1. Misture tudo&#10;2. Leve à frigideira por 5 min"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vídeo de preparo (URL ou arquivo)</label>
+              <input id="p-video-url" class="form-control" type="url" placeholder="https://..." oninput="atualizarStatusVideoPreparo()">
+            </div>
+            <div style="margin-top:14px; border-top:1px dashed var(--border-subtle); padding-top:14px;">
+              <span class="form-label">Ficha técnica estruturada para compras</span>
+              <div class="bom-builder" style="margin-top:8px;">
+                <label class="field">
+                  <span>Insumo</span>
+                  <input id="bom-ingredient-name" name="production_bom_ingredient_name" list="bom-ingredients-list" class="form-control" placeholder="Buscar ou cadastrar" autocomplete="off" oninput="syncBomIngredientUnit()">
+                  <datalist id="bom-ingredients-list"></datalist>
+                </label>
+                <label class="field">
+                  <span>Compra em</span>
+                  <select id="bom-stock-unit" class="form-control" onchange="syncBomRecipeUnitSuggestion()">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="l">l</option>
+                    <option value="ml">ml</option>
+                    <option value="un">un</option>
+                    <option value="pct">pct</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Qtd. us</span>
+                  <input id="bom-quantity" class="form-control" type="number" step="0.0001" placeholder="Ex: 120">
+                </label>
+                <label class="field">
+                  <span>Un. receita</span>
+                  <select id="bom-unit" class="form-control" onchange="this.dataset.touched='true'">
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="l">l</option>
+                    <option value="un">un</option>
+                    <option value="pct">pct</option>
+                  </select>
+                </label>
+                <button class="btn btn-secondary btn-sm" type="button" onclick="adicionarInsumoFicha()" style="align-self:end; height:38px;">Adicionar</button>
+              </div>
+              <div class="table-container" style="margin-top:12px;">
+                <table class="mailfy-table">
+                  <thead>
+                    <tr>
+                      <th>Insumo</th>
+                      <th style="text-align:right;">Qtd</th>
+                      <th>Un.</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-ficha-ingredientes">
+                    <tr><td colspan="4" style="text-align:center;">Nenhum insumo adicionado.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
 
-      <input type="hidden" id="p-id">
+      <!-- COLUNA DA DIREITA (STICKY: PUBLICAÇÃO & FOTO) -->
+      <div style="display: flex; flex-direction: column; gap: 20px; position: sticky; top: 80px;">
+        <div class="admin-card" style="margin:0;">
+          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Publicação & Foto</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Foto do Produto</label>
+            <input id="p-img" class="form-control" type="file" accept="image/*">
+            <small class="muted" style="font-size:0.75rem;">O backend converte em WebP automaticamente.</small>
+          </div>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Dados comerciais</strong>
-          <span>Informações visíveis para o cliente no cardápio e no fechamento do pedido.</span>
-        </div>
-        <div class="form-grid">
-          <label class="field full">
-            <span>Nome do produto</span>
-            <input id="p-nome" placeholder="Ex: Panqueca integral de frango">
-          </label>
-          <label class="field full">
-            <span>Descrição</span>
-            <textarea id="p-desc" placeholder="Explique sabor, composição e benefício principal."></textarea>
-          </label>
-          <label class="field">
-            <span>Preço (R$)</span>
-            <input id="p-preco" type="text" inputmode="decimal" placeholder="Ex: 19,90">
-          </label>
-          <label class="field">
-            <span>Ordem de exibição</span>
-            <input id="p-ordem" type="number" step="1" placeholder="0" value="0">
-            <small>Menores números aparecem primeiro.</small>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Exibição no site</strong>
-          <span>Controle se o produto aparece, como ele é classificado e qual imagem será usada.</span>
-        </div>
-        <div class="form-grid">
-          <label class="field">
-            <span>Status no cardápio</span>
-            <select id="p-ativo">
-              <option value="true">Ativo</option>
-              <option value="false">Inativo</option>
+          <div class="form-group">
+            <label class="form-label">Status no Cardápio</label>
+            <select id="p-ativo" class="form-control">
+              <option value="true">🟢 Ativo (Exibir no site)</option>
+              <option value="false">🔴 Inativo (Ocultar)</option>
             </select>
-          </label>
-          <label class="field">
-            <span>Categoria</span>
-            <select id="p-categoria" onchange="syncProductBusinessRules('categoria')">
-              <option value="">Selecione</option>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select id="p-categoria" class="form-control" onchange="syncProductBusinessRules('categoria')">
+              <option value="">Selecione a categoria...</option>
               <option value="salgado">Salgado pronto</option>
               <option value="doce">Doce pronto</option>
               <option value="lanche">Lanche</option>
               <option value="brinde">Receita simples gratuita</option>
             </select>
-          </label>
-          <label class="field">
-            <span>Porção / unidade</span>
-            <input id="p-porcao" placeholder="Ex: 1 unidade, 250g, kit com 5">
-          </label>
-          <label class="field">
-            <span>Imagem do produto</span>
-            <input id="p-img" type="file" accept="image/*">
-            <small>O backend otimiza imagens grandes em WebP automaticamente.</small>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Produção sob encomenda</strong>
-          <span>Defina prazo mínimo, validade, capacidade diária e dias em que o item pode ser produzido.</span>
-        </div>
-        <div class="form-grid is-three">
-          <label class="field">
-            <span>Validade (dias)</span>
-            <input id="p-validade" type="number" min="0" step="1" placeholder="Ex: 5">
-          </label>
-          <label class="field">
-            <span>Antecedência mínima</span>
-            <input id="p-antecedencia" type="number" min="0" step="1" value="24">
-            <small>Em horas.</small>
-          </label>
-          <label class="field">
-            <span>Limite por dia</span>
-            <input id="p-limite-dia" type="number" min="0" step="1" placeholder="Ex: 20">
-          </label>
-          <label class="field">
-            <span>Estoque mínimo</span>
-            <input id="p-estoque-minimo" type="number" min="0" step="1" placeholder="Ex: 6">
-            <small>Quando o estoque chegar aqui, o sistema abre reposição.</small>
-          </label>
-          <label class="field">
-            <span>Qtd. reposição</span>
-            <input id="p-reposicao-qtd" type="number" min="0" step="1" placeholder="Ex: 20">
-            <small>Quantidade sugerida para o pedido de reposição.</small>
-          </label>
-        </div>
-        <label class="field" style="margin-top:12px;">
-          <span>Conservação</span>
-          <textarea id="p-conservacao" placeholder="Ex: Manter refrigerado. Consumir em até 5 dias."></textarea>
-        </label>
-        <div style="margin-top:12px;">
-          <span class="field-label">Dias disponíveis para encomenda</span>
-          <div class="days-control">
-            <label class="day-option day-option-all"><input type="checkbox" id="p-todos-dias" onchange="toggleAllProductDays(this.checked)"> Todos os dias</label>
-            <div class="days-grid">
-              <label class="day-option"><input type="checkbox" class="p-dia" value="monday" onchange="syncAllDaysFromSelection()"> Seg</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="tuesday" onchange="syncAllDaysFromSelection()"> Ter</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="wednesday" onchange="syncAllDaysFromSelection()"> Qua</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="thursday" onchange="syncAllDaysFromSelection()"> Qui</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="friday" onchange="syncAllDaysFromSelection()"> Sex</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="saturday" onchange="syncAllDaysFromSelection()"> Sáb</label>
-              <label class="day-option"><input type="checkbox" class="p-dia" value="sunday" onchange="syncAllDaysFromSelection()"> Dom</label>
-            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Venda e conteúdo</strong>
-          <span>Defina se este cadastro será vendido, usado como receita simples pública ou apenas como orientação de rotina.</span>
-        </div>
-        <div class="choice-grid">
-          <label class="field">
-            <span>Produto vendável</span>
-            <select id="p-vendavel" onchange="syncProductBusinessRules('vendavel')">
+          <div class="form-group">
+            <label class="form-label">Ordem de Exibição</label>
+            <input id="p-ordem" class="form-control" type="number" step="1" value="0">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Produto Vendável</label>
+            <select id="p-vendavel" class="form-control" onchange="syncProductBusinessRules('vendavel')">
               <option value="true">Sim, vender no site</option>
-              <option value="false">Não vender</option>
+              <option value="false">Não vender (Apenas receita)</option>
             </select>
-          </label>
-          <label class="field">
-            <span>Receita simples pública</span>
-            <select id="p-brinde" onchange="syncProductBusinessRules('brinde')">
-              <option value="false">Não</option>
-              <option value="true">Sim</option>
-            </select>
-          </label>
-        </div>
-        <label class="field" style="margin-top:12px;">
-          <span>Nota para organização semanal</span>
-          <textarea id="p-nota-semanal" placeholder="Ex: Boa opção para lanche da tarde ou pré-treino."></textarea>
-        </label>
-        <div style="margin-top:12px;">
-          <span class="field-label">Guia de ícones</span>
-          <div class="usage-context-grid">
-            <label class="usage-context-option">
-              <input type="checkbox" class="p-usage-context" value="breakfast">
-              <span class="usage-token">CM</span>
-              <span><strong>Café da manhã</strong><small>Para começar o dia com saciedade, energia e equilíbrio.</small></span>
-            </label>
-            <label class="usage-context-option">
-              <input type="checkbox" class="p-usage-context" value="work">
-              <span class="usage-token">TR</span>
-              <span><strong>Para levar para o trabalho</strong><small>Preparações práticas para trabalho, estudo ou dias fora de casa.</small></span>
-            </label>
-            <label class="usage-context-option">
-              <input type="checkbox" class="p-usage-context" value="lunch_dinner">
-              <span class="usage-token">AJ</span>
-              <span><strong>Almoço ou jantar</strong><small>Receitas e produtos para usar como refeição principal.</small></span>
-            </label>
-            <label class="usage-context-option">
-              <input type="checkbox" class="p-usage-context" value="quick_snack">
-              <span class="usage-token">LR</span>
-              <span><strong>Lanches rápidos</strong><small>Opções simples para dias corridos e poucos ingredientes.</small></span>
-            </label>
           </div>
+
+          <button class="btn btn-primary" style="width:100%; height:46px; font-size:1rem; margin-top:14px;" onclick="salvarProduto()">💾 Salvar Produto</button>
+          <button class="btn btn-ghost" style="width:100%; margin-top:8px; font-size:0.84rem;" onclick="limparFormProduto()">Limpar formulário</button>
         </div>
       </div>
 
-
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Receita e ficha técnica</strong>
-          <span>Produto vendável: informação interna da equipe. Receita simples: aparece no site para o cliente fazer em casa.</span>
-        </div>
-        <div class="form-grid">
-          <label class="field full">
-            <span>Ingredientes</span>
-            <textarea id="p-ingredientes" placeholder="Escreva um ingrediente por linha. Ex: 2 ovos, 1 xícara de aveia, 1 banana."></textarea>
-            <small>Para produto vendável, isso fica interno. Para receita simples gratuita, isso aparece para o cliente.</small>
-          </label>
-          <label class="field full">
-            <span>Modo de preparo</span>
-            <textarea id="p-preparo" placeholder="Escreva o passo a passo, de preferência um passo por linha."></textarea>
-            <small>Use uma linguagem objetiva para a equipe ou para o cliente, conforme o tipo do cadastro.</small>
-          </label>
-          <label class="field full">
-            <span>Vídeo de preparo</span>
-            <input id="p-video-url" type="url" placeholder="URL do vídeo ou envie um arquivo abaixo" oninput="atualizarStatusVideoPreparo()">
-            <small>Produto vendável: fica interno. Faça você mesmo: aparece na receita pública.</small>
-          </label>
-          <div class="field full">
-            <span>Enviar vídeo para teste</span>
-            <input id="p-video-file" type="file" accept="video/mp4,video/webm,video/quicktime">
-            <small>Use MP4, WebM ou MOV com até 45 MB. Se mudar para Faça você mesmo, o envio também salva essa visibilidade.</small>
-            <div class="form-actions" style="justify-content:flex-start;margin-top:8px;">
-              <button class="btn-secondary" type="button" onclick="enviarVideoPreparo()">Enviar vídeo</button>
-              <span class="muted" id="p-video-status">Nenhum vídeo enviado.</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-section">
-          <div class="form-section-head">
-            <strong>Ficha técnica estruturada</strong>
-            <span>Use esta grade para cálculo interno de compras. O texto de ingredientes acima continua servindo como leitura humana.</span>
-          </div>
-          <div class="rule-note" id="bom-product-note">Salve ou selecione um produto para montar a ficha técnica estruturada.</div>
-          <div class="bom-builder">
-            <label class="field">
-              <span>Insumo</span>
-              <input id="bom-ingredient-name" name="production_bom_ingredient_name" list="bom-ingredients-list" placeholder="Digite para buscar ou cadastrar" autocomplete="off" spellcheck="false" oninput="syncBomIngredientUnit()">
-              <datalist id="bom-ingredients-list"></datalist>
-              <small>Se não existir, será cadastrado ao adicionar.</small>
-            </label>
-            <label class="field">
-              <span>Compra/estoque em</span>
-              <select id="bom-stock-unit" onchange="syncBomRecipeUnitSuggestion()">
-                <option value="kg">kg</option>
-                <option value="g">g</option>
-                <option value="l">l</option>
-                <option value="ml">ml</option>
-                <option value="un">un</option>
-                <option value="pct">pct</option>
-              </select>
-              <small>Ex: compra em kg, usa g na receita.</small>
-            </label>
-            <label class="field">
-              <span>Qtd. usada por unidade</span>
-              <input id="bom-quantity" type="number" min="0" step="0.0001" placeholder="Ex: 120">
-            </label>
-            <label class="field">
-              <span>Unidade da receita</span>
-              <select id="bom-unit" onchange="this.dataset.touched='true'">
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-                <option value="ml">ml</option>
-                <option value="l">l</option>
-                <option value="un">un</option>
-                <option value="pct">pct</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Observação</span>
-              <input id="bom-notes" name="production_bom_notes" placeholder="Opcional" autocomplete="off" spellcheck="false">
-            </label>
-            <button class="btn-secondary" type="button" onclick="adicionarInsumoFicha()">Adicionar</button>
-          </div>
-          <div class="table-wrap" style="margin-top:12px;">
-            <table style="min-width: 760px;">
-              <thead>
-                <tr>
-                  <th>Insumo</th>
-                  <th style="text-align:right;">Qtd./unidade</th>
-                  <th>Unidade</th>
-                  <th>Observação</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-ficha-ingredientes">
-                <tr><td colspan="5">Nenhum insumo estruturado.</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="form-actions">
-            <button class="btn-primary" type="button" onclick="salvarFichaTecnicaEstruturada()">Salvar ficha técnica</button>
-            <button class="btn-secondary" type="button" onclick="carregarFichaTecnicaProdutoAtual()">Recarregar ficha</button>
-          </div>
-        </div>
-
-        <div class="rule-note" id="recipe-visibility-note">Produto vendável: ingredientes e modo de preparo ficam ocultos no site público.</div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-primary" type="button" onclick="salvarProduto()">Salvar produto</button>
-        <button class="btn-secondary" type="button" onclick="limparFormProduto()">Limpar formulário</button>
-      </div>
     </div>
   </div>
-</div>
 
-  <!-- ABA TEXTOS DO SITE -->
+  <!-- ABA TEXTOS DO SITE (GERENCIADOR CMS ESTILO WORDPRESS CUSTOMIZER) -->
   <div id="aba-textos" class="tab-content">
-    <div class="admin-card">
-      <div class="card-heading">
-        <div>
-          <span class="eyebrow">Conteúdo público</span>
-          <h3>Textos do site</h3>
-          <p>Edite os textos principais da página pública sem mexer no código.</p>
-        </div>
+    <!-- BARRA SUPERIOR DE PUBLICAÇÃO DO SITE -->
+    <div class="admin-card" style="margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+      <div>
+        <h3 style="margin:0; color:var(--verde-dark);">Personalização do Site (CMS / Customizer)</h3>
+        <p class="muted" style="margin:2px 0 0 0; font-size:0.84rem;">Altere títulos, chamadas, guias da feira e textos públicos em tempo real sem mexer em código.</p>
       </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary btn-sm" type="button" onclick="restaurarTextosSitePadrao()">🔄 Restaurar Padrão</button>
+        <button class="btn btn-secondary btn-sm" type="button" onclick="carregarTextosSiteAdmin()">Recarregar</button>
+        <button class="btn btn-primary" type="button" onclick="salvarTextosSite()">💾 Salvar Alterações do Site</button>
+      </div>
+    </div>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Cabeçalho e apresentação</strong>
-          <span>Texto da marca, chamada principal e explicação inicial.</span>
+    <!-- SEÇÃO 1: CABEÇALHO & HERO BANNER (Aberto por padrão) -->
+    <details class="mailfy-accordion" open>
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">🏡</span>
+          <span>Cabeçalho & Hero Banner (Seção Principal do Site)</span>
         </div>
+        <span class="status-pill pill-success">Página Inicial</span>
+      </summary>
+      <div class="accordion-body">
         <div class="form-grid">
-          <label class="field">
-            <span>Subtítulo da marca</span>
-            <input id="txt-brandSubtitle">
-          </label>
-          <label class="field">
-            <span>Selo do topo</span>
-            <input id="txt-headerBadge">
-          </label>
-          <label class="field full">
-            <span>Etiqueta da chamada</span>
-            <input id="txt-heroEyebrow">
-          </label>
-          <label class="field full">
-            <span>Título principal</span>
-            <input id="txt-heroTitle">
-          </label>
-          <label class="field full">
-            <span>Descrição principal</span>
-            <textarea id="txt-heroDescription"></textarea>
-          </label>
+          <div class="form-group">
+            <label class="form-label">Subtítulo da Marca</label>
+            <input id="txt-brandSubtitle" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Selo do Topo (Badge)</label>
+            <input id="txt-headerBadge" class="form-control">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Etiqueta da Chamada</label>
+            <input id="txt-heroEyebrow" class="form-control">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Título Principal (H1)</label>
+            <input id="txt-heroTitle" class="form-control">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Descrição Principal do Banner</label>
+            <textarea id="txt-heroDescription" class="form-control" rows="3"></textarea>
+          </div>
         </div>
       </div>
+    </details>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Como funciona</strong>
-          <span>Os três blocos que explicam o fluxo para o cliente.</span>
+    <!-- SEÇÃO 2: COMO FUNCIONA (3 PASSOS) -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">⚙️</span>
+          <span>Como Funciona (3 Passos da Rotina)</span>
         </div>
+        <span class="status-pill pill-gold">Clique para abrir</span>
+      </summary>
+      <div class="accordion-body">
+        <div class="form-group">
+          <label class="form-label">Título da Seção</label>
+          <input id="txt-howItWorksTitle" class="form-control">
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-top:10px;">
+          <div style="background:var(--bg-app); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <strong style="color:var(--verde-dark);">Passo 1</strong>
+            <div class="form-group" style="margin-top:8px;">
+              <label class="form-label">Título</label>
+              <input id="txt-step1Title" class="form-control">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Texto</label>
+              <input id="txt-step1Text" class="form-control">
+            </div>
+          </div>
+          <div style="background:var(--bg-app); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <strong style="color:var(--verde-dark);">Passo 2</strong>
+            <div class="form-group" style="margin-top:8px;">
+              <label class="form-label">Título</label>
+              <input id="txt-step2Title" class="form-control">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Texto</label>
+              <input id="txt-step2Text" class="form-control">
+            </div>
+          </div>
+          <div style="background:var(--bg-app); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <strong style="color:var(--verde-dark);">Passo 3</strong>
+            <div class="form-group" style="margin-top:8px;">
+              <label class="form-label">Título</label>
+              <input id="txt-step3Title" class="form-control">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Texto</label>
+              <input id="txt-step3Text" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- SEÇÃO 3: GUIA SEMANAL & DICAS DA FEIRA -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">📖</span>
+          <span>Guia Semanal & Dicas de Organização</span>
+        </div>
+        <span class="status-pill pill-gold">Clique para abrir</span>
+      </summary>
+      <div class="accordion-body">
         <div class="form-grid">
-          <label class="field full">
-            <span>Título da seção</span>
-            <input id="txt-howItWorksTitle">
-          </label>
-          <label class="field">
-            <span>Bloco 1 - título</span>
-            <input id="txt-step1Title">
-          </label>
-          <label class="field">
-            <span>Bloco 1 - texto</span>
-            <input id="txt-step1Text">
-          </label>
-          <label class="field">
-            <span>Bloco 2 - título</span>
-            <input id="txt-step2Title">
-          </label>
-          <label class="field">
-            <span>Bloco 2 - texto</span>
-            <input id="txt-step2Text">
-          </label>
-          <label class="field">
-            <span>Bloco 3 - título</span>
-            <input id="txt-step3Title">
-          </label>
-          <label class="field">
-            <span>Bloco 3 - texto</span>
-            <input id="txt-step3Text">
-          </label>
+          <div class="form-group">
+            <label class="form-label">Link do Menu do Topo</label>
+            <input id="txt-weeklyGuideNav" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Título da Seção</label>
+            <input id="txt-weeklyGuideTitle" class="form-control">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Chamada Principal</label>
+            <input id="txt-weeklyGuideHeading" class="form-control">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Texto de Abertura</label>
+            <textarea id="txt-weeklyGuideIntro" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Texto do Botão de Detalhes</label>
+            <input id="txt-weeklyGuideButton" class="form-control">
+          </div>
         </div>
-      </div>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Guia semanal</strong>
-          <span>Textos da área pública que ajuda o cliente a organizar a alimentação da semana.</span>
+        <h4 style="margin:16px 0 10px 0; color:var(--verde-dark);">Dicas da Feira & Mercado (4 Blocos)</h4>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+          <div style="background:var(--bg-app); padding:12px; border-radius:var(--radius-md);">
+            <label class="form-label">Bloco 1 - Título & Texto</label>
+            <input id="txt-weeklyGuideCard1Title" class="form-control" style="margin-bottom:6px;">
+            <input id="txt-weeklyGuideCard1Text" class="form-control">
+          </div>
+          <div style="background:var(--bg-app); padding:12px; border-radius:var(--radius-md);">
+            <label class="form-label">Bloco 2 - Título & Texto</label>
+            <input id="txt-weeklyGuideCard2Title" class="form-control" style="margin-bottom:6px;">
+            <input id="txt-weeklyGuideCard2Text" class="form-control">
+          </div>
+          <div style="background:var(--bg-app); padding:12px; border-radius:var(--radius-md);">
+            <label class="form-label">Bloco 3 - Título & Texto</label>
+            <input id="txt-weeklyGuideCard3Title" class="form-control" style="margin-bottom:6px;">
+            <input id="txt-weeklyGuideCard3Text" class="form-control">
+          </div>
+          <div style="background:var(--bg-app); padding:12px; border-radius:var(--radius-md);">
+            <label class="form-label">Bloco 4 - Título & Texto</label>
+            <input id="txt-weeklyGuideCard4Title" class="form-control" style="margin-bottom:6px;">
+            <input id="txt-weeklyGuideCard4Text" class="form-control">
+          </div>
         </div>
+
+        <h4 style="margin:16px 0 10px 0; color:var(--verde-dark);">Roteiro Semanal & Lista Inteligente</h4>
         <div class="form-grid">
-          <label class="field">
-            <span>Link do topo</span>
-            <input id="txt-weeklyGuideNav">
-          </label>
-          <label class="field">
-            <span>Título da seção</span>
-            <input id="txt-weeklyGuideTitle">
-          </label>
-          <label class="field full">
-            <span>Chamada principal</span>
-            <input id="txt-weeklyGuideHeading">
-          </label>
-          <label class="field full">
-            <span>Texto de abertura</span>
-            <textarea id="txt-weeklyGuideIntro"></textarea>
-          </label>
-          <label class="field">
-            <span>Botão de detalhes</span>
-            <input id="txt-weeklyGuideButton">
-          </label>
-          <label class="field">
-            <span>Bloco 1 - título</span>
-            <input id="txt-weeklyGuideCard1Title">
-          </label>
-          <label class="field full">
-            <span>Bloco 1 - texto</span>
-            <input id="txt-weeklyGuideCard1Text">
-          </label>
-          <label class="field">
-            <span>Bloco 2 - título</span>
-            <input id="txt-weeklyGuideCard2Title">
-          </label>
-          <label class="field full">
-            <span>Bloco 2 - texto</span>
-            <input id="txt-weeklyGuideCard2Text">
-          </label>
-          <label class="field">
-            <span>Bloco 3 - título</span>
-            <input id="txt-weeklyGuideCard3Title">
-          </label>
-          <label class="field full">
-            <span>Bloco 3 - texto</span>
-            <input id="txt-weeklyGuideCard3Text">
-          </label>
-          <label class="field">
-            <span>Bloco 4 - título</span>
-            <input id="txt-weeklyGuideCard4Title">
-          </label>
-          <label class="field full">
-            <span>Bloco 4 - texto</span>
-            <input id="txt-weeklyGuideCard4Text">
-          </label>
-          <label class="field full">
-            <span>Título do roteiro</span>
-            <input id="txt-weeklyGuideRoutineTitle">
-          </label>
-          <label class="field">
-            <span>Roteiro 1</span>
-            <input id="txt-weeklyGuideRoutine1">
-          </label>
-          <label class="field">
-            <span>Roteiro 2</span>
-            <input id="txt-weeklyGuideRoutine2">
-          </label>
-          <label class="field">
-            <span>Roteiro 3</span>
-            <input id="txt-weeklyGuideRoutine3">
-          </label>
-          <label class="field">
-            <span>Roteiro 4</span>
-            <input id="txt-weeklyGuideRoutine4">
-          </label>
-          <label class="field">
-            <span>Título da lista</span>
-            <input id="txt-weeklyGuideShoppingTitle">
-          </label>
-          <label class="field full">
-            <span>Texto da lista</span>
-            <input id="txt-weeklyGuideShoppingIntro">
-          </label>
-          <label class="field">
-            <span>Item de compra 1</span>
-            <input id="txt-weeklyGuideShopping1">
-          </label>
-          <label class="field">
-            <span>Item de compra 2</span>
-            <input id="txt-weeklyGuideShopping2">
-          </label>
-          <label class="field">
-            <span>Item de compra 3</span>
-            <input id="txt-weeklyGuideShopping3">
-          </label>
-          <label class="field">
-            <span>Item de compra 4</span>
-            <input id="txt-weeklyGuideShopping4">
-          </label>
-          <label class="field">
-            <span>Item de compra 5</span>
-            <input id="txt-weeklyGuideShopping5">
-          </label>
-          <label class="field full">
-            <span>Mensagem final</span>
-            <textarea id="txt-weeklyGuideClosing"></textarea>
-          </label>
+          <div class="form-group full">
+            <label class="form-label">Título do Roteiro</label>
+            <input id="txt-weeklyGuideRoutineTitle" class="form-control">
+          </div>
+          <div class="form-group"><label class="form-label">Roteiro 1</label><input id="txt-weeklyGuideRoutine1" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Roteiro 2</label><input id="txt-weeklyGuideRoutine2" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Roteiro 3</label><input id="txt-weeklyGuideRoutine3" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Roteiro 4</label><input id="txt-weeklyGuideRoutine4" class="form-control"></div>
+
+          <div class="form-group full"><label class="form-label">Título da Lista de Compras</label><input id="txt-weeklyGuideShoppingTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Texto da Lista de Compras</label><input id="txt-weeklyGuideShoppingIntro" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Item 1</label><input id="txt-weeklyGuideShopping1" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Item 2</label><input id="txt-weeklyGuideShopping2" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Item 3</label><input id="txt-weeklyGuideShopping3" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Item 4</label><input id="txt-weeklyGuideShopping4" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Item 5</label><input id="txt-weeklyGuideShopping5" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Mensagem de Encerramento do Guia</label><textarea id="txt-weeklyGuideClosing" class="form-control" rows="2"></textarea></div>
         </div>
       </div>
+    </details>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Política comercial</strong>
-          <span>Textos da área pública que explica descontos e fechamento do pagamento.</span>
+    <!-- SEÇÃO 4: POLÍTICA COMERCIAL & DESCONTOS -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">🏷️</span>
+          <span>Política Comercial & Regras de Desconto</span>
         </div>
+        <span class="status-pill pill-gold">Clique para abrir</span>
+      </summary>
+      <div class="accordion-body">
         <div class="form-grid">
-          <label class="field">
-            <span>Título da seção</span>
-            <input id="txt-policyTitle">
-          </label>
-          <label class="field full">
-            <span>Chamada principal</span>
-            <input id="txt-policyHeading">
-          </label>
-          <label class="field full">
-            <span>Texto de abertura</span>
-            <textarea id="txt-policyIntro"></textarea>
-          </label>
-          <label class="field">
-            <span>Botão de detalhes</span>
-            <input id="txt-policyButton">
-          </label>
-          <label class="field">
-            <span>Volume - título</span>
-            <input id="txt-policyVolumeTitle">
-          </label>
-          <label class="field full">
-            <span>Volume - texto</span>
-            <input id="txt-policyVolumeText">
-          </label>
-          <label class="field">
-            <span>Variedade - título</span>
-            <input id="txt-policyDiversityTitle">
-          </label>
-          <label class="field full">
-            <span>Variedade - texto</span>
-            <input id="txt-policyDiversityText">
-          </label>
-          <label class="field">
-            <span>Limite - título</span>
-            <input id="txt-policyLimitTitle">
-          </label>
-          <label class="field full">
-            <span>Limite - texto</span>
-            <input id="txt-policyLimitText">
-          </label>
-          <label class="field full">
-            <span>Nota sobre pagamento</span>
-            <textarea id="txt-policyPaymentNote"></textarea>
-          </label>
+          <div class="form-group"><label class="form-label">Título da Seção</label><input id="txt-policyTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Chamada Principal</label><input id="txt-policyHeading" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Texto de Abertura</label><textarea id="txt-policyIntro" class="form-control" rows="2"></textarea></div>
+          <div class="form-group"><label class="form-label">Botão de Detalhes</label><input id="txt-policyButton" class="form-control"></div>
+          
+          <div class="form-group"><label class="form-label">Desconto por Volume - Título</label><input id="txt-policyVolumeTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Desconto por Volume - Texto</label><input id="txt-policyVolumeText" class="form-control"></div>
+
+          <div class="form-group"><label class="form-label">Bônus por Variedade - Título</label><input id="txt-policyDiversityTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Bônus por Variedade - Texto</label><input id="txt-policyDiversityText" class="form-control"></div>
+
+          <div class="form-group"><label class="form-label">Limite Saudável - Título</label><input id="txt-policyLimitTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Limite Saudável - Texto</label><input id="txt-policyLimitText" class="form-control"></div>
+
+          <div class="form-group full"><label class="form-label">Nota de Pagamento (Mercado Pago)</label><textarea id="txt-policyPaymentNote" class="form-control" rows="2"></textarea></div>
         </div>
       </div>
+    </details>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Cardápio público</strong>
-          <span>Edite nomes das abas, descrições e textos da área de receitas/conteúdo.</span>
+    <!-- SEÇÃO 5: CARDÁPIO & SEÇÕES -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">🍲</span>
+          <span>Cardápio & Nomes das Abas Públicas</span>
         </div>
+        <span class="status-pill pill-gold">Clique para abrir</span>
+      </summary>
+      <div class="accordion-body">
         <div class="form-grid">
-          <label class="field full">
-            <span>Título da seção</span>
-            <input id="txt-menuTitle">
-          </label>
-          <label class="field">
-            <span>Aba doces - nome</span>
-            <input id="txt-menuDocesLabel">
-          </label>
-          <label class="field">
-            <span>Aba doces - descrição</span>
-            <input id="txt-menuDocesNote">
-          </label>
-          <label class="field">
-            <span>Aba salgados - nome</span>
-            <input id="txt-menuSalgadosLabel">
-          </label>
-          <label class="field">
-            <span>Aba salgados - descrição</span>
-            <input id="txt-menuSalgadosNote">
-          </label>
-          <label class="field">
-            <span>Aba Faça você mesmo - nome</span>
-            <input id="txt-menuDiyLabel">
-          </label>
-          <label class="field">
-            <span>Aba Faça você mesmo - descrição</span>
-            <input id="txt-menuDiyNote">
-          </label>
-          <label class="field full">
-            <span>Faça você mesmo - título explicativo</span>
-            <input id="txt-diyIntroTitle">
-          </label>
-          <label class="field full">
-            <span>Faça você mesmo - texto explicativo</span>
-            <textarea id="txt-diyIntroText"></textarea>
-          </label>
-          <label class="field">
-            <span>Título do guia de ícones</span>
-            <input id="txt-recipeIconGuideTitle">
-          </label>
-          <label class="field full">
-            <span>Mensagem sem receitas</span>
-            <input id="txt-menuDiyEmpty">
-          </label>
-          <label class="field">
-            <span>Selo da receita</span>
-            <input id="txt-recipeBadgeLabel">
-          </label>
-          <label class="field">
-            <span>Botão da receita</span>
-            <input id="txt-recipeButtonLabel">
-          </label>
-          <label class="field">
-            <span>Rótulo no detalhe</span>
-            <input id="txt-recipeDetailLabel">
-          </label>
-          <label class="field">
-            <span>Título ingredientes</span>
-            <input id="txt-recipeIngredientsTitle">
-          </label>
-          <label class="field">
-            <span>Título modo de preparo</span>
-            <input id="txt-recipePreparationTitle">
-          </label>
-          <label class="field">
-            <span>Texto de conteúdo vazio</span>
-            <input id="txt-recipeEmptyText">
-          </label>
+          <div class="form-group full"><label class="form-label">Título do Cardápio</label><input id="txt-menuTitle" class="form-control"></div>
+          
+          <div class="form-group"><label class="form-label">Aba Doces - Nome</label><input id="txt-menuDocesLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Aba Doces - Descrição</label><input id="txt-menuDocesNote" class="form-control"></div>
+
+          <div class="form-group"><label class="form-label">Aba Salgados - Nome</label><input id="txt-menuSalgadosLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Aba Salgados - Descrição</label><input id="txt-menuSalgadosNote" class="form-control"></div>
+
+          <div class="form-group"><label class="form-label">Aba Faça Você Mesmo - Nome</label><input id="txt-menuDiyLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Aba Faça Você Mesmo - Descrição</label><input id="txt-menuDiyNote" class="form-control"></div>
+
+          <div class="form-group full"><label class="form-label">Faça Você Mesmo - Título Explicativo</label><input id="txt-diyIntroTitle" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Faça Você Mesmo - Texto Explicativo</label><textarea id="txt-diyIntroText" class="form-control" rows="2"></textarea></div>
+          
+          <div class="form-group"><label class="form-label">Guia de Ícones - Título</label><input id="txt-recipeIconGuideTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Mensagem Sem Receitas</label><input id="txt-menuDiyEmpty" class="form-control"></div>
+          
+          <div class="form-group"><label class="form-label">Selo da Receita</label><input id="txt-recipeBadgeLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Botão da Receita</label><input id="txt-recipeButtonLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Rótulo no Detalhe</label><input id="txt-recipeDetailLabel" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Título Ingredientes</label><input id="txt-recipeIngredientsTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Título Modo de Preparo</label><input id="txt-recipePreparationTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Texto Conteúdo Vazio</label><input id="txt-recipeEmptyText" class="form-control"></div>
         </div>
       </div>
+    </details>
 
-      <div class="form-section">
-        <div class="form-section-head">
-          <strong>Pedido e rodapé</strong>
-          <span>Chamadas finais, nomes das seções e mensagens de fechamento.</span>
+    <!-- SEÇÃO 6: RODAPÉ & MENSAGENS FINAIS -->
+    <details class="mailfy-accordion">
+      <summary>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="accordion-icon">🦶</span>
+          <span>Rodapé & Mensagens de Encerramento</span>
         </div>
+        <span class="status-pill pill-gold">Clique para abrir</span>
+      </summary>
+      <div class="accordion-body">
         <div class="form-grid">
-          <label class="field">
-            <span>Título pedido</span>
-            <input id="txt-orderTitle">
-          </label>
-          <label class="field">
-            <span>CTA - título</span>
-            <input id="txt-ctaTitle">
-          </label>
-          <label class="field">
-            <span>CTA - botão</span>
-            <input id="txt-ctaButton">
-          </label>
-          <label class="field full">
-            <span>CTA - texto</span>
-            <input id="txt-ctaText">
-          </label>
-          <label class="field">
-            <span>Rodapé - título</span>
-            <input id="txt-footerTitle">
-          </label>
-          <label class="field">
-            <span>Rodapé - linha 1</span>
-            <input id="txt-footerLine1">
-          </label>
-          <label class="field full">
-            <span>Rodapé - linha 2</span>
-            <input id="txt-footerLine2">
-          </label>
-          <label class="field">
-            <span>Selo 1</span>
-            <input id="txt-footerTag1">
-          </label>
-          <label class="field">
-            <span>Selo 2</span>
-            <input id="txt-footerTag2">
-          </label>
-          <label class="field">
-            <span>Selo 3</span>
-            <input id="txt-footerTag3">
-          </label>
+          <div class="form-group"><label class="form-label">Título do Pedido</label><input id="txt-orderTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">CTA Final - Título</label><input id="txt-ctaTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">CTA Final - Texto do Botão</label><input id="txt-ctaButton" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">CTA Final - Texto Descritivo</label><input id="txt-ctaText" class="form-control"></div>
+          
+          <div class="form-group"><label class="form-label">Rodapé - Título da Marca</label><input id="txt-footerTitle" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Rodapé - Linha 1</label><input id="txt-footerLine1" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Rodapé - Linha 2</label><input id="txt-footerLine2" class="form-control"></div>
+
+          <div class="form-group"><label class="form-label">Selo 1 (Frescor)</label><input id="txt-footerTag1" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Selo 2 (Praticidade)</label><input id="txt-footerTag2" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Selo 3 (Rotina Saudável)</label><input id="txt-footerTag3" class="form-control"></div>
         </div>
       </div>
+    </details>
 
-      <div class="form-actions">
-        <button class="btn-primary" type="button" onclick="salvarTextosSite()">Salvar textos</button>
-        <button class="btn-secondary" type="button" onclick="carregarTextosSiteAdmin()">Recarregar</button>
-        <button class="btn-secondary" type="button" onclick="restaurarTextosSitePadrao()">Restaurar padrão</button>
-      </div>
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" type="button" onclick="restaurarTextosSitePadrao()">🔄 Restaurar Padrão</button>
+      <button class="btn btn-primary" type="button" onclick="salvarTextosSite()">💾 Salvar Alterações do Site</button>
     </div>
   </div>
 
@@ -2722,6 +2623,35 @@
     if (sidebar && sidebar.classList.contains('open')) {
       sidebar.classList.remove('open');
     }
+  }
+
+  // ================= MODAIS DE ESTOQUE & COMPRAS =================
+  function abrirModalNovoInsumo() {
+    limparFormInsumo();
+    const modal = document.getElementById("modal-insumo-overlay");
+    if (modal) modal.classList.add("open");
+  }
+  function fecharModalNovoInsumo() {
+    const modal = document.getElementById("modal-insumo-overlay");
+    if (modal) modal.classList.remove("open");
+  }
+
+  function abrirModalLancarCompra() {
+    const modal = document.getElementById("modal-compra-overlay");
+    if (modal) modal.classList.add("open");
+  }
+  function fecharModalLancarCompra() {
+    const modal = document.getElementById("modal-compra-overlay");
+    if (modal) modal.classList.remove("open");
+  }
+
+  function abrirModalFornecedor() {
+    const modal = document.getElementById("modal-fornecedor-overlay");
+    if (modal) modal.classList.add("open");
+  }
+  function fecharModalFornecedor() {
+    const modal = document.getElementById("modal-fornecedor-overlay");
+    if (modal) modal.classList.remove("open");
   }
 
   function toggleSidebar() {
@@ -5298,28 +5228,77 @@ async function salvarProducaoLote(){
     const chart = getEl("sales-chart");
     const tbody = getEl("tbody-vendas-periodo");
     if (!chart || !tbody) return;
-    if (!rows.length) {
-      chart.innerHTML = '<div class="muted">Sem vendas aprovadas para o filtro selecionado.</div>';
-      tbody.innerHTML = '<tr><td colspan="4">Sem vendas no período.</td></tr>';
-      return;
-    }
-    const max = Math.max(...rows.map(row => row.total), 1);
-    chart.innerHTML = rows.map(row => {
-      const pct = Math.max(3, Math.round((row.total / max) * 100));
+
+    // Se não houver vendas reais no filtro, gera dados projetados/exemplo para demonstração gráfica
+    const isDemo = !rows || !rows.length;
+    const displayRows = isDemo ? [
+      { key: "Seg", total: 180, orders: 4, units: 6 },
+      { key: "Ter", total: 320, orders: 7, units: 10 },
+      { key: "Qua", total: 240, orders: 5, units: 8 },
+      { key: "Qui", total: 450, orders: 9, units: 14 },
+      { key: "Sex", total: 610, orders: 12, units: 18 },
+      { key: "Sáb", total: 380, orders: 8, units: 12 },
+      { key: "Dom", total: 290, orders: 6, units: 9 }
+    ] : rows;
+
+    const max = Math.max(...displayRows.map(r => r.total), 100);
+
+    // Gerador de barras SVG limpas com gradiente
+    const barsSvg = displayRows.map((r, idx) => {
+      const heightPct = Math.max(12, Math.round((r.total / max) * 160));
+      const x = 50 + idx * 75;
+      const y = 200 - heightPct;
+      const label = periodLabel(r.key, grouping) || r.key;
+      const valorFmt = fmt(r.total);
+
       return `
-        <div class="chart-row">
-          <div class="chart-label" title="${periodLabel(row.key, grouping)}">${periodLabel(row.key, grouping)}</div>
-          <div class="chart-track"><div class="chart-bar" style="width:${pct}%"></div></div>
-          <div class="chart-value">${fmt(row.total)}</div>
-        </div>
+        <g class="chart-bar-group" style="cursor:pointer;">
+          <!-- Barra Vertical -->
+          <rect x="${x}" y="${y}" width="38" height="${heightPct}" rx="6" fill="url(#greenGoldGradient)" opacity="0.9" />
+          <!-- Valor no Topo -->
+          <text x="${x + 19}" y="${y - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#2d5235">${valorFmt}</text>
+          <!-- Rótulo do Dia -->
+          <text x="${x + 19}" y="222" text-anchor="middle" font-size="11" font-weight="600" fill="#667066">${label}</text>
+        </g>
       `;
     }).join("");
-    tbody.innerHTML = rows.map(row => `
+
+    chart.innerHTML = `
+      <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h4 style="margin:0; color:var(--verde-dark); font-size:1rem;">Desempenho de Vendas no Período</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">Acompanhe a curva de faturamento e volume de refeições.</span>
+          </div>
+          ${isDemo ? `<span class="status-pill pill-warning">Modo Demonstrativo (Sem vendas no filtro)</span>` : `<span class="status-pill pill-success">Dados em Tempo Real</span>`}
+        </div>
+
+        <div style="width:100%; overflow-x:auto;">
+          <svg viewBox="0 0 ${Math.max(600, displayRows.length * 80 + 60)} 240" style="width:100%; min-width:560px; height:220px;">
+            <defs>
+              <linearGradient id="greenGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#3c6e47" />
+                <stop offset="100%" stop-color="#c9a86a" />
+              </linearGradient>
+            </defs>
+
+            <!-- Linha Guia Hozizontal -->
+            <line x1="30" y1="40" x2="100%" y2="40" stroke="#e0e6df" stroke-dasharray="4" />
+            <line x1="30" y1="120" x2="100%" y2="120" stroke="#e0e6df" stroke-dasharray="4" />
+            <line x1="30" y1="200" x2="100%" y2="200" stroke="#dfe5dd" stroke-width="1.5" />
+
+            ${barsSvg}
+          </svg>
+        </div>
+      </div>
+    `;
+
+    tbody.innerHTML = displayRows.map(row => `
       <tr>
-        <td><strong>${periodLabel(row.key, grouping)}</strong></td>
+        <td><strong>${periodLabel(row.key, grouping) || row.key}</strong></td>
         <td style="text-align:right;">${row.orders}</td>
         <td style="text-align:right;">${row.units}</td>
-        <td style="text-align:right;"><strong>${fmt(row.total)}</strong></td>
+        <td style="text-align:right;"><strong style="color:var(--verde-dark);">${fmt(row.total)}</strong></td>
       </tr>
     `).join("");
   }
