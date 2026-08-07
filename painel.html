@@ -2594,14 +2594,14 @@
 
   function selectSidebarTab(tabId, el) {
     abrirAba(tabId);
-    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
-    if (el) el.classList.add('active');
+    if (el) {
+      document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+      el.classList.add('active');
+    }
     const sidebar = document.getElementById('app-sidebar');
     if (sidebar && sidebar.classList.contains('open')) {
       sidebar.classList.remove('open');
     }
-  }
-
   // ================= MODAIS DE ESTOQUE & COMPRAS =================
   function abrirModalNovoInsumo() {
     limparFormInsumo();
@@ -2641,66 +2641,58 @@
   }
 
   function abrirAba(idAba) {
-    try {
-      const targetId = idAba || "aba-config";
-      const previousTab = getCurrentTabId();
+    const targetId = idAba || "aba-config";
 
-      document.querySelectorAll('.tab-content').forEach(el => {
-        el.classList.remove('active');
-        el.style.display = "none";
-      });
+    // 1. Oculta fisicamente todas as abas
+    document.querySelectorAll('.tab-content').forEach(el => {
+      el.classList.remove('active');
+      el.setAttribute('style', 'display: none !important;');
+    });
 
-      const tab = document.getElementById(targetId);
-      if (tab) {
-        tab.classList.add('active');
-        tab.style.display = "block";
-      }
-
-      if (previousTab !== targetId) {
-        const searchInput = document.getElementById("global-search");
-        if (searchInput) searchInput.value = "";
-      }
-
-      // Atualiza links da sidebar
-      document.querySelectorAll(".sidebar-link").forEach(link => {
-        const isActive = link.dataset.tabId === targetId;
-        link.classList.toggle("active", isActive);
-      });
-
-      // Atualiza Breadcrumb
-      const currentPageEl = document.getElementById("topbar-current-page");
-      if (currentPageEl && TAB_BREADCRUMBS[targetId]) {
-        currentPageEl.textContent = TAB_BREADCRUMBS[targetId];
-      }
-
-      updateSearchPlaceholder();
-
-      // Chamadas assíncronas protegidas
-      if (targetId === 'aba-compras') {
-        try { carregarFornecedores(); } catch (e) { console.error(e); }
-        try { carregarCompras(); } catch (e) { console.error(e); }
-        try { carregarInsumos(); } catch (e) { console.error(e); }
-      }
-      if (targetId === 'aba-config') {
-        try { atualizarDashboardFinanceiro(); } catch (e) { console.error(e); }
-      }
-      if (targetId === 'aba-cardapio') {
-        try { carregarProdutosAdmin(); } catch (e) { console.error(e); }
-      }
-      if (targetId === 'aba-cadastro-produto') {
-        try { carregarInsumos(); } catch (e) { console.error(e); }
-        if (!PRODUTOS_ADMIN.length) {
-          try { carregarProdutosAdmin(); } catch (e) { console.error(e); }
-        }
-      }
-      if (targetId === 'aba-textos') {
-        try { carregarTextosSiteAdmin(); } catch (e) { console.error(e); }
-        try { filtrarCamposTextosSite(); } catch (e) { console.error(e); }
-      }
-      try { handleGlobalSearch(); } catch (e) { console.error(e); }
-    } catch (err) {
-      console.error("Erro ao alternar abas:", err);
+    // 2. Torna visivel a aba alvo
+    const tab = document.getElementById(targetId);
+    if (tab) {
+      tab.classList.add('active');
+      tab.setAttribute('style', 'display: block !important; opacity: 1 !important; visibility: visible !important;');
     }
+
+    // 3. Atualiza estado ativo da sidebar
+    document.querySelectorAll(".sidebar-link").forEach(link => {
+      const isActive = link.dataset.tabId === targetId;
+      link.classList.toggle("active", isActive);
+    });
+
+    // 4. Atualiza Breadcrumb
+    const currentPageEl = document.getElementById("topbar-current-page");
+    if (currentPageEl && TAB_BREADCRUMBS[targetId]) {
+      currentPageEl.textContent = TAB_BREADCRUMBS[targetId];
+    }
+
+    updateSearchPlaceholder();
+
+    // 5. Carregamento de dados protegido sem travar a interface
+    if (targetId === 'aba-compras') {
+      try { carregarFornecedores(); } catch (e) {}
+      try { carregarCompras(); } catch (e) {}
+      try { carregarInsumos(); } catch (e) {}
+    }
+    if (targetId === 'aba-config') {
+      try { atualizarDashboardFinanceiro(); } catch (e) {}
+    }
+    if (targetId === 'aba-cardapio') {
+      try { carregarProdutosAdmin(); } catch (e) {}
+    }
+    if (targetId === 'aba-cadastro-produto') {
+      try { carregarInsumos(); } catch (e) {}
+      if (!PRODUTOS_ADMIN.length) {
+        try { carregarProdutosAdmin(); } catch (e) {}
+      }
+    }
+    if (targetId === 'aba-textos') {
+      try { carregarTextosSiteAdmin(); } catch (e) {}
+      try { filtrarCamposTextosSite(); } catch (e) {}
+    }
+    try { handleGlobalSearch(); } catch (e) {}
   }
 
   function normalizeSearch(value) {
@@ -5375,10 +5367,12 @@ async function salvarProducaoLote(){
     }
   }
 
-  // INICIALIZAÇÃO AUTOMÁTICA
-  aplicarPermissoes();
-  const initialTab = getCurrentTabId();
-  abrirAba(initialTab);
+  // INICIALIZAÇÃO AUTOMÁTICA DE ROTAS & NAVEGAÇÃO VISUAL DE ABAS
+  document.addEventListener("DOMContentLoaded", () => {
+    aplicarPermissoes();
+    abrirAba("aba-config");
+  });
+
   document.addEventListener("click", (event) => {
     if (event.target === getEl("product-recipe-overlay")) fecharFichaProduto();
   });
