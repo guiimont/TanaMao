@@ -2800,9 +2800,8 @@
       const data = await res.json();
       preencherTextosSite(data?.data?.value || SITE_CONTENT_DEFAULTS);
     } catch (e) {
-      console.error(e);
+      console.warn("Utilizando padroes locais de textos do site:", e);
       preencherTextosSite(SITE_CONTENT_DEFAULTS);
-      alert("Não foi possível carregar os textos do site.");
     }
   }
 
