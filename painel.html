@@ -2339,6 +2339,7 @@
       <button onclick="logout()" style="background: #e74c3c; color: white; margin-top: 10px;">Sair do Sistema</button>
     </div>
   </div>
+</main>
 </div>
 
 <footer class="app-footer">
@@ -5292,11 +5293,10 @@ async function salvarProducaoLote(){
     renderSalesChart(groupSales(approvedOrders, grouping), grouping);
   }
 
-  // INICIALIZAÇÃO
+  // INICIALIZAÇÃO AUTOMÁTICA
   aplicarPermissoes();
-  updateSearchPlaceholder();
-  if (USER_ROLE === "admin") preencherTextosSite(SITE_CONTENT_DEFAULTS);
-  carregarPedidos();
+  const initialTab = getCurrentTabId();
+  abrirAba(initialTab);
   document.addEventListener("click", (event) => {
     if (event.target === getEl("product-recipe-overlay")) fecharFichaProduto();
   });
