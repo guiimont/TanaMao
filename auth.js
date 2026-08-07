@@ -10,34 +10,35 @@
     user = {};
   }
 
-  // Garante que o painel sempre abra com acesso de administração sem travar ou redirecionar em tela em branco
-  if (!token) {
-    token = "session_admin_active";
-    user = { name: "Administrador", role: "admin" };
-    localStorage.setItem("tnm_token", token);
-    localStorage.setItem("tnm_user", JSON.stringify(user));
-    localStorage.setItem("tnm_role", "admin");
-  }
+  // Define o cargo globalmente para a interface
+  window.USER_ROLE = user.role || localStorage.getItem("tnm_role") || "admin";
 
-  window.USER_ROLE = user.role || "admin";
-
-  // 3. Interceptador global do Fetch API
+  // Interceptador global do Fetch API para injetar Header Authorization em TODAS as chamadas
   const originalFetch = window.fetch;
-  window.fetch = async function() {
-    let [resource, config] = arguments;
-    if (!config) config = {};
-    if (!config.headers) config.headers = {};
-    
+  window.fetch = async function(resource, config) {
+    config = config || {};
+
+    // Normaliza cabeçalhos da requisição
+    let headers = {};
+    if (config.headers) {
+      if (config.headers instanceof Headers) {
+        config.headers.forEach((val, key) => { headers[key] = val; });
+      } else if (typeof config.headers === "object") {
+        headers = { ...config.headers };
+      }
+    }
+
+    // Injeta o token de autenticação salvo no localStorage
     const activeToken = localStorage.getItem("tnm_token");
     if (activeToken) {
-      config.headers['Authorization'] = `Bearer ${activeToken}`;
-    }
-    
-    if (!config.headers['Content-Type'] && !(config.body instanceof FormData)) {
-      config.headers['Content-Type'] = 'application/json';
+      headers["Authorization"] = `Bearer ${activeToken}`;
     }
 
-    const response = await originalFetch(resource, config);
-    return response;
+    if (!headers["Content-Type"] && !(config.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    config.headers = headers;
+    return originalFetch(resource, config);
   };
 })();
