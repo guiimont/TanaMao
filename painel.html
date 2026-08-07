@@ -5280,61 +5280,73 @@ async function salvarProducaoLote(){
 
   // ================= DASHBOARD FINANCEIRO =================
   async function atualizarDashboardFinanceiro() {
-    ensureFinanceDefaultDates();
-    const dateFrom = getEl("dash-de")?.value || "";
-    const dateTo = getEl("dash-ate")?.value || "";
-    const grouping = getEl("dash-agrupamento")?.value || "day";
-    const dayPeriod = getEl("dash-periodo-dia")?.value || "all";
+    try {
+      ensureFinanceDefaultDates();
+      const dateFrom = getEl("dash-de")?.value || "";
+      const dateTo = getEl("dash-ate")?.value || "";
+      const grouping = getEl("dash-agrupamento")?.value || "day";
+      const dayPeriod = getEl("dash-periodo-dia")?.value || "all";
 
-    const [resOrders, resCosts, resStock] = await Promise.all([
-      fetch(API + "/operations/orders"),
-      fetch(API + "/costs"),
-      fetch(API + "/stock")
-    ]);
+      const [resOrders, resCosts, resStock] = await Promise.all([
+        fetch(API + "/operations/orders").catch(() => null),
+        fetch(API + "/costs").catch(() => null),
+        fetch(API + "/stock").catch(() => null)
+      ]);
 
-    const dataOrders = await resOrders.json();
-    const dataCosts = await resCosts.json();
-    const dataStock = await resStock.json();
+      const dataOrders = resOrders && resOrders.ok ? await resOrders.json().catch(() => ({})) : {};
+      const dataCosts = resCosts && resCosts.ok ? await resCosts.json().catch(() => ({})) : {};
+      const dataStock = resStock && resStock.ok ? await resStock.json().catch(() => ({})) : {};
 
-    const approvedOrders = (dataOrders.orders || []).filter(order => {
-      if (order.payment_status !== "approved") return false;
-      const date = getSaleDate(order);
-      if (dateFrom && date < dateFrom) return false;
-      if (dateTo && date > dateTo) return false;
-      if (dayPeriod !== "all" && getDayPeriod(getSaleHour(order)) !== dayPeriod) return false;
-      return true;
-    });
+      const approvedOrders = (dataOrders.orders || []).filter(order => {
+        if (order.payment_status !== "approved") return false;
+        const date = getSaleDate(order);
+        if (dateFrom && date < dateFrom) return false;
+        if (dateTo && date > dateTo) return false;
+        if (dayPeriod !== "all" && getDayPeriod(getSaleHour(order)) !== dayPeriod) return false;
+        return true;
+      });
 
-    const costs = (dataCosts.data || []).filter(cost => {
-      const date = String(cost.created_at || "").slice(0, 10);
-      if (dateFrom && date && date < dateFrom) return false;
-      if (dateTo && date && date > dateTo) return false;
-      return true;
-    });
+      const costs = (dataCosts.data || []).filter(cost => {
+        const date = String(cost.created_at || "").slice(0, 10);
+        if (dateFrom && date && date < dateFrom) return false;
+        if (dateTo && date && date > dateTo) return false;
+        return true;
+      });
 
-    const stockEntries = (dataStock.entries || []).filter(entry => {
-      const date = getEntryDate(entry);
-      if (dateFrom && date && date < dateFrom) return false;
-      if (dateTo && date && date > dateTo) return false;
-      return true;
-    });
+      const stockEntries = (dataStock.entries || []).filter(entry => {
+        const date = getEntryDate(entry);
+        if (dateFrom && date && date < dateFrom) return false;
+        if (dateTo && date && date > dateTo) return false;
+        return true;
+      });
 
-    const bruto = approvedOrders.reduce((acc, order) => acc + Number(order.total || 0), 0);
-    const taxas = approvedOrders.reduce((acc, order) => acc + Number(order.gateway_fee || 0), 0);
-    const custosFixos = costs.reduce((acc, cost) => acc + Number(cost.value || 0), 0);
-    const compras = stockEntries.reduce((acc, entry) => acc + Number(entry.total_value || 0), 0);
-    const lucro = bruto - taxas - custosFixos - compras;
-    const ticket = approvedOrders.length ? bruto / approvedOrders.length : 0;
+      const bruto = approvedOrders.reduce((acc, order) => acc + Number(order.total || 0), 0);
+      const taxas = approvedOrders.reduce((acc, order) => acc + Number(order.gateway_fee || 0), 0);
+      const custosFixos = costs.reduce((acc, cost) => acc + Number(cost.value || 0), 0);
+      const compras = stockEntries.reduce((acc, entry) => acc + Number(entry.total_value || 0), 0);
+      const lucro = bruto - taxas - custosFixos - compras;
+      const ticket = approvedOrders.length ? bruto / approvedOrders.length : 0;
 
-    getEl("dash-bruto").innerText = fmt(bruto);
-    getEl("dash-pedidos").innerText = String(approvedOrders.length);
-    getEl("dash-ticket").innerText = fmt(ticket);
-    getEl("dash-taxas").innerText = fmt(taxas);
-    getEl("dash-custos").innerText = fmt(custosFixos);
-    getEl("dash-compras").innerText = fmt(compras);
-    getEl("dash-lucro").innerText = fmt(lucro);
+      if (getEl("dash-bruto")) getEl("dash-bruto").innerText = fmt(bruto);
+      if (getEl("dash-pedidos")) getEl("dash-pedidos").innerText = String(approvedOrders.length);
+      if (getEl("dash-ticket")) getEl("dash-ticket").innerText = fmt(ticket);
+      if (getEl("dash-taxas")) getEl("dash-taxas").innerText = fmt(taxas);
+      if (getEl("dash-custos")) getEl("dash-custos").innerText = fmt(custosFixos);
+      if (getEl("dash-compras")) getEl("dash-compras").innerText = fmt(compras);
+      if (getEl("dash-lucro")) getEl("dash-lucro").innerText = fmt(lucro);
 
-    renderSalesChart(groupSales(approvedOrders, grouping), grouping);
+      renderSalesChart(groupSales(approvedOrders, grouping), grouping);
+    } catch (err) {
+      console.error("Erro ao atualizar dashboard financeiro:", err);
+      if (getEl("dash-bruto")) getEl("dash-bruto").innerText = fmt(0);
+      if (getEl("dash-pedidos")) getEl("dash-pedidos").innerText = "0";
+      if (getEl("dash-ticket")) getEl("dash-ticket").innerText = fmt(0);
+      if (getEl("dash-taxas")) getEl("dash-taxas").innerText = fmt(0);
+      if (getEl("dash-custos")) getEl("dash-custos").innerText = fmt(0);
+      if (getEl("dash-compras")) getEl("dash-compras").innerText = fmt(0);
+      if (getEl("dash-lucro")) getEl("dash-lucro").innerText = fmt(0);
+      renderSalesChart([], "day");
+    }
   }
 
   // INICIALIZAÇÃO AUTOMÁTICA
