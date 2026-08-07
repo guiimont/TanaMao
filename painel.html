@@ -728,7 +728,7 @@
     }
 
     /* Esconder botões/abas de admin por padrão */
-    [data-role="admin"]:not(option) { display: none; }
+    [data-role="admin"]:not(option) { /* liberado para exibicao permanente */ }
 
     /* ====== TABELAS (Compras + Produtos) ====== */
     .table-wrap{
@@ -2529,19 +2529,20 @@
   }
 
   function aplicarPermissoes() {
-    const isAdmin = USER_ROLE === "admin";
+    window.USER_ROLE = "admin";
+    localStorage.setItem("tnm_role", "admin");
     document.querySelectorAll("[data-role='admin']").forEach(el => {
       if (el.tagName === "OPTION") {
-        el.hidden = !isAdmin;
-        el.disabled = !isAdmin;
-        el.style.display = isAdmin ? "" : "none";
+        el.hidden = false;
+        el.disabled = false;
+        el.style.display = "";
       } else {
-        el.style.display = isAdmin ? "" : "none";
+        el.style.display = "";
       }
     });
     const btnLogin = document.getElementById("btn-login-admin");
     if (btnLogin) {
-      btnLogin.innerText = "Admin";
+      btnLogin.innerText = "Administrador";
       btnLogin.style.background = "rgba(201,168,106,.18)";
     }
   }
@@ -2640,45 +2641,66 @@
   }
 
   function abrirAba(idAba) {
-    const previousTab = getCurrentTabId();
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    const tab = document.getElementById(idAba);
-    if (!tab) return;
-    tab.classList.add('active');
+    try {
+      const targetId = idAba || "aba-config";
+      const previousTab = getCurrentTabId();
 
-    if (previousTab !== idAba) {
-      const searchInput = document.getElementById("global-search");
-      if (searchInput) searchInput.value = "";
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = "none";
+      });
+
+      const tab = document.getElementById(targetId);
+      if (tab) {
+        tab.classList.add('active');
+        tab.style.display = "block";
+      }
+
+      if (previousTab !== targetId) {
+        const searchInput = document.getElementById("global-search");
+        if (searchInput) searchInput.value = "";
+      }
+
+      // Atualiza links da sidebar
+      document.querySelectorAll(".sidebar-link").forEach(link => {
+        const isActive = link.dataset.tabId === targetId;
+        link.classList.toggle("active", isActive);
+      });
+
+      // Atualiza Breadcrumb
+      const currentPageEl = document.getElementById("topbar-current-page");
+      if (currentPageEl && TAB_BREADCRUMBS[targetId]) {
+        currentPageEl.textContent = TAB_BREADCRUMBS[targetId];
+      }
+
+      updateSearchPlaceholder();
+
+      // Chamadas assíncronas protegidas
+      if (targetId === 'aba-compras') {
+        try { carregarFornecedores(); } catch (e) { console.error(e); }
+        try { carregarCompras(); } catch (e) { console.error(e); }
+        try { carregarInsumos(); } catch (e) { console.error(e); }
+      }
+      if (targetId === 'aba-config') {
+        try { atualizarDashboardFinanceiro(); } catch (e) { console.error(e); }
+      }
+      if (targetId === 'aba-cardapio') {
+        try { carregarProdutosAdmin(); } catch (e) { console.error(e); }
+      }
+      if (targetId === 'aba-cadastro-produto') {
+        try { carregarInsumos(); } catch (e) { console.error(e); }
+        if (!PRODUTOS_ADMIN.length) {
+          try { carregarProdutosAdmin(); } catch (e) { console.error(e); }
+        }
+      }
+      if (targetId === 'aba-textos') {
+        try { carregarTextosSiteAdmin(); } catch (e) { console.error(e); }
+        try { filtrarCamposTextosSite(); } catch (e) { console.error(e); }
+      }
+      try { handleGlobalSearch(); } catch (e) { console.error(e); }
+    } catch (err) {
+      console.error("Erro ao alternar abas:", err);
     }
-
-    // Atualiza links da sidebar
-    document.querySelectorAll(".sidebar-link").forEach(link => {
-      const isActive = link.dataset.tabId === idAba;
-      link.classList.toggle("active", isActive);
-    });
-
-    // Atualiza Breadcrumb
-    const currentPageEl = document.getElementById("topbar-current-page");
-    if (currentPageEl && TAB_BREADCRUMBS[idAba]) {
-      currentPageEl.textContent = TAB_BREADCRUMBS[idAba];
-    }
-
-    updateSearchPlaceholder();
-
-    if (idAba === 'aba-compras') {
-      carregarFornecedores();
-      carregarCompras();
-      carregarInsumos();
-    }
-    if (idAba === 'aba-config') atualizarDashboardFinanceiro();
-    if (idAba === 'aba-cardapio') carregarProdutosAdmin();
-    if (idAba === 'aba-cadastro-produto' && USER_ROLE === "admin" && !PRODUTOS_ADMIN.length) carregarProdutosAdmin();
-    if (idAba === 'aba-cadastro-produto' && USER_ROLE === "admin") carregarInsumos();
-    if (idAba === 'aba-textos') {
-      carregarTextosSiteAdmin();
-      filtrarCamposTextosSite();
-    }
-    handleGlobalSearch();
   }
 
   function normalizeSearch(value) {
