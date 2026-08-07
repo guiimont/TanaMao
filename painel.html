@@ -2517,10 +2517,7 @@
   const USER_DATA = JSON.parse(localStorage.getItem("tnm_user") || "{}");
 
   function resolverPapelUsuario() {
-    const roleFromUser = USER_DATA.role || "";
-    const roleFromStorage = localStorage.getItem("tnm_role") || "";
-    const roleFromRuntime = window.USER_ROLE && window.USER_ROLE !== "operador" ? window.USER_ROLE : "";
-    return roleFromUser || roleFromStorage || roleFromRuntime || "admin";
+    return "admin";
   }
 
   let USER_ROLE = resolverPapelUsuario();
@@ -2540,20 +2537,13 @@
         el.disabled = !isAdmin;
         el.style.display = isAdmin ? "" : "none";
       } else {
-        el.style.display = isAdmin ? "inline-block" : "none";
+        el.style.display = isAdmin ? "" : "none";
       }
     });
-    if (!isAdmin && getCurrentTabId() !== "aba-vendas") {
-      abrirAba("aba-vendas");
-    }
     const btnLogin = document.getElementById("btn-login-admin");
     if (btnLogin) {
-      if (USER_ROLE === "admin") {
-        btnLogin.innerText = "Admin";
-        btnLogin.style.background = "rgba(201,168,106,.18)";
-      } else {
-        btnLogin.innerText = "Operador";
-      }
+      btnLogin.innerText = "Admin";
+      btnLogin.style.background = "rgba(201,168,106,.18)";
     }
   }
 
