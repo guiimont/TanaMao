@@ -8,15 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-1">
+  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-2">
   <!-- Deve permanecer antes de qualquer script que faça chamadas à API. -->
   <script src="auth.js?v=20260807-1"></script>
   <script src="/assets/js/toast.js"></script>
 
   <style>
     :root{
-      --verde:#3C6E47;
-      --verde-escuro:#2d5235;
+      --verde:#596B3F;
+      --verde-escuro:#303A25;
       --dourado:#C9A86A;
       --fundo:#f4f6f4;
       --borda:#dfe5dd;
@@ -37,7 +37,7 @@
 
     .app-header {
       background:#fff;
-      border-bottom:1px solid rgba(60,110,71,0.14);
+      border-bottom:1px solid rgba(89,107,63,0.14);
       box-shadow:0 8px 22px rgba(36,49,38,0.04);
     }
 
@@ -64,7 +64,7 @@
       object-fit:contain;
       border-radius:14px;
       background:var(--verde);
-      border:1px solid rgba(45,82,53,.25);
+      border:1px solid rgba(48,58,37,.25);
       padding:6px;
     }
 
@@ -104,11 +104,11 @@
       display:inline-flex;
       align-items:center;
       min-height:36px;
-      border:1px solid rgba(60,110,71,.16);
+      border:1px solid rgba(89,107,63,.16);
       border-radius:999px;
       padding:0 12px;
       color:var(--verde-escuro);
-      background:rgba(60,110,71,.06);
+      background:rgba(89,107,63,.06);
       font-size:.82rem;
       font-weight:800;
       white-space:nowrap;
@@ -141,7 +141,7 @@
       gap:12px;
       align-items:end;
       background:rgba(244,246,244,.94);
-      border:1px solid rgba(60,110,71,.14);
+      border:1px solid rgba(89,107,63,.14);
       border-radius:14px;
       padding:12px;
       margin-bottom:16px;
@@ -174,15 +174,15 @@
     }
 
     .workspace-tab:hover {
-      border-color: rgba(60,110,71,.35);
-      background: rgba(60,110,71,.06);
+      border-color: rgba(89,107,63,.35);
+      background: rgba(89,107,63,.06);
     }
 
     .workspace-tab.active {
       border-color: var(--verde);
       background: var(--verde);
       color: #fff;
-      box-shadow: 0 8px 18px rgba(60,110,71,.16);
+      box-shadow: 0 8px 18px rgba(89,107,63,.16);
     }
 
     .toolbar-field {
@@ -261,8 +261,8 @@
     .dropdown-actions summary::-webkit-details-marker { display:none; }
 
     .dropdown-actions[open] summary {
-      border-color:rgba(60,110,71,.35);
-      box-shadow:0 0 0 3px rgba(60,110,71,.08);
+      border-color:rgba(89,107,63,.35);
+      box-shadow:0 0 0 3px rgba(89,107,63,.08);
     }
 
     .dropdown-menu {
@@ -286,8 +286,8 @@
     }
 
     .rule-note {
-      border: 1px solid rgba(60,110,71,.18);
-      background: rgba(60,110,71,.07);
+      border: 1px solid rgba(89,107,63,.18);
+      background: rgba(89,107,63,.07);
       color: var(--verde-escuro);
       border-radius: 10px;
       padding: 10px 12px;
@@ -325,7 +325,7 @@
       width: 34px;
       height: 30px;
       border-radius: 10px;
-      background: rgba(60,110,71,.1);
+      background: rgba(89,107,63,.1);
       color: var(--verde-escuro);
       font-size: .72rem;
       font-weight: 800;
@@ -356,7 +356,7 @@
       align-items: center;
       min-height: 26px;
       border-radius: 999px;
-      border: 1px solid rgba(60,110,71,.16);
+      border: 1px solid rgba(89,107,63,.16);
       background: #f8fbf7;
       color: var(--verde-escuro);
       padding: 0 8px;
@@ -622,7 +622,7 @@
       transition: 0.2s;
     }
 
-    .tab-btn:hover { background: rgba(60,110,71,0.05); }
+    .tab-btn:hover { background: rgba(89,107,63,0.05); }
     .tab-btn.active { background: var(--verde); color: #fff; }
 
     /* Lógica de exibição das abas */
@@ -797,10 +797,10 @@
       white-space: nowrap;
     }
 
-    .badge.on{ border-color: rgba(60,110,71,.25); background: rgba(60,110,71,.08); color: var(--verde-escuro); }
+    .badge.on{ border-color: rgba(89,107,63,.25); background: rgba(89,107,63,.08); color: var(--verde-escuro); }
     .badge.off{ border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); color: #444; }
 
-    .badge.insumos{ border-color: rgba(60,110,71,.25); background: rgba(60,110,71,.08); color: var(--verde-escuro); }
+    .badge.insumos{ border-color: rgba(89,107,63,.25); background: rgba(89,107,63,.08); color: var(--verde-escuro); }
     .badge.embalagens{ border-color: rgba(201,168,106,.35); background: rgba(201,168,106,.12); color: #7b5a21; }
     .badge.outros{ border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); color: #444; }
 
@@ -1067,9 +1067,9 @@
     }
 
     .day-option:has(input:checked) {
-      border-color:rgba(60,110,71,.55);
-      background:rgba(60,110,71,.09);
-      box-shadow:inset 0 0 0 1px rgba(60,110,71,.12);
+      border-color:rgba(89,107,63,.55);
+      background:rgba(89,107,63,.09);
+      box-shadow:inset 0 0 0 1px rgba(89,107,63,.12);
     }
 
     .day-option:has(input:disabled) {
@@ -1118,7 +1118,7 @@
       justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
-      border-top:1px solid rgba(60,110,71,.12);
+      border-top:1px solid rgba(89,107,63,.12);
     }
 
     .app-footer strong {
@@ -5222,7 +5222,7 @@ async function salvarProducaoLote(){
       return `
         <g class="chart-bar-group" style="cursor:pointer;">
           <rect x="${x}" y="${y}" width="38" height="${heightPct}" rx="6" fill="url(#greenGoldGradient)" opacity="0.9" />
-          <text x="${x + 19}" y="${y - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#2d5235">${valorFmt}</text>
+          <text x="${x + 19}" y="${y - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#303A25">${valorFmt}</text>
           <text x="${x + 19}" y="222" text-anchor="middle" font-size="11" font-weight="600" fill="#667066">${label}</text>
         </g>
       `;
@@ -5242,7 +5242,7 @@ async function salvarProducaoLote(){
           <svg viewBox="0 0 ${Math.max(600, rows.length * 80 + 60)} 240" style="width:100%; min-width:560px; height:220px;">
             <defs>
               <linearGradient id="greenGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#3c6e47" />
+                <stop offset="0%" stop-color="#596b3f" />
                 <stop offset="100%" stop-color="#c9a86a" />
               </linearGradient>
             </defs>
