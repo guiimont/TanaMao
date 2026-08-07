@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/main.css">\n  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-1">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-1">
   <!-- Deve permanecer antes de qualquer script que faça chamadas à API. -->
   <script src="auth.js?v=20260807-1"></script>
   <script src="/assets/js/toast.js"></script>
@@ -3044,8 +3045,11 @@
 
     // Se faltou item, avisa (sem travar a operação)
     if (data.delivery_status === "preparing" && Array.isArray(data.issues) && data.issues.length){
-      const msg = data.issues.map(i => `• ${i.product_id}: faltou ${i.missing} (pediu ${i.requested}, tinha ${i.available})`).join("\n");
-      alert("Pedido enviado para Produção (faltas detectadas):\n\n" + msg);
+      const msg = data.issues.map(i => `• ${i.product_id}: faltou ${i.missing} (pediu ${i.requested}, tinha ${i.available})`).join("
+");
+      alert("Pedido enviado para Produção (faltas detectadas):
+
+" + msg);
     }
 
     carregarPedidos();
@@ -3348,7 +3352,8 @@
       const content = await page.getTextContent();
       lines.push(...groupPdfTextLines(content.items || []));
     }
-    return lines.join("\n");
+    return lines.join("
+");
   }
 
   function parseDateToInput(value) {
@@ -3508,7 +3513,8 @@
   }
 
   function getPdfInvoiceMeta(text) {
-    const lines = String(text || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const lines = String(text || "").split(/\r?
+/).map(line => line.trim()).filter(Boolean);
     const cnpjMatch = text.match(/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}/);
     const numberMatch =
       text.match(/(?:N[ºo°]\s*|Numero\s*|Número\s*)(\d{3,})/i) ||
@@ -3533,7 +3539,8 @@
   function parsePdfInvoiceText(text) {
     const lines = String(text || "")
       .replace(/\u00a0/g, " ")
-      .split(/\r?\n/)
+      .split(/\r?
+/)
       .map(line => line.replace(/\s+/g, " ").trim())
       .filter(Boolean);
 
@@ -3877,7 +3884,9 @@
     if (!entries.length) return alert("Nenhuma compra filtrada para apagar.");
     const total = entries.reduce((acc, e) => acc + Number(e.total_value || 0), 0);
     const ok = confirm(
-      "Apagar " + entries.length + " compra(s) filtrada(s), totalizando " + fmt(total) + "?\n\n" +
+      "Apagar " + entries.length + " compra(s) filtrada(s), totalizando " + fmt(total) + "?
+
+" +
       "Use os filtros antes para manter apenas os registros novos da nota."
     );
     if (!ok) return;
@@ -4121,7 +4130,8 @@
 
   function formatRecipeTextForHtml(value, ordered = false) {
     const lines = String(value || "")
-      .split(/\r?\n/)
+      .split(/\r?
+/)
       .map(line => normalizeOrderedRecipeLine(line.trim(), ordered))
       .filter(Boolean);
 
@@ -5391,5 +5401,6 @@ async function salvarProducaoLote(){
   });
   setInterval(carregarPedidos, 30000);
 </script>
-  <script src="/assets/js/erp-modern.js?v=20260807-1"></script>\n</body>
+  <script src="/assets/js/erp-modern.js?v=20260807-1"></script>
+</body>
 </html>
