@@ -610,6 +610,52 @@ details.mailfy-accordion .accordion-body {
   box-shadow: 0 0 0 3px rgba(60, 110, 71, 0.15);
 }
 
+/* --- KPI GRID EXECUTIVO --- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--verde-border);
+}
+
+.kpi-value {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--verde-dark);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.kpi-value.danger { color: var(--status-danger-text); }
+.kpi-value.gold { color: var(--dourado-dark); }
+
+.kpi-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* RESPONSIVIDADE MOBILE */
 @media (max-width: 992px) {
   .sidebar { position: fixed; transform: translateX(-100%); box-shadow: var(--shadow-lg); }
@@ -618,5 +664,7 @@ details.mailfy-accordion .accordion-body {
   .mobile-nav-toggle { display: inline-flex; }
   .topbar-search { display: none; }
   .board { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .app-content { padding: 16px; }
 }
+

@@ -1614,10 +1614,8 @@
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
         <button class="btn btn-secondary" onclick="fecharModalFornecedor()">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarFornecedor()">Salvar Fornecedor</button>
-      </div>
     </div>
   </div>
-</div>
 
   <!-- ABA CARDÁPIO & ESTOQUE -->
   <div id="aba-cardapio" class="tab-content">
@@ -1740,7 +1738,6 @@
     </div>
 
   </div>
-</div>
 
   <!-- ABA CADASTRO DE PRODUTO (LAYOUT SAAS 2 COLUNAS) -->
   <div id="aba-cadastro-produto" class="tab-content">
@@ -5151,64 +5148,14 @@ async function salvarProducaoLote(){
   }
 
   function periodLabel(key, grouping){
+    if (!key) return "";
     if (grouping === "month") {
       const [year, month] = key.split("-");
-      return `${month}/${year}`;
+      return month && year ? `${month}/${year}` : key;
     }
     if (grouping === "period") return formatDayPeriod(key);
+    if (key.length <= 3 || !key.includes("-")) return key;
     return formatOrderDate(key);
-  }
-
-  function getEntryDate(entry){
-    return String(entry.entry_date || entry.created_at || "").slice(0, 10);
-  }
-
-  function ensureFinanceDefaultDates(){
-    const de = getEl("dash-de");
-    const ate = getEl("dash-ate");
-    const now = new Date();
-    const today = now.toISOString().slice(0, 10);
-    const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    if (de && !de.value) de.value = first;
-    if (ate && !ate.value) ate.value = today;
-  }
-
-  function setFinancePeriod(period){
-    const de = getEl("dash-de");
-    const ate = getEl("dash-ate");
-    const now = new Date();
-    const today = now.toISOString().slice(0, 10);
-    if (period === "today") {
-      if (de) de.value = today;
-      if (ate) ate.value = today;
-    } else {
-      const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-      if (de) de.value = first;
-      if (ate) ate.value = today;
-    }
-    atualizarDashboardFinanceiro();
-  }
-
-  function getOrderUnits(order){
-    return (order.items_json || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-  }
-
-  function groupSales(orders, grouping){
-    const map = new Map();
-    orders.forEach(order => {
-      const date = getSaleDate(order);
-      const key = grouping === "month"
-        ? date.slice(0, 7)
-        : grouping === "period"
-          ? getDayPeriod(getSaleHour(order))
-          : date;
-      if (!map.has(key)) map.set(key, { key, orders: 0, units: 0, total: 0 });
-      const row = map.get(key);
-      row.orders += 1;
-      row.units += getOrderUnits(order);
-      row.total += Number(order.total || 0);
-    });
-    return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
   }
 
   function renderSalesChart(rows, grouping){
@@ -5216,22 +5163,22 @@ async function salvarProducaoLote(){
     const tbody = getEl("tbody-vendas-periodo");
     if (!chart || !tbody) return;
 
-    // Se não houver vendas reais no filtro, gera dados projetados/exemplo para demonstração gráfica
-    const isDemo = !rows || !rows.length;
-    const displayRows = isDemo ? [
-      { key: "Seg", total: 180, orders: 4, units: 6 },
-      { key: "Ter", total: 320, orders: 7, units: 10 },
-      { key: "Qua", total: 240, orders: 5, units: 8 },
-      { key: "Qui", total: 450, orders: 9, units: 14 },
-      { key: "Sex", total: 610, orders: 12, units: 18 },
-      { key: "Sáb", total: 380, orders: 8, units: 12 },
-      { key: "Dom", total: 290, orders: 6, units: 9 }
-    ] : rows;
+    if (!rows || !rows.length) {
+      chart.innerHTML = `
+        <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:32px; text-align:center;">
+          <div style="font-size:2.4rem; margin-bottom:8px;">📊</div>
+          <h4 style="margin:0; color:var(--verde-dark); font-size:1.05rem;">Nenhuma Venda Aprovada no Período Selecionado</h4>
+          <p class="muted" style="margin:6px 0 0 0; font-size:0.86rem;">Selecione outro intervalo de datas no filtro acima para visualizar o histórico financeiro.</p>
+        </div>
+      `;
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Sem vendas registradas no período.</td></tr>';
+      return;
+    }
 
-    const max = Math.max(...displayRows.map(r => r.total), 100);
+    const max = Math.max(...rows.map(r => r.total), 100);
 
     // Gerador de barras SVG limpas com gradiente
-    const barsSvg = displayRows.map((r, idx) => {
+    const barsSvg = rows.map((r, idx) => {
       const heightPct = Math.max(12, Math.round((r.total / max) * 160));
       const x = 50 + idx * 75;
       const y = 200 - heightPct;
@@ -5240,11 +5187,8 @@ async function salvarProducaoLote(){
 
       return `
         <g class="chart-bar-group" style="cursor:pointer;">
-          <!-- Barra Vertical -->
           <rect x="${x}" y="${y}" width="38" height="${heightPct}" rx="6" fill="url(#greenGoldGradient)" opacity="0.9" />
-          <!-- Valor no Topo -->
           <text x="${x + 19}" y="${y - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#2d5235">${valorFmt}</text>
-          <!-- Rótulo do Dia -->
           <text x="${x + 19}" y="222" text-anchor="middle" font-size="11" font-weight="600" fill="#667066">${label}</text>
         </g>
       `;
@@ -5257,11 +5201,11 @@ async function salvarProducaoLote(){
             <h4 style="margin:0; color:var(--verde-dark); font-size:1rem;">Desempenho de Vendas no Período</h4>
             <span style="font-size:0.78rem; color:var(--text-muted);">Acompanhe a curva de faturamento e volume de refeições.</span>
           </div>
-          ${isDemo ? `<span class="status-pill pill-warning">Modo Demonstrativo (Sem vendas no filtro)</span>` : `<span class="status-pill pill-success">Dados em Tempo Real</span>`}
+          <span class="status-pill pill-success">Dados em Tempo Real</span>
         </div>
 
         <div style="width:100%; overflow-x:auto;">
-          <svg viewBox="0 0 ${Math.max(600, displayRows.length * 80 + 60)} 240" style="width:100%; min-width:560px; height:220px;">
+          <svg viewBox="0 0 ${Math.max(600, rows.length * 80 + 60)} 240" style="width:100%; min-width:560px; height:220px;">
             <defs>
               <linearGradient id="greenGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="#3c6e47" />
@@ -5269,7 +5213,6 @@ async function salvarProducaoLote(){
               </linearGradient>
             </defs>
 
-            <!-- Linha Guia Hozizontal -->
             <line x1="30" y1="40" x2="100%" y2="40" stroke="#e0e6df" stroke-dasharray="4" />
             <line x1="30" y1="120" x2="100%" y2="120" stroke="#e0e6df" stroke-dasharray="4" />
             <line x1="30" y1="200" x2="100%" y2="200" stroke="#dfe5dd" stroke-width="1.5" />
@@ -5280,7 +5223,7 @@ async function salvarProducaoLote(){
       </div>
     `;
 
-    tbody.innerHTML = displayRows.map(row => `
+    tbody.innerHTML = rows.map(row => `
       <tr>
         <td><strong>${periodLabel(row.key, grouping) || row.key}</strong></td>
         <td style="text-align:right;">${row.orders}</td>
