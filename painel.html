@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 51753)
+Total output lines: 5406
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -7,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-2">
+  <link rel="stylesheet" href="/assets/css/main.css?v=20260807-3">
+  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-3">
   <!-- Deve permanecer antes de qualquer script que faça chamadas à API. -->
   <script src="auth.js?v=20260807-1"></script>
   <script src="/assets/js/toast.js"></script>
@@ -2654,205 +2657,7 @@
     return document.querySelector(".tab-content.active")?.id || "aba-config";
   }
 
-  function abrirAba(idAba) {
-    const targetId = idAba || "aba-config";
-
-    // 1. Oculta fisicamente todas as abas
-    document.querySelectorAll('.tab-content').forEach(el => {
-      el.classList.remove('active');
-      el.setAttribute('style', 'display: none !important;');
-    });
-
-    // 2. Torna visivel a aba alvo
-    const tab = document.getElementById(targetId);
-    if (tab) {
-      tab.classList.add('active');
-      tab.setAttribute('style', 'display: block !important; opacity: 1 !important; visibility: visible !important;');
-    }
-
-    // 3. Atualiza estado ativo da sidebar
-    document.querySelectorAll(".sidebar-link").forEach(link => {
-      const isActive = link.dataset.tabId === targetId;
-      link.classList.toggle("active", isActive);
-    });
-
-    // 4. Atualiza Breadcrumb
-    const currentPageEl = document.getElementById("topbar-current-page");
-    if (currentPageEl && TAB_BREADCRUMBS[targetId]) {
-      currentPageEl.textContent = TAB_BREADCRUMBS[targetId];
-    }
-
-    updateSearchPlaceholder();
-
-    // 5. Carregamento de dados protegido sem travar a interface
-    if (targetId === 'aba-compras') {
-      try { carregarFornecedores(); } catch (e) {}
-      try { carregarCompras(); } catch (e) {}
-      try { carregarInsumos(); } catch (e) {}
-    }
-    if (targetId === 'aba-config') {
-      try { atualizarDashboardFinanceiro(); } catch (e) {}
-    }
-    if (targetId === 'aba-cardapio') {
-      try { carregarProdutosAdmin(); } catch (e) {}
-    }
-    if (targetId === 'aba-cadastro-produto') {
-      try { carregarInsumos(); } catch (e) {}
-      if (!PRODUTOS_ADMIN.length) {
-        try { carregarProdutosAdmin(); } catch (e) {}
-      }
-    }
-    if (targetId === 'aba-textos') {
-      try { carregarTextosSiteAdmin(); } catch (e) {}
-      try { filtrarCamposTextosSite(); } catch (e) {}
-    }
-    try { handleGlobalSearch(); } catch (e) {}
-  }
-
-  function normalizeSearch(value) {
-    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  }
-
-  function getGlobalSearch() {
-    return normalizeSearch(document.getElementById("global-search")?.value || "");
-  }
-
-  function matchesGlobalSearch(...values) {
-    const query = getGlobalSearch();
-    if (!query) return true;
-    return normalizeSearch(values.filter(Boolean).join(" ")).includes(query);
-  }
-
-  function updateSearchPlaceholder() {
-    const input = document.getElementById("global-search");
-    if (!input) return;
-    const labels = {
-      "aba-vendas": "Buscar cliente, produto, endereço ou total...",
-      "aba-compras": "Buscar fornecedor, item, categoria ou data...",
-      "aba-cardapio": "Buscar produto, categoria, descrição ou status...",
-      "aba-cadastro-produto": "Cadastro único de produto, ficha interna e receita simples...",
-      "aba-textos": "Buscar campo ou conteúdo do site...",
-      "aba-config": "Buscar nesta área..."
-    };
-    input.placeholder = labels[getCurrentTabId()] || "Buscar...";
-  }
-
-  function handleGlobalSearch() {
-    const tabId = getCurrentTabId();
-    if (tabId === "aba-vendas") renderizar();
-    if (tabId === "aba-compras") {
-      aplicarFiltrosCompras();
-      renderInsumos();
-    }
-    if (tabId === "aba-cardapio" && Array.isArray(PRODUTOS_ADMIN)) renderProdutosAdmin();
-    if (tabId === "aba-textos") filtrarCamposTextosSite();
-  }
-
-  function limparBuscaProdutos() {
-    const input = document.getElementById("global-search");
-    if (input) input.value = "";
-    renderProdutosAdmin();
-  }
-
-  function editarLimite() {
-    const valor = prompt("Defina o novo limite diário de pedidos:");
-    if (valor === null) return;
-
-    const num = Number(valor);
-    if (!Number.isFinite(num) || num <= 0) {
-      alert("Digite um número válido (ex: 30).");
-      return;
-    }
-    alert("Limite ajustado para: " + num + " (integração com API depois).");
-  }
-
-  function normalizeSiteContentValue(value) {
-    if (typeof value !== "string") return value || {};
-    try { return JSON.parse(value); } catch { return {}; }
-  }
-
-  function preencherTextosSite(content = {}) {
-    const merged = { ...SITE_CONTENT_DEFAULTS, ...normalizeSiteContentValue(content) };
-    SITE_CONTENT_FIELDS.forEach(key => {
-      const el = document.getElementById("txt-" + key);
-      if (el) el.value = merged[key] || "";
-    });
-    filtrarCamposTextosSite();
-  }
-
-  function filtrarCamposTextosSite() {
-    const query = getGlobalSearch();
-    document.querySelectorAll("#aba-textos .field, #aba-textos .form-group, #aba-textos details").forEach(el => {
-      if (!query) {
-        el.style.display = "";
-      } else {
-        const matches = normalizeSearch(el.textContent).includes(query);
-        el.style.display = matches ? "" : "none";
-        if (matches && el.tagName === "DETAILS") el.open = true;
-      }
-    });
-  }
-
-  function coletarTextosSite() {
-    return SITE_CONTENT_FIELDS.reduce((acc, key) => {
-      const el = document.getElementById("txt-" + key);
-      acc[key] = el ? el.value.trim() : SITE_CONTENT_DEFAULTS[key];
-      return acc;
-    }, {});
-  }
-
-  function restaurarTextosSitePadrao() {
-    preencherTextosSite(SITE_CONTENT_DEFAULTS);
-  }
-
-  async function carregarTextosSiteAdmin() {
-    try {
-      const res = await fetch(API + "/settings/site_content?t=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) throw new Error("Erro ao carregar textos.");
-      const data = await res.json();
-      preencherTextosSite(data?.data?.value || SITE_CONTENT_DEFAULTS);
-    } catch (e) {
-      console.warn("Utilizando padroes locais de textos do site:", e);
-      preencherTextosSite(SITE_CONTENT_DEFAULTS);
-    }
-  }
-
-  async function verificarTextosPublicados(value) {
-    try {
-      const res = await fetch(API + "/settings/public/site_content?t=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) return false;
-      const data = await res.json();
-      const publicValue = normalizeSiteContentValue(data?.data?.value);
-      return SITE_CONTENT_FIELDS.every(key => (publicValue[key] || "") === (value[key] || ""));
-    } catch {
-      return false;
-    }
-  }
-
-  async function salvarTextosSite() {
-    const value = coletarTextosSite();
-    try {
-      const res = await fetch(API + "/settings/site_content", {
-        method: "PUT",
-        body: JSON.stringify({ value })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.message || "Erro ao salvar textos.");
-
-      const publicado = await verificarTextosPublicados(value);
-      if (publicado) {
-        alert("Textos do site atualizados! Recarregue o site público para ver a nova versão.");
-      } else {
-        alert("Textos salvos no painel, mas o site público ainda não está devolvendo esses textos. Confira se o PR do backend foi mesclado/deployado e se a SQL de site_content foi rodada no Supabase.");
-      }
-    } catch (e) {
-      console.error(e);
-      alert(e.message || "Erro ao salvar textos do site.");
-    }
-  }
-
-  // ================= PEDIDOS (KANBAN) =================
-  async function carregarPedidos(){
+  func…1753 tokens truncated… async function carregarPedidos(){
     try {
       const res = await fetch(API + "/operations/orders", { headers: getAuthHeaders() });
       const data = await res.json();
