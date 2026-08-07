@@ -1,0 +1,94 @@
+/* ERP Tá na Mão — camada visual 2026
+   Mantém IDs e integrações existentes; reorganiza hierarquia, densidade e responsividade. */
+:root{
+  --erp-ink:#17221b; --erp-muted:#647067; --erp-line:#e4e9e4;
+  --erp-bg:#f6f8f6; --erp-card:#fff; --erp-green:#245c38;
+  --erp-green-2:#35764a; --erp-gold:#c79b45; --erp-danger:#c73e3e;
+  --erp-radius:14px; --erp-shadow:0 1px 2px rgba(18,34,23,.04),0 10px 28px rgba(18,34,23,.06);
+}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{background:var(--erp-bg)!important;color:var(--erp-ink)!important;font-family:Manrope,Poppins,sans-serif!important}
+.app-layout{min-height:100vh}
+.sidebar{width:248px!important;background:#173d27!important;border-right:0!important;box-shadow:8px 0 32px rgba(20,50,31,.08);padding:0!important}
+.sidebar-header{padding:22px 14px 14px!important}
+.sidebar-brand{padding:0 8px 22px!important;margin-bottom:12px!important;border-bottom:1px solid rgba(255,255,255,.11)!important}
+.sidebar-brand img{width:42px!important;height:42px!important;border-radius:12px!important;box-shadow:none!important}
+.sidebar-brand-title{color:#fff!important;font-size:1rem!important}
+.sidebar-brand-badge{color:#b7cbbc!important;letter-spacing:.08em!important}
+.sidebar-nav-label{color:#90aa97!important;font-size:.66rem!important;letter-spacing:.13em!important;padding:12px 10px 7px!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:4px!important}
+.sidebar-link{min-height:44px!important;padding:0 11px!important;border-radius:10px!important;color:#cddbd0!important;gap:11px!important;font-size:.88rem!important;font-weight:650!important;transition:.18s ease!important}
+.sidebar-link:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;transform:none!important}
+.sidebar-link.active{background:#fff!important;color:#214d31!important;box-shadow:0 8px 20px rgba(4,20,10,.16)!important}
+.sidebar-link.active:before{display:none!important}
+.nav-icon{width:20px!important;filter:grayscale(1);opacity:.9;font-size:.96rem!important}
+.sidebar-link.active .nav-icon{filter:none}
+.sidebar-footer{background:#123520!important;border-top:1px solid rgba(255,255,255,.09)!important;padding:14px!important}
+.sidebar-user-name{color:#fff!important}.sidebar-user-role{color:#98b19f!important}.sidebar-user-avatar{background:#d7b46c!important;color:#173d27!important}
+.sidebar-logout-btn{color:#c8d7cc!important}
+.main-wrapper{margin-left:248px!important;min-width:0!important}
+.app-topbar{height:68px!important;padding:0 28px!important;border-bottom:1px solid var(--erp-line)!important;background:rgba(255,255,255,.94)!important;box-shadow:none!important;backdrop-filter:blur(14px);position:sticky!important;top:0!important;z-index:50!important}
+.topbar-breadcrumb{font-size:.84rem!important}.topbar-breadcrumb span:first-child{color:var(--erp-muted)!important}.topbar-breadcrumb .current{color:var(--erp-ink)!important;font-weight:800!important}
+.topbar-search{max-width:390px!important;border:1px solid var(--erp-line)!important;background:#f8faf8!important;border-radius:10px!important}
+.topbar-search:focus-within{border-color:#7ea58a!important;box-shadow:0 0 0 3px rgba(53,118,74,.1)!important}
+.app-content{max-width:1500px!important;margin:0 auto!important;padding:28px!important}
+.tab-content.active{animation:erpEnter .18s ease-out}
+@keyframes erpEnter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.erp-page-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:0 0 20px}
+.erp-page-heading h1{font-size:1.65rem;line-height:1.2;margin:0;color:var(--erp-ink);letter-spacing:-.035em}
+.erp-page-heading p{margin:6px 0 0;color:var(--erp-muted);font-size:.88rem}
+.admin-card,.mailfy-accordion,.kpi-card,.summary-bar,.section-toolbar{border:1px solid var(--erp-line)!important;border-radius:var(--erp-radius)!important;background:var(--erp-card)!important;box-shadow:none!important}
+.admin-card{padding:20px!important;margin-bottom:16px!important}
+.admin-card:hover{box-shadow:none!important;transform:none!important}
+.kpi-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
+.kpi-card{padding:18px!important;min-height:104px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+.kpi-value{font-size:1.55rem!important;letter-spacing:-.035em!important;color:var(--erp-ink)!important}
+.kpi-label{font-size:.72rem!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:var(--erp-muted)!important;margin-top:7px!important}
+.section-toolbar{padding:12px 14px!important;margin-bottom:14px!important;min-height:58px}
+.summary-bar{padding:13px 16px!important}
+.mailfy-accordion{margin:12px 0!important;overflow:hidden!important}
+.mailfy-accordion>summary{padding:15px 18px!important;background:#fff!important}
+.accordion-body{padding:18px!important;border-top:1px solid var(--erp-line)!important}
+.table-container{border:1px solid var(--erp-line)!important;border-radius:12px!important;overflow:auto!important;background:#fff}
+.mailfy-table{border-collapse:separate!important;border-spacing:0!important;width:100%!important}
+.mailfy-table th{position:sticky;top:0;background:#f7f9f7!important;color:#59645b!important;font-size:.69rem!important;text-transform:uppercase!important;letter-spacing:.055em!important;padding:11px 13px!important;border-bottom:1px solid var(--erp-line)!important;white-space:nowrap}
+.mailfy-table td{padding:12px 13px!important;border-bottom:1px solid #edf0ed!important;font-size:.83rem!important;vertical-align:middle!important}
+.mailfy-table tbody tr:hover td{background:#fafcf9!important}
+.mailfy-table tbody tr:last-child td{border-bottom:0!important}
+.btn,button{border-radius:9px!important;font-family:Manrope,Poppins,sans-serif!important;font-weight:750!important}
+.btn-primary{background:var(--erp-green)!important;color:#fff!important;border-color:var(--erp-green)!important}
+.btn-primary:hover{background:#19492b!important}
+.btn-gold{background:var(--erp-gold)!important;color:#1e321f!important}
+.btn-secondary{background:#fff!important;color:#304237!important;border:1px solid #dbe2dc!important}
+.form-control,input,select,textarea{border:1px solid #dce3dd!important;border-radius:9px!important;background:#fff!important;min-height:40px!important}
+.form-control:focus,input:focus,select:focus,textarea:focus{outline:0!important;border-color:#689678!important;box-shadow:0 0 0 3px rgba(53,118,74,.1)!important}
+.form-label,label{color:#4f5d53!important;font-weight:700!important}
+.board{gap:12px!important;align-items:start!important}
+.column{background:#eef2ee!important;border:1px solid #e1e7e2!important;border-radius:13px!important;padding:10px!important;min-height:240px!important}
+.column-header{background:transparent!important;color:#425047!important;font-size:.73rem!important;text-transform:uppercase!important;letter-spacing:.06em!important;padding:5px 5px 12px!important}
+.panel-overlay{backdrop-filter:blur(4px);background:rgba(12,25,16,.48)!important}
+.panel-modal{border:0!important;box-shadow:0 24px 70px rgba(12,25,16,.25)!important}
+.status-pill{font-size:.7rem!important}
+.rule-note{border-radius:10px!important}
+.app-footer{max-width:1500px!important;padding-left:28px!important;padding-right:28px!important}
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .app-content{padding:22px!important}
+}
+@media(max-width:820px){
+  .sidebar{width:268px!important;transform:translateX(-100%)!important;transition:transform .2s ease!important;z-index:1000!important}
+  .sidebar.open{transform:translateX(0)!important}
+  .main-wrapper{margin-left:0!important}
+  .app-topbar{padding:0 16px!important}
+  .topbar-search{display:none!important}
+  .app-content{padding:18px 14px!important}
+  .board{grid-template-columns:1fr!important}
+}
+@media(max-width:560px){
+  html{font-size:14px}.kpi-grid{grid-template-columns:1fr 1fr!important}
+  .kpi-card{min-height:90px!important;padding:14px!important}
+  .topbar-actions .btn-secondary{display:none!important}
+  .erp-page-heading h1{font-size:1.38rem}
+  .admin-card{padding:15px!important}
+}
