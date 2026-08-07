@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/main.css">\n  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260807-1">
   <!-- Deve permanecer antes de qualquer script que faça chamadas à API. -->
   <script src="auth.js?v=20260807-1"></script>
   <script src="/assets/js/toast.js"></script>
@@ -1160,27 +1160,27 @@
       <nav class="sidebar-nav">
         <a class="sidebar-link active" data-tab-id="aba-config" onclick="selectSidebarTab('aba-config', this)">
           <span class="nav-icon">📊</span>
-          <span>Visão Geral (Financeiro)</span>
+          <span>Visão geral</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-vendas" onclick="selectSidebarTab('aba-vendas', this)">
           <span class="nav-icon">👨‍🍳</span>
-          <span>Cozinha & Pedidos</span>
+          <span>Pedidos e produção</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-cardapio" onclick="selectSidebarTab('aba-cardapio', this)">
           <span class="nav-icon">🍲</span>
-          <span>Cardápio & Produtos</span>
+          <span>Catálogo e produtos</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-compras" onclick="selectSidebarTab('aba-compras', this)">
           <span class="nav-icon">📦</span>
-          <span>Estoque & Compras</span>
+          <span>Estoque e compras</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-cadastro-produto" onclick="selectSidebarTab('aba-cadastro-produto', this)">
           <span class="nav-icon">➕</span>
-          <span>Novo Produto</span>
+          <span>Cadastrar produto</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-textos" onclick="selectSidebarTab('aba-textos', this)">
           <span class="nav-icon">⚙️</span>
-          <span>Configurações do Site</span>
+          <span>Administração do site</span>
         </a>
       </nav>
     </div>
@@ -5391,5 +5391,5 @@ async function salvarProducaoLote(){
   });
   setInterval(carregarPedidos, 30000);
 </script>
-</body>
+  <script src="/assets/js/erp-modern.js?v=20260807-1"></script>\n</body>
 </html>
