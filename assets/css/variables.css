@@ -10,22 +10,22 @@
   --verde-hover: #335d3c;
   --verde-dark: #223c28;
   --verde-deep: #16291a;
-  --verde-light: #dfead9;
-  --verde-soft: #eaf1e5;
+  --verde-light: #e0ebd8;
+  --verde-soft: #eef4ea;
   --verde-border: #b9ceb5;
 
   --dourado-primary: #c9a86a;
   --dourado-hover: #b59253;
   --dourado-dark: #8c6c2e;
-  --dourado-light: #f3e8cc;
-  --dourado-soft: #f8f0df;
+  --dourado-light: #eee2c5;
+  --dourado-soft: #f5eedc;
   --dourado-border: #dfc48d;
 
   /* --- CORES NEUTRAS & SURFACES --- */
   --bg-app: #e8efe3;
-  --bg-card: #fffdf6;
-  --bg-subtle: #dfe9da;
-  --bg-hover: #e4eddf;
+  --bg-card: #f6f8f2;
+  --bg-subtle: #e0eadb;
+  --bg-hover: #dbe7d5;
 
   --border-subtle: #e5ece6;
   --border-medium: #d4ded6;
