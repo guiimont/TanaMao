@@ -668,3 +668,15 @@ details.mailfy-accordion .accordion-body {
   .app-content { padding: 16px; }
 }
 
+/* --- REGRAS DE EXIBIÇÃO DE ABAS DO PAINEL --- */
+.tab-content {
+  display: none;
+  width: 100%;
+}
+
+.tab-content.active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
