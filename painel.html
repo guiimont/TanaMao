@@ -2547,11 +2547,13 @@
       abrirAba("aba-vendas");
     }
     const btnLogin = document.getElementById("btn-login-admin");
-    if (USER_ROLE === "admin") {
-      btnLogin.innerText = "Admin";
-      btnLogin.style.background = "rgba(201,168,106,.18)";
-    } else {
-      btnLogin.innerText = "Operador";
+    if (btnLogin) {
+      if (USER_ROLE === "admin") {
+        btnLogin.innerText = "Admin";
+        btnLogin.style.background = "rgba(201,168,106,.18)";
+      } else {
+        btnLogin.innerText = "Operador";
+      }
     }
   }
 
@@ -5232,6 +5234,56 @@ async function salvarProducaoLote(){
         <td style="text-align:right;"><strong style="color:var(--verde-dark);">${fmt(row.total)}</strong></td>
       </tr>
     `).join("");
+  function getEntryDate(entry){
+    return String(entry.entry_date || entry.created_at || "").slice(0, 10);
+  }
+
+  function ensureFinanceDefaultDates(){
+    const de = getEl("dash-de");
+    const ate = getEl("dash-ate");
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    if (de && !de.value) de.value = first;
+    if (ate && !ate.value) ate.value = today;
+  }
+
+  function setFinancePeriod(period){
+    const de = getEl("dash-de");
+    const ate = getEl("dash-ate");
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    if (period === "today") {
+      if (de) de.value = today;
+      if (ate) ate.value = today;
+    } else {
+      const first = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+      if (de) de.value = first;
+      if (ate) ate.value = today;
+    }
+    atualizarDashboardFinanceiro();
+  }
+
+  function getOrderUnits(order){
+    return (order.items_json || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  }
+
+  function groupSales(orders, grouping){
+    const map = new Map();
+    orders.forEach(order => {
+      const date = getSaleDate(order);
+      const key = grouping === "month"
+        ? date.slice(0, 7)
+        : grouping === "period"
+          ? getDayPeriod(getSaleHour(order))
+          : date;
+      if (!map.has(key)) map.set(key, { key, orders: 0, units: 0, total: 0 });
+      const row = map.get(key);
+      row.orders += 1;
+      row.units += getOrderUnits(order);
+      row.total += Number(order.total || 0);
+    });
+    return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
   }
 
   // ================= DASHBOARD FINANCEIRO =================

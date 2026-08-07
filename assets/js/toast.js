@@ -8,6 +8,14 @@ class ToastManager {
   }
 
   init() {
+    if (this.container && document.body && document.body.contains(this.container)) return;
+    if (!document.body) {
+      if (!this._listeningDom) {
+        this._listeningDom = true;
+        document.addEventListener('DOMContentLoaded', () => this.init());
+      }
+      return;
+    }
     if (!document.querySelector('.toast-container')) {
       this.container = document.createElement('div');
       this.container.className = 'toast-container';
