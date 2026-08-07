@@ -2547,6 +2547,15 @@
     }
   }
 
+  function getAuthHeaders(extra = {}) {
+    const token = localStorage.getItem("tnm_token") || localStorage.getItem("token") || "";
+    return {
+      "Authorization": token ? `Bearer ${token}` : "",
+      "Content-Type": "application/json",
+      ...extra
+    };
+  }
+
   async function alterarMinhaSenha() {
     const btn = document.getElementById("btn-trocar-senha");
     const novaSenha = document.getElementById("nova-senha").value;
@@ -2841,7 +2850,7 @@
   // ================= PEDIDOS (KANBAN) =================
   async function carregarPedidos(){
     try {
-      const res = await fetch(API + "/operations/orders");
+      const res = await fetch(API + "/operations/orders", { headers: getAuthHeaders() });
       const data = await res.json();
       pedidos = data.orders || [];
       renderizar();
@@ -3051,7 +3060,7 @@
 
   // ================= GESTÃO DE COMPRAS & FORNECEDORES =================
   async function carregarFornecedores() {
-    const res = await fetch(API + "/suppliers");
+    const res = await fetch(API + "/suppliers", { headers: getAuthHeaders() });
     const data = await res.json();
 
     const suppliers = data.suppliers || [];
@@ -3768,7 +3777,7 @@
     if (totalEl) totalEl.textContent = fmt(0);
 
     try {
-      const res = await fetch(API + "/stock");
+      const res = await fetch(API + "/stock", { headers: getAuthHeaders() });
       const data = await res.json();
 
       COMPRAS_ENTRIES = data.entries || [];
@@ -4366,7 +4375,7 @@
     tbody.innerHTML = `<tr><td colspan="8">Carregando...</td></tr>`;
 
     try{
-      const res = await fetch(API + "/products/admin", { cache: "no-store" });
+      const res = await fetch(API + "/products/admin", { headers: getAuthHeaders(), cache: "no-store" });
       const data = await readJsonResponse(res);
       if(!res.ok || !data.ok) throw new Error(data.message || `Erro ${res.status} ao carregar produtos`);
       PRODUTOS_ADMIN = Array.isArray(data.products) ? data.products : [];
@@ -5307,9 +5316,9 @@ async function salvarProducaoLote(){
       const dayPeriod = getEl("dash-periodo-dia")?.value || "all";
 
       const [resOrders, resCosts, resStock] = await Promise.all([
-        fetch(API + "/operations/orders").catch(() => null),
-        fetch(API + "/costs").catch(() => null),
-        fetch(API + "/stock").catch(() => null)
+        fetch(API + "/operations/orders", { headers: getAuthHeaders() }).catch(() => null),
+        fetch(API + "/costs", { headers: getAuthHeaders() }).catch(() => null),
+        fetch(API + "/stock", { headers: getAuthHeaders() }).catch(() => null)
       ]);
 
       const dataOrders = resOrders && resOrders.ok ? await resOrders.json().catch(() => ({})) : {};
