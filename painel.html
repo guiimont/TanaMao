@@ -2340,12 +2340,11 @@
     </div>
   </div>
 </main>
-</div>
-
-<footer class="app-footer">
-  <span><strong>Tá na Mão ERP</strong> · Operação, cardápio e produção sob encomenda.</span>
-  <span>Atualize o cardápio no painel e valide o resultado no site público.</span>
-</footer>
+    <footer class="app-footer">
+      <span><strong>Tá na Mão ERP</strong> · Operação, cardápio e produção sob encomenda.</span>
+      <span>Atualize o cardápio no painel e valide o resultado no site público.</span>
+    </footer>
+  </div>
 
 <div id="product-recipe-overlay" class="panel-overlay" role="dialog" aria-modal="true" aria-labelledby="product-recipe-title">
   <div class="panel-modal">
@@ -2755,7 +2754,7 @@
 
   function filtrarCamposTextosSite() {
     const query = getGlobalSearch();
-    document.querySelectorAll("#aba-textos .field").forEach(field => {
+    document.querySelectorAll("#aba-textos .field, #aba-textos .form-group").forEach(field => {
       field.style.display = !query || normalizeSearch(field.textContent).includes(query) ? "" : "none";
     });
   }
