@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/main.css?v=20260807-3">
+  <link rel="stylesheet" href="/assets/css/main.css?v=20260807-4">
   <script src="auth.js"></script>
   <script src="/assets/js/toast.js"></script>
   <style>
@@ -1343,22 +1343,30 @@
         flex-direction: column;
       }
     }
-    /* Branding v3 — superfícies com identidade, sem perder leveza */
-    body { background: linear-gradient(180deg, #e8efe3 0%, #f2ead8 46%, #dfeadd 100%); }
+    /* Branding v4 — base verde contínua e acentos com função */
+    body { background: #e8efe3; }
     header { background: rgba(232,239,227,.94); border-bottom-color: rgba(60,110,71,.18); }
-    .hero { background: linear-gradient(135deg, #d8e6d4 0%, #eef0dd 48%, #ead9b5 100%); }
+    .hero { background: #e8efe3; }
     .intro-card, .guide-card, .guide-panel, .product, .recipe-detail-section, .policy-item {
-      background: linear-gradient(145deg, #f7f5e9, #e9f0e4);
+      background: #f5f8f1;
       border-color: rgba(60,110,71,.18);
     }
     .product:nth-child(even), .guide-card:nth-child(3n+2), .policy-item:nth-child(even) {
-      background: linear-gradient(145deg, #f3e7c9, #eef1df);
-      border-color: rgba(201,168,106,.3);
+      background: #f5f8f1;
+      border-color: rgba(60,110,71,.18);
     }
-    .guide-section, .policy-section { background: #dfeadd; }
-    .diy-intro, .recipe-detail-section { background: linear-gradient(135deg, #efe1bf, #e1ead9); }
-    .cta-section { background: linear-gradient(135deg, #223c28 0%, #3c6e47 68%, #8c6c2e 140%); }
+    .guide-section, .policy-section, .diy-intro, .recipe-detail-section { background: #e0eadb; }
+    .cta-section { background: #223c28; }
     footer { background: #1b3020; }
+    .site-header, .site-footer { background: rgba(232,239,227,.96); }
+    .section, .policy-card, .modal, .pag-item, .usage-icon-item, .menu-tab,
+    .detail-row, .footer-tags span, .m-resumo, .modal input {
+      background: #f5f8f1;
+      border-color: rgba(60,110,71,.16);
+    }
+    .guide-tags span, .usage-chip, .p-detail-btn, .recipe-badge, #area-logado {
+      background: #e0eadb;
+    }
   </style>
 </head>
 <body id="topo">
