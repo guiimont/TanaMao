@@ -10,22 +10,22 @@
   --verde-hover: #335d3c;
   --verde-dark: #223c28;
   --verde-deep: #16291a;
-  --verde-light: #eaf3ec;
-  --verde-soft: #f1f7f2;
-  --verde-border: #cbe0ce;
+  --verde-light: #dfead9;
+  --verde-soft: #eaf1e5;
+  --verde-border: #b9ceb5;
 
   --dourado-primary: #c9a86a;
   --dourado-hover: #b59253;
   --dourado-dark: #8c6c2e;
-  --dourado-light: #faf5ea;
-  --dourado-soft: #fcf8f0;
-  --dourado-border: #edd9b4;
+  --dourado-light: #f3e8cc;
+  --dourado-soft: #f8f0df;
+  --dourado-border: #dfc48d;
 
   /* --- CORES NEUTRAS & SURFACES --- */
-  --bg-app: #f7f9f7;
-  --bg-card: #ffffff;
-  --bg-subtle: #f0f4f1;
-  --bg-hover: #f3f7f4;
+  --bg-app: #e8efe3;
+  --bg-card: #fffdf6;
+  --bg-subtle: #dfe9da;
+  --bg-hover: #e4eddf;
 
   --border-subtle: #e5ece6;
   --border-medium: #d4ded6;
