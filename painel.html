@@ -1784,24 +1784,8 @@
       </details>
 
       <div class="table-status" id="produtos-status">Carregando produtos...</div>
-      <div class="table-container" style="margin-bottom: 16px;">
-        <table class="mailfy-table">
-          <thead>
-            <tr>
-              <th>Foto</th>
-              <th>Produto</th>
-              <th>Status</th>
-              <th style="text-align:right;">Preço</th>
-              <th style="text-align:right;">Estoque</th>
-              <th style="text-align:right;">Mínimo</th>
-              <th style="text-align:right;">Ordem</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-produtos">
-            <tr><td colspan="8" style="text-align:center;">Carregando catálogo...</td></tr>
-          </tbody>
-        </table>
+      <div id="produtos-categorias" class="product-category-grid" aria-live="polite">
+        <div class="product-category-empty">Carregando catálogo...</div>
       </div>
 
       <!-- PEDIDOS DE REPOSIÇÃO (RECOLHÍVEL) -->
@@ -4730,10 +4714,10 @@
   }
 
   async function carregarProdutosAdmin(){
-    const tbody = getEl("tbody-produtos");
+    const categories = getEl("produtos-categorias");
     const status = getEl("produtos-status");
     if (status) status.innerText = "Carregando produtos...";
-    tbody.innerHTML = `<tr><td colspan="8">Carregando...</td></tr>`;
+    if (categories) categories.innerHTML = `<div class="product-category-empty">Carregando catálogo...</div>`;
 
     try{
       const res = await fetch(API + "/products/admin", { headers: getAuthHeaders(), cache: "no-store" });
@@ -4746,7 +4730,7 @@
       console.error(e);
       PRODUTOS_ADMIN = [];
       if (status) status.innerText = "Nao foi possivel carregar os produtos.";
-      tbody.innerHTML = `<tr><td colspan="8">Erro ao carregar produtos: ${e.message || "falha desconhecida"}.</td></tr>`;
+      if (categories) categories.innerHTML = `<div class="product-category-empty">Erro ao carregar produtos: ${escapeHtml(e.message || "falha desconhecida")}.</div>`;
     }
   }
 
@@ -4836,8 +4820,9 @@
   }
 
   function renderProdutosAdmin(){
-    const tbody = getEl("tbody-produtos");
+    const categories = getEl("produtos-categorias");
     const status = getEl("produtos-status");
+    if (!categories) return;
     const produtosVisiveis = (PRODUTOS_ADMIN || []).filter(p => !isArchivedProduct(p));
     const totalProdutos = produtosVisiveis.length;
     const query = getGlobalSearch();
@@ -4867,13 +4852,13 @@
     }
 
     if(!produtosFiltrados.length){
-      tbody.innerHTML = query
-        ? `<tr><td colspan="8">Nenhum produto encontrado para esta busca. <button class="inline-action" type="button" onclick="limparBuscaProdutos()">Limpar busca</button></td></tr>`
-        : `<tr><td colspan="8">Nenhum produto cadastrado ainda.</td></tr>`;
+      categories.innerHTML = query
+        ? `<div class="product-category-empty">Nenhum produto encontrado para esta busca. <button class="inline-action" type="button" onclick="limparBuscaProdutos()">Limpar busca</button></div>`
+        : `<div class="product-category-empty">Nenhum produto cadastrado ainda.</div>`;
       return;
     }
 
-    tbody.innerHTML = produtosFiltrados.map(p => {
+    const productRow = p => {
       const img = p.image_url
         ? `<img class="product-cell-img" src="${p.image_url}" alt="Foto">`
         : `<div class="product-cell-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:1.2rem;">🍲</div>`;
@@ -4915,7 +4900,60 @@
           </td>
         </tr>
       `;
+    };
+
+    const grouped = produtosFiltrados.reduce((result, product) => {
+      const label = String(product.category || "Outros").trim() || "Outros";
+      const key = normalizeSearch(label);
+      if (!result[key]) result[key] = { label, products: [] };
+      result[key].products.push(product);
+      return result;
+    }, {});
+
+    const groups = Object.values(grouped).sort((a, b) =>
+      a.label.localeCompare(b.label, "pt-BR", { sensitivity: "base" })
+    );
+
+    categories.innerHTML = groups.map((group, index) => {
+      const active = group.products.filter(product => product.active !== false).length;
+      const lowStock = group.products.filter(product => {
+        const stock = Number(product.stock_quantity || 0);
+        const minimum = Number(product.reorder_min_quantity || 0);
+        return product.active !== false && product.is_sellable !== false && minimum > 0 && stock <= minimum;
+      }).length;
+      const shouldOpen = !!query;
+
+      return `
+        <details class="product-category-card" ${shouldOpen ? "open" : ""}>
+          <summary>
+            <span class="product-category-icon" aria-hidden="true">${categoryIcon(group.label)}</span>
+            <span class="product-category-title">
+              <strong>${escapeHtml(group.label)}</strong>
+              <small>${group.products.length} ${group.products.length === 1 ? "produto" : "produtos"} · ${active} ${active === 1 ? "ativo" : "ativos"}</small>
+            </span>
+            ${lowStock ? `<span class="product-category-alert">${lowStock} ${lowStock === 1 ? "reposição" : "reposições"}</span>` : `<span class="product-category-ok">Estoque em dia</span>`}
+            <span class="product-category-toggle" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="product-category-body">
+            <div class="table-container">
+              <table class="mailfy-table product-category-table">
+                <thead><tr><th>Foto</th><th>Produto</th><th>Status</th><th>Preço</th><th>Estoque</th><th>Mínimo</th><th>Ordem</th><th>Ações</th></tr></thead>
+                <tbody>${group.products.map(productRow).join("")}</tbody>
+              </table>
+            </div>
+          </div>
+        </details>`;
     }).join("");
+  }
+
+  function categoryIcon(category){
+    const value = normalizeSearch(category);
+    if (value.includes("doce") || value.includes("sobremesa")) return "🍰";
+    if (value.includes("lanche") || value.includes("salgado")) return "🥪";
+    if (value.includes("bebida") || value.includes("suco")) return "🥤";
+    if (value.includes("refeicao") || value.includes("prato") || value.includes("marmita")) return "🍲";
+    if (value.includes("brinde")) return "🎁";
+    return "🍽️";
   }
 
 
@@ -5749,6 +5787,6 @@ async function salvarProducaoLote(){
   });
   setInterval(carregarPedidos, 30000);
 </script>
-  <script src="/assets/js/erp-modern.js?v=20260807-1"></script>
+  <script src="/assets/js/erp-modern.js?v=20260808-1"></script>
 </body>
 </html>
