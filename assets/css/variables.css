@@ -6,26 +6,26 @@
 
 :root {
   /* --- CORES DA MARCA (BRANDING) --- */
-  --verde-primary: #3c6e47;
-  --verde-hover: #335d3c;
-  --verde-dark: #223c28;
-  --verde-deep: #16291a;
-  --verde-light: #e0ebd8;
-  --verde-soft: #eef4ea;
-  --verde-border: #b9ceb5;
+  --verde-primary: #5d6d4d;
+  --verde-hover: #4f5e41;
+  --verde-dark: #3d4933;
+  --verde-deep: #293123;
+  --verde-light: #e2e8d9;
+  --verde-soft: #eef2e8;
+  --verde-border: #c3cdb8;
 
-  --dourado-primary: #c9a86a;
-  --dourado-hover: #b59253;
-  --dourado-dark: #8c6c2e;
-  --dourado-light: #eee2c5;
-  --dourado-soft: #f5eedc;
-  --dourado-border: #dfc48d;
+  --dourado-primary: #e17e4f;
+  --dourado-hover: #c96b40;
+  --dourado-dark: #9f4d2c;
+  --dourado-light: #f5cfbb;
+  --dourado-soft: #fce9df;
+  --dourado-border: #efb493;
 
   /* --- CORES NEUTRAS & SURFACES --- */
-  --bg-app: #e8efe3;
-  --bg-card: #f6f8f2;
-  --bg-subtle: #e0eadb;
-  --bg-hover: #dbe7d5;
+  --bg-app: #f7efe1;
+  --bg-card: #fffaf2;
+  --bg-subtle: #efe6d7;
+  --bg-hover: #f2eadf;
 
   --border-subtle: #e5ece6;
   --border-medium: #d4ded6;
@@ -81,7 +81,7 @@
   --shadow-md: 0 8px 24px rgba(15, 26, 17, 0.07);
   --shadow-lg: 0 16px 36px rgba(15, 26, 17, 0.1);
   --shadow-glow-green: 0 4px 20px rgba(60, 110, 71, 0.25);
-  --shadow-glow-gold: 0 4px 20px rgba(201, 168, 106, 0.3);
+  --shadow-glow-gold: 0 4px 20px rgba(225, 126, 79, 0.28);
 
   /* --- TRANSIÇÕES --- */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);

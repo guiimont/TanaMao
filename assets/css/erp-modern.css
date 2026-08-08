@@ -292,3 +292,12 @@ body{background:var(--erp-bg)!important}
 .btn-gold,.admin-card button{background:#c89b3c!important}
 .chart-bar{background:var(--erp-green)!important}
 @media(max-width:820px){.erp-page-heading{padding:13px 15px!important}}
+
+/* Brand kit 2026 — camada definitiva após os estilos legados */
+:root{--erp-ink:#263021;--erp-muted:#68705f;--erp-line:#e4dacb;--erp-bg:#f7efe1;--erp-card:#fffaf2;--erp-green:#5d6d4d;--erp-green-2:#788867;--erp-green-dark:#3d4933;--erp-green-soft:#e8eddf;--erp-gold:#e17e4f;--erp-gold-soft:#fbe7dc;--erp-sand:#f7efe1}
+body{background:radial-gradient(circle at 92% 3%,rgba(225,126,79,.1),transparent 28rem),linear-gradient(145deg,#fbf5ea 0%,#f7efe1 60%,#efe7d9 100%)!important}
+.sidebar{background:linear-gradient(180deg,#5d6d4d 0%,#3d4933 100%)!important}.sidebar-footer{background:#303a29!important}.sidebar-link.active{box-shadow:inset 3px 0 0 var(--erp-gold),0 8px 20px rgba(32,42,27,.18)!important}
+.app-topbar{background:rgba(255,250,242,.94)!important;border-bottom-color:rgba(93,109,77,.16)!important}.erp-page-heading{border-left-color:var(--erp-gold)!important;background:rgba(255,250,242,.76)!important}
+.admin-card,.mailfy-accordion,.kpi-card,.summary-bar,.section-toolbar{background:var(--erp-card)!important;border-color:rgba(93,109,77,.16)!important}.kpi-card{background:#e8eddf!important;border-top-color:var(--erp-green)!important}.kpi-card:nth-child(2n){background:#fbe7dc!important;border-top-color:var(--erp-gold)!important}.kpi-card:nth-child(2n) .kpi-value{color:#a95631!important}
+.btn-primary{background:var(--erp-gold)!important;border-color:var(--erp-gold)!important;color:#fff!important;box-shadow:0 8px 18px rgba(225,126,79,.22)!important}.btn-primary:hover{background:#c96b40!important;border-color:#c96b40!important}.btn-secondary{background:#fffaf2!important;border-color:#d9d0c3!important}
+.round-command-bar{background:linear-gradient(135deg,#5d6d4d,#46543a)!important}.operation-kpi{background:#fffaf2!important;border-color:rgba(93,109,77,.18)!important}.round-next-action{border-left-color:var(--erp-gold)!important}
