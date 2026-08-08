@@ -301,3 +301,44 @@ body{background:radial-gradient(circle at 92% 3%,rgba(225,126,79,.1),transparent
 .admin-card,.mailfy-accordion,.kpi-card,.summary-bar,.section-toolbar{background:var(--erp-card)!important;border-color:rgba(93,109,77,.16)!important}.kpi-card{background:#e8eddf!important;border-top-color:var(--erp-green)!important}.kpi-card:nth-child(2n){background:#fbe7dc!important;border-top-color:var(--erp-gold)!important}.kpi-card:nth-child(2n) .kpi-value{color:#a95631!important}
 .btn-primary{background:var(--erp-gold)!important;border-color:var(--erp-gold)!important;color:#fff!important;box-shadow:0 8px 18px rgba(225,126,79,.22)!important}.btn-primary:hover{background:#c96b40!important;border-color:#c96b40!important}.btn-secondary{background:#fffaf2!important;border-color:#d9d0c3!important}
 .round-command-bar{background:linear-gradient(135deg,#5d6d4d,#46543a)!important}.operation-kpi{background:#fffaf2!important;border-color:rgba(93,109,77,.18)!important}.round-next-action{border-left-color:var(--erp-gold)!important}
+
+/* Cadastro de produto — hierarquia e fluxo de trabalho */
+#aba-cadastro-produto{max-width:1280px;margin:0 auto}
+.product-form-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start}
+.product-form-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.product-form-section,.product-publish-card{margin:0!important;padding:24px!important}
+.product-section-heading{display:flex;align-items:flex-start;gap:12px;margin:0 0 22px;padding:0 0 16px;border-bottom:1px solid rgba(93,109,77,.14)}
+.product-section-heading h3,.product-section-heading p{margin:0!important;border:0!important;padding:0!important}
+.product-section-heading h3{font-size:1rem!important;line-height:1.3;color:var(--erp-green-dark)!important}
+.product-section-heading p{margin-top:4px!important;color:var(--erp-muted)!important;font-size:.78rem;line-height:1.45}
+.product-section-step{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:8px;background:var(--erp-green);color:#fff;font-size:.76rem;font-weight:850;box-shadow:0 4px 10px rgba(93,109,77,.16)}
+.product-section-heading-compact{align-items:center;margin:0;padding:0;border:0}
+.product-section-heading-compact strong{display:block;color:var(--erp-green-dark);font-size:.9rem}
+.product-section-heading-compact small{display:block;margin-top:3px;color:var(--erp-muted);font-size:.72rem;font-weight:550}
+.product-form-section .form-grid{gap:16px!important}
+.product-form-section .form-label,.product-publish-card .form-label{display:block;margin-bottom:7px;font-size:.7rem!important;letter-spacing:.035em;text-transform:uppercase}
+.product-form-section .form-control,.product-publish-card .form-control{min-height:46px!important;padding:11px 12px!important}
+.product-form-section textarea.form-control{line-height:1.5}
+.product-form-section .form-grid.is-three{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px!important}
+.product-form-aside{position:sticky;top:88px;min-width:0}
+.product-publish-card .form-group{margin-bottom:17px}
+.product-upload-zone{display:flex!important;min-height:126px;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:16px;border:1.5px dashed #aab69e;border-radius:12px;background:#f2f6ed;color:var(--erp-green-dark)!important;text-align:center;cursor:pointer;transition:.18s ease}
+.product-upload-zone:hover{border-color:var(--erp-green);background:#e9f0e3}
+.product-upload-zone strong{font-size:.82rem}.product-upload-zone small{color:var(--erp-muted);font-size:.68rem;font-weight:550;line-height:1.35}
+.product-upload-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--erp-green);color:#fff;font-size:1.1rem;line-height:1}
+.product-file-input{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+.product-publish-actions{margin-top:22px;padding-top:18px;border-top:1px solid rgba(93,109,77,.14)}
+.product-publish-card .product-save-button{width:100%;min-height:48px;background:var(--erp-green)!important;border-color:var(--erp-green)!important;color:#fff!important;font-size:.9rem!important;box-shadow:0 8px 18px rgba(93,109,77,.2)!important}
+.product-publish-card .product-save-button:hover{background:#4d5c3f!important}
+.product-publish-card .product-clear-button{width:100%;margin-top:7px!important;padding:8px!important;background:transparent!important;border:0!important;color:var(--erp-muted)!important;box-shadow:none!important;font-size:.75rem!important}
+.product-publish-card .product-clear-button:hover{color:#9b4c2d!important;background:var(--erp-gold-soft)!important}
+.product-recipe-section{margin:0!important}.product-recipe-section>summary{padding:18px 20px!important}
+.product-accordion-action{padding:6px 10px;border:1px solid rgba(93,109,77,.2);border-radius:999px;background:#f8faf5;color:var(--erp-green-dark);font-size:.68rem;font-weight:750}
+.days-control{gap:10px!important}.days-grid{gap:8px!important}
+.day-option{min-height:42px!important;justify-content:center!important;border-radius:9px!important;cursor:pointer!important;transition:.16s ease!important}
+.day-option input{width:16px!important;height:16px!important;min-height:0!important;accent-color:var(--erp-green)}
+.day-option:has(input:checked){background:var(--erp-green)!important;border-color:var(--erp-green)!important;color:#fff!important;box-shadow:0 4px 10px rgba(93,109,77,.14)}
+.day-option-all{justify-content:space-between!important;padding:0 13px!important}
+@media(max-width:1080px){.product-form-layout{grid-template-columns:minmax(0,1fr) 280px;gap:18px}.product-form-section,.product-publish-card{padding:20px!important}}
+@media(max-width:900px){.product-form-layout{grid-template-columns:1fr}.product-form-aside{position:static}.product-publish-card{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.product-publish-card>.product-section-heading,.product-publish-actions{grid-column:1/-1}.product-upload-zone{min-height:116px}}
+@media(max-width:620px){.product-form-section .form-grid.is-three,.product-publish-card{grid-template-columns:1fr}.product-section-heading{margin-bottom:18px}.product-form-section,.product-publish-card{padding:17px!important}.days-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.product-publish-card>.product-section-heading,.product-publish-actions{grid-column:auto}.product-accordion-action{display:none}}

@@ -1834,15 +1834,18 @@
 
   <!-- ABA CADASTRO DE PRODUTO (LAYOUT SAAS 2 COLUNAS) -->
   <div id="aba-cadastro-produto" class="tab-content">
-    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;">
+    <div class="product-form-layout">
       
       <!-- COLUNA DA ESQUERDA (DADOS PRINCIPAIS DO PRODUTO) -->
-      <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="product-form-main">
         <input type="hidden" id="p-id">
 
         <!-- DADOS COMERCIAIS & PREÇO -->
-        <div class="admin-card" style="margin:0;">
-          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Informações do Produto & Preço</h3>
+        <div class="admin-card product-form-section">
+          <div class="product-section-heading">
+            <span class="product-section-step">1</span>
+            <div><h3>Informações comerciais</h3><p>Dados que o cliente verá no cardápio.</p></div>
+          </div>
           <div class="form-grid">
             <label class="field full">
               <span class="form-label">Nome do produto *</span>
@@ -1864,8 +1867,11 @@
         </div>
 
         <!-- PRODUÇÃO SOB ENCOMENDA & VALIDADE -->
-        <div class="admin-card" style="margin:0;">
-          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Produção sob Encomenda & Validade</h3>
+        <div class="admin-card product-form-section">
+          <div class="product-section-heading">
+            <span class="product-section-step">2</span>
+            <div><h3>Produção e disponibilidade</h3><p>Defina validade, capacidade e quando o produto pode ser encomendado.</p></div>
+          </div>
           <div class="form-grid is-three">
             <label class="field">
               <span class="form-label">Validade (dias)</span>
@@ -1910,13 +1916,13 @@
         </div>
 
         <!-- FICHA TÉCNICA E MODO DE PREPARO -->
-        <details class="mailfy-accordion" style="margin:0;">
+        <details class="mailfy-accordion product-recipe-section">
           <summary>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="accordion-icon">📋</span>
-              <span>Ficha Técnica & Receita (Ingredientes e Preparo)</span>
+            <div class="product-section-heading product-section-heading-compact">
+              <span class="product-section-step">3</span>
+              <div><strong>Ficha técnica e receita</strong><small>Ingredientes, preparo e estrutura de compras.</small></div>
             </div>
-            <span class="status-pill pill-gold">Clique para abrir</span>
+            <span class="product-accordion-action">Abrir seção</span>
           </summary>
           <div class="accordion-body">
             <div class="form-group">
@@ -1988,14 +1994,21 @@
       </div>
 
       <!-- COLUNA DA DIREITA (STICKY: PUBLICAÇÃO & FOTO) -->
-      <div style="display: flex; flex-direction: column; gap: 20px; position: sticky; top: 80px;">
-        <div class="admin-card" style="margin:0;">
-          <h3 style="margin-bottom:14px; color:var(--verde-dark);">Publicação & Foto</h3>
+      <aside class="product-form-aside">
+        <div class="admin-card product-publish-card">
+          <div class="product-section-heading product-section-heading-compact">
+            <span class="product-section-step">4</span>
+            <div><h3>Publicação</h3><p>Imagem, categoria e exibição na loja.</p></div>
+          </div>
           
           <div class="form-group">
-            <label class="form-label">Foto do Produto</label>
-            <input id="p-img" class="form-control" type="file" accept="image/*">
-            <small class="muted" style="font-size:0.75rem;">O backend converte em WebP automaticamente.</small>
+            <label class="form-label">Foto do produto</label>
+            <label class="product-upload-zone" for="p-img">
+              <span class="product-upload-icon">＋</span>
+              <strong>Adicionar imagem</strong>
+              <small>PNG ou JPG · conversão automática para WebP</small>
+            </label>
+            <input id="p-img" class="product-file-input" type="file" accept="image/*">
           </div>
 
           <div class="form-group">
@@ -2030,10 +2043,12 @@
             </select>
           </div>
 
-          <button class="btn btn-primary" style="width:100%; height:46px; font-size:1rem; margin-top:14px;" onclick="salvarProduto()">💾 Salvar Produto</button>
-          <button class="btn btn-ghost" style="width:100%; margin-top:8px; font-size:0.84rem;" onclick="limparFormProduto()">Limpar formulário</button>
+          <div class="product-publish-actions">
+            <button class="btn btn-primary product-save-button" onclick="salvarProduto()">Salvar produto</button>
+            <button class="btn btn-ghost product-clear-button" onclick="limparFormProduto()">Limpar formulário</button>
+          </div>
         </div>
-      </div>
+      </aside>
 
     </div>
   </div>
