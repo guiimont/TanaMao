@@ -1159,9 +1159,13 @@
       <div class="sidebar-nav-label">Painel Principal</div>
 
       <nav class="sidebar-nav">
-        <a class="sidebar-link active" data-tab-id="aba-config" onclick="selectSidebarTab('aba-config', this)">
+        <a class="sidebar-link active" data-tab-id="aba-operacao" onclick="selectSidebarTab('aba-operacao', this)">
+          <span class="nav-icon">🎯</span>
+          <span>Operação do dia</span>
+        </a>
+        <a class="sidebar-link" data-tab-id="aba-config" onclick="selectSidebarTab('aba-config', this)">
           <span class="nav-icon">📊</span>
-          <span>Visão geral</span>
+          <span>Financeiro</span>
         </a>
         <a class="sidebar-link" data-tab-id="aba-vendas" onclick="selectSidebarTab('aba-vendas', this)">
           <span class="nav-icon">👨‍🍳</span>
@@ -1209,7 +1213,7 @@
         <div class="topbar-breadcrumb">
           <span>Tá na Mão!</span>
           <span>/</span>
-          <span class="current" id="topbar-current-page">Visão Geral</span>
+          <span class="current" id="topbar-current-page">Operação do dia</span>
         </div>
       </div>
 
@@ -1226,6 +1230,91 @@
 
     <!-- CONTEÚDO DAS ABAS -->
     <main class="app-content">
+
+  <!-- CENTRAL DE OPERAÇÃO -->
+  <div id="aba-operacao" class="tab-content">
+    <div class="erp-page-heading operation-heading">
+      <div>
+        <span class="operation-eyebrow">CENTRAL DE EXECUÇÃO</span>
+        <h1>Operação do dia</h1>
+        <p>Pedidos pagos viram compras, produção, separação e entrega em uma única rodada.</p>
+      </div>
+      <div class="operation-heading-actions">
+        <button class="btn btn-secondary" type="button" onclick="carregarRodadasProducao(true)">Atualizar</button>
+        <button class="btn btn-primary" type="button" onclick="abrirNovaRodada()">+ Nova rodada</button>
+      </div>
+    </div>
+
+    <div id="round-alert" class="operation-alert" hidden></div>
+
+    <section id="round-empty" class="admin-card operation-empty" hidden>
+      <div class="operation-empty-icon">◎</div>
+      <h2>Nenhuma rodada criada</h2>
+      <p>Crie a primeira rodada para transformar automaticamente os pedidos pagos em demanda de produção e lista de compras.</p>
+      <button class="btn btn-primary" type="button" onclick="abrirNovaRodada()">Criar primeira rodada</button>
+    </section>
+
+    <section id="round-loading" class="admin-card operation-loading">Carregando a operação...</section>
+
+    <div id="round-workspace" hidden>
+      <div class="round-command-bar">
+        <div>
+          <div class="round-title-line">
+            <h2 id="round-title">Rodada</h2>
+            <span id="round-status" class="round-status">Rascunho</span>
+          </div>
+          <p id="round-dates" class="muted"></p>
+        </div>
+        <div class="round-selector-wrap">
+          <label for="round-selector">Rodada</label>
+          <select id="round-selector" onchange="selecionarRodada(this.value)"></select>
+        </div>
+      </div>
+
+      <div class="operation-kpis">
+        <article class="operation-kpi"><span>Pedidos</span><strong id="round-kpi-orders">0</strong><small>confirmados</small></article>
+        <article class="operation-kpi"><span>Demanda</span><strong id="round-kpi-units">0</strong><small>unidades pedidas</small></article>
+        <article class="operation-kpi"><span>Produzir</span><strong id="round-kpi-production">0</strong><small>após estoque e margem</small></article>
+        <article class="operation-kpi"><span>Comprar</span><strong id="round-kpi-shopping">0</strong><small>itens com falta</small></article>
+        <article class="operation-kpi"><span>Entregas</span><strong id="round-kpi-deliveries">0</strong><small id="round-kpi-pickups">0 retiradas</small></article>
+      </div>
+
+      <section class="admin-card round-next-action">
+        <div class="next-action-copy">
+          <span class="operation-eyebrow">PRÓXIMA AÇÃO</span>
+          <h3 id="round-next-title">Revisar rodada</h3>
+          <p id="round-next-description">Confira a demanda e as fichas técnicas antes de fechar os pedidos.</p>
+        </div>
+        <div class="next-action-buttons">
+          <button id="round-recalculate-btn" class="btn btn-secondary" type="button" onclick="recalcularRodadaAtual()">Recalcular pedidos</button>
+          <button id="round-advance-btn" class="btn btn-primary" type="button" onclick="avancarRodadaAtual()">Fechar pedidos</button>
+        </div>
+      </section>
+
+      <div class="operation-grid">
+        <section class="admin-card operation-panel">
+          <div class="operation-panel-head">
+            <div><span class="operation-eyebrow">PLANO</span><h3>Produção necessária</h3></div>
+            <span id="round-demand-count" class="round-count">0 produtos</span>
+          </div>
+          <div id="round-demand-list" class="operation-list"></div>
+        </section>
+
+        <section class="admin-card operation-panel">
+          <div class="operation-panel-head">
+            <div><span class="operation-eyebrow">SUPRIMENTOS</span><h3>Lista de compras</h3></div>
+            <button class="text-action" type="button" onclick="abrirAba('aba-compras')">Abrir estoque →</button>
+          </div>
+          <div id="round-shopping-list" class="operation-list"></div>
+        </section>
+      </div>
+
+      <section id="round-missing-card" class="admin-card operation-blocker" hidden>
+        <div><span class="operation-eyebrow">BLOQUEIO</span><h3>Fichas técnicas pendentes</h3><p>Complete estes produtos antes de fechar os pedidos da rodada.</p></div>
+        <div id="round-missing-list" class="blocker-list"></div>
+      </section>
+    </div>
+  </div>
 
   <!-- ABA VENDAS -->
   <div id="aba-vendas" class="tab-content">
@@ -2344,6 +2433,28 @@
     </div>
   </div>
 </main>
+
+<div id="modal-round-overlay" class="panel-overlay" aria-hidden="true">
+  <div class="panel-modal round-modal" role="dialog" aria-modal="true" aria-labelledby="round-modal-title">
+    <div class="operation-panel-head">
+      <div><span class="operation-eyebrow">PLANEJAMENTO</span><h2 id="round-modal-title">Nova rodada de produção</h2></div>
+      <button class="modal-close" type="button" onclick="fecharNovaRodada()" aria-label="Fechar">×</button>
+    </div>
+    <p class="muted">A rodada incluirá pedidos pagos, ainda não utilizados, com entrega na data escolhida.</p>
+    <div class="round-form-grid">
+      <div class="round-field full"><label for="round-form-title">Nome da rodada</label><input id="round-form-title" type="text" placeholder="Ex.: Produção de sábado"></div>
+      <div class="round-field"><label for="round-form-cutoff">Fechamento dos pedidos</label><input id="round-form-cutoff" type="datetime-local"></div>
+      <div class="round-field"><label for="round-form-margin">Margem de segurança (%)</label><input id="round-form-margin" type="number" min="0" max="100" step="1" value="0"></div>
+      <div class="round-field"><label for="round-form-production">Data de produção</label><input id="round-form-production" type="date"></div>
+      <div class="round-field"><label for="round-form-delivery">Data de entrega</label><input id="round-form-delivery" type="date"></div>
+      <div class="round-field full"><label for="round-form-notes">Observações</label><textarea id="round-form-notes" rows="3" placeholder="Informações importantes desta rodada"></textarea></div>
+    </div>
+    <div class="form-actions round-modal-actions">
+      <button class="btn btn-secondary" type="button" onclick="fecharNovaRodada()">Cancelar</button>
+      <button id="round-create-btn" class="btn btn-primary" type="button" onclick="criarRodadaProducao()">Criar e calcular rodada</button>
+    </div>
+  </div>
+</div>
     <footer class="app-footer">
       <span><strong>Tá na Mão ERP</strong> · Operação, cardápio e produção sob encomenda.</span>
       <span>Atualize o cardápio no painel e valide o resultado no site público.</span>
@@ -2597,6 +2708,7 @@
 
   // ================= CONTROLE DAS ABAS & SIDEBAR SAAS =================
   const TAB_BREADCRUMBS = {
+    "aba-operacao": "Operação do dia",
     "aba-config": "Visão Geral (Financeiro)",
     "aba-vendas": "Cozinha & Pedidos",
     "aba-cardapio": "Cardápio & Produtos",
@@ -2689,6 +2801,9 @@
       try { carregarFornecedores(); } catch (e) {}
       try { carregarCompras(); } catch (e) {}
       try { carregarInsumos(); } catch (e) {}
+    }
+    if (targetId === 'aba-operacao') {
+      try { carregarRodadasProducao(); } catch (e) {}
     }
     if (targetId === 'aba-config') {
       try { atualizarDashboardFinanceiro(); } catch (e) {}
@@ -3045,11 +3160,8 @@
 
     // Se faltou item, avisa (sem travar a operação)
     if (data.delivery_status === "preparing" && Array.isArray(data.issues) && data.issues.length){
-      const msg = data.issues.map(i => `• ${i.product_id}: faltou ${i.missing} (pediu ${i.requested}, tinha ${i.available})`).join("
-");
-      alert("Pedido enviado para Produção (faltas detectadas):
-
-" + msg);
+      const msg = data.issues.map(i => `• ${i.product_id}: faltou ${i.missing} (pediu ${i.requested}, tinha ${i.available})`).join("\n");
+      alert("Pedido enviado para Produção (faltas detectadas):\n\n" + msg);
     }
 
     carregarPedidos();
@@ -3064,6 +3176,221 @@
   });
   carregarPedidos();
 }
+
+  // ================= CENTRAL DE OPERAÇÃO & RODADAS =================
+  const ROUND_STATUS = {
+    draft: { label: "Rascunho", next: "orders_closed", action: "Fechar pedidos", title: "Revisar demanda e fichas", description: "Recalcule se novos pedidos entrarem. Depois feche a rodada para iniciar a execução." },
+    orders_closed: { label: "Pedidos fechados", next: "purchasing", action: "Iniciar compras", title: "Comprar o que está faltando", description: "Use a lista consolidada, registre as entradas e avance quando os insumos estiverem disponíveis." },
+    purchasing: { label: "Em compras", next: "producing", action: "Iniciar produção", title: "Concluir recebimento", description: "Confirme os insumos recebidos antes de liberar os lotes para a cozinha." },
+    producing: { label: "Em produção", next: "packing", action: "Iniciar embalagem", title: "Executar lotes de produção", description: "Produza as quantidades planejadas e registre divergências antes da separação." },
+    packing: { label: "Em embalagem", next: "delivering", action: "Liberar entregas", title: "Separar pedidos", description: "Confira item por item e libere somente os pedidos completos." },
+    delivering: { label: "Em entrega", next: "completed", action: "Concluir rodada", title: "Finalizar entregas e retiradas", description: "Confirme cada entrega ou retirada e feche o resultado operacional." },
+    completed: { label: "Concluída", next: null, action: "Rodada concluída", title: "Operação concluída", description: "A rodada foi finalizada. Consulte os dados ou crie a próxima." },
+    canceled: { label: "Cancelada", next: null, action: "Rodada cancelada", title: "Rodada cancelada", description: "Esta rodada não pode mais ser executada." }
+  };
+  let RODADAS_PRODUCAO = [];
+  let RODADA_ATUAL = null;
+  let RODADAS_CARREGADAS = false;
+
+  function formatDateBR(value, withTime = false) {
+    if (!value) return "—";
+    const raw = withTime ? new Date(value) : new Date(`${String(value).slice(0, 10)}T12:00:00`);
+    if (Number.isNaN(raw.getTime())) return "—";
+    return new Intl.DateTimeFormat("pt-BR", withTime ? { dateStyle: "short", timeStyle: "short" } : { dateStyle: "short" }).format(raw);
+  }
+
+  function formatQuantity(value) {
+    const number = Number(value || 0);
+    return Number.isInteger(number) ? String(number) : number.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+  }
+
+  function roundSummary(round) { return round?.summary_json || {}; }
+  function roundDemand(round) { return Array.isArray(round?.demand_json) ? round.demand_json : []; }
+  function roundShopping(round) { return Array.isArray(round?.shopping_json) ? round.shopping_json : []; }
+  function roundMissing(round) { return Array.isArray(round?.missing_requirements_json) ? round.missing_requirements_json : []; }
+
+  function mostrarAlertaRodada(message, type = "error") {
+    const alert = getEl("round-alert");
+    if (!alert) return;
+    alert.textContent = message;
+    alert.className = `operation-alert ${type}`;
+    alert.hidden = !message;
+  }
+
+  async function carregarRodadasProducao(force = false) {
+    if (RODADAS_CARREGADAS && !force) {
+      renderizarCentralOperacao();
+      return;
+    }
+    getEl("round-loading").hidden = false;
+    getEl("round-workspace").hidden = true;
+    getEl("round-empty").hidden = true;
+    mostrarAlertaRodada("");
+    try {
+      const response = await fetch(`${API}/operations/production-rounds`, { headers: getAuthHeaders(), cache: "no-store" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || "Não foi possível carregar as rodadas.");
+      RODADAS_PRODUCAO = data.rounds || [];
+      RODADAS_CARREGADAS = true;
+      if (!RODADA_ATUAL || !RODADAS_PRODUCAO.some(item => item.id === RODADA_ATUAL.id)) {
+        RODADA_ATUAL = [...RODADAS_PRODUCAO].reverse().find(item => !["completed", "canceled"].includes(item.status)) || RODADAS_PRODUCAO.at(-1) || null;
+      } else {
+        RODADA_ATUAL = RODADAS_PRODUCAO.find(item => item.id === RODADA_ATUAL.id);
+      }
+      renderizarCentralOperacao();
+    } catch (error) {
+      console.error("Erro ao carregar rodadas:", error);
+      getEl("round-loading").textContent = "A Central de Operação ainda não conseguiu acessar o backend.";
+      mostrarAlertaRodada(error.message);
+    }
+  }
+
+  function renderizarCentralOperacao() {
+    getEl("round-loading").hidden = true;
+    if (!RODADA_ATUAL) {
+      getEl("round-empty").hidden = false;
+      getEl("round-workspace").hidden = true;
+      return;
+    }
+    getEl("round-empty").hidden = true;
+    getEl("round-workspace").hidden = false;
+    const round = RODADA_ATUAL;
+    const summary = roundSummary(round);
+    const state = ROUND_STATUS[round.status] || ROUND_STATUS.draft;
+    getEl("round-title").textContent = round.title || "Rodada de produção";
+    getEl("round-status").textContent = state.label;
+    getEl("round-status").dataset.status = round.status;
+    getEl("round-dates").textContent = `Fecha em ${formatDateBR(round.order_cutoff_at, true)} · Produção ${formatDateBR(round.production_date)} · Entrega ${formatDateBR(round.delivery_date)} · Margem ${formatQuantity(round.safety_margin_percent)}%`;
+    getEl("round-kpi-orders").textContent = formatQuantity(summary.order_count);
+    getEl("round-kpi-units").textContent = formatQuantity(summary.ordered_units);
+    getEl("round-kpi-production").textContent = formatQuantity(summary.planned_units);
+    getEl("round-kpi-shopping").textContent = formatQuantity(summary.purchase_item_count);
+    getEl("round-kpi-deliveries").textContent = formatQuantity(summary.delivery_count);
+    getEl("round-kpi-pickups").textContent = `${formatQuantity(summary.pickup_count)} retiradas`;
+    getEl("round-next-title").textContent = state.title;
+    getEl("round-next-description").textContent = state.description;
+    const advance = getEl("round-advance-btn");
+    advance.textContent = state.action;
+    advance.disabled = !state.next;
+    advance.dataset.nextStatus = state.next || "";
+    getEl("round-recalculate-btn").hidden = round.status !== "draft";
+
+    const selector = getEl("round-selector");
+    selector.innerHTML = RODADAS_PRODUCAO.map(item => `<option value="${item.id}">${escapeHtml(item.title || "Rodada")} · ${formatDateBR(item.production_date)}</option>`).join("");
+    selector.value = round.id;
+    renderizarDemandaRodada(roundDemand(round));
+    renderizarComprasRodada(roundShopping(round));
+    renderizarPendenciasRodada(roundMissing(round));
+  }
+
+  function renderizarDemandaRodada(items) {
+    getEl("round-demand-count").textContent = `${items.length} produto${items.length === 1 ? "" : "s"}`;
+    getEl("round-demand-list").innerHTML = items.length ? items.map(item => `
+      <div class="operation-list-row">
+        <div><strong>${escapeHtml(item.product_name || "Produto")}</strong><small>${formatQuantity(item.ordered_quantity)} pedidos + ${formatQuantity(item.safety_margin_quantity)} margem − ${formatQuantity(item.ready_stock_quantity)} prontos</small></div>
+        <span class="quantity-badge">${formatQuantity(item.planned_quantity)} un.</span>
+      </div>`).join("") : `<div class="operation-list-empty">Nenhum pedido pago para esta data de entrega.</div>`;
+  }
+
+  function renderizarComprasRodada(items) {
+    const missing = items.filter(item => Number(item.purchase_quantity || 0) > 0);
+    getEl("round-shopping-list").innerHTML = missing.length ? missing.map(item => `
+      <div class="operation-list-row">
+        <div><strong>${escapeHtml(item.item_name || "Insumo")}</strong><small>Precisa ${formatQuantity(item.required_quantity)} ${escapeHtml(item.unit_type || "")} · estoque ${formatQuantity(item.current_stock)}</small></div>
+        <span class="quantity-badge gold">${formatQuantity(item.purchase_quantity)} ${escapeHtml(item.unit_type || "")}</span>
+      </div>`).join("") : `<div class="operation-list-empty success">Estoque suficiente para a rodada.</div>`;
+  }
+
+  function renderizarPendenciasRodada(items) {
+    const card = getEl("round-missing-card");
+    card.hidden = !items.length;
+    getEl("round-missing-list").innerHTML = items.map(item => `<button type="button" onclick="editarProduto('${item.product_id}')"><strong>${escapeHtml(item.product_name)}</strong><span>${formatQuantity(item.planned_quantity)} un. sem ficha técnica →</span></button>`).join("");
+  }
+
+  function selecionarRodada(id) {
+    RODADA_ATUAL = RODADAS_PRODUCAO.find(item => item.id === id) || RODADA_ATUAL;
+    renderizarCentralOperacao();
+  }
+
+  function abrirNovaRodada() {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const production = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+    const delivery = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const localDateTime = date => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    const localDate = date => localDateTime(date).slice(0, 10);
+    getEl("round-form-title").value = `Rodada ${formatDateBR(delivery.toISOString().slice(0, 10))}`;
+    getEl("round-form-cutoff").value = localDateTime(cutoff);
+    getEl("round-form-production").value = localDate(production);
+    getEl("round-form-delivery").value = localDate(delivery);
+    getEl("round-form-margin").value = "0";
+    getEl("round-form-notes").value = "";
+    getEl("modal-round-overlay").classList.add("open");
+    getEl("modal-round-overlay").setAttribute("aria-hidden", "false");
+  }
+
+  function fecharNovaRodada() {
+    getEl("modal-round-overlay").classList.remove("open");
+    getEl("modal-round-overlay").setAttribute("aria-hidden", "true");
+  }
+
+  async function criarRodadaProducao() {
+    const button = getEl("round-create-btn");
+    const payload = {
+      title: getEl("round-form-title").value.trim(),
+      order_cutoff_at: getEl("round-form-cutoff").value,
+      production_date: getEl("round-form-production").value,
+      delivery_date: getEl("round-form-delivery").value,
+      safety_margin_percent: Number(getEl("round-form-margin").value || 0),
+      notes: getEl("round-form-notes").value.trim() || null
+    };
+    button.disabled = true;
+    button.textContent = "Calculando...";
+    try {
+      const response = await fetch(`${API}/operations/production-rounds`, { method: "POST", headers: getAuthHeaders(), body: JSON.stringify(payload) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || "Não foi possível criar a rodada.");
+      fecharNovaRodada();
+      RODADA_ATUAL = data.round;
+      RODADAS_CARREGADAS = false;
+      await carregarRodadasProducao(true);
+      mostrarAlertaRodada("Rodada criada e demanda calculada.", "success");
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Criar e calcular rodada";
+    }
+  }
+
+  async function recalcularRodadaAtual() {
+    if (!RODADA_ATUAL) return;
+    try {
+      const response = await fetch(`${API}/operations/production-rounds/${RODADA_ATUAL.id}/recalculate`, { method: "POST", headers: getAuthHeaders() });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || "Não foi possível recalcular a rodada.");
+      RODADA_ATUAL = data.round;
+      RODADAS_CARREGADAS = false;
+      await carregarRodadasProducao(true);
+      mostrarAlertaRodada("Rodada recalculada com os pedidos mais recentes.", "success");
+    } catch (error) { alert(error.message); }
+  }
+
+  async function avancarRodadaAtual() {
+    const nextStatus = getEl("round-advance-btn")?.dataset.nextStatus;
+    if (!RODADA_ATUAL || !nextStatus) return;
+    const state = ROUND_STATUS[RODADA_ATUAL.status];
+    if (!confirm(`${state.action}? Esta ação altera a etapa operacional da rodada.`)) return;
+    try {
+      const response = await fetch(`${API}/operations/production-rounds/${RODADA_ATUAL.id}/status`, { method: "PATCH", headers: getAuthHeaders(), body: JSON.stringify({ status: nextStatus }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || "Não foi possível avançar a rodada.");
+      RODADA_ATUAL = data.round;
+      RODADAS_CARREGADAS = false;
+      await carregarRodadasProducao(true);
+      mostrarAlertaRodada(`Etapa atualizada: ${ROUND_STATUS[nextStatus].label}.`, "success");
+    } catch (error) { alert(error.message); }
+  }
 
   // ================= GESTÃO DE COMPRAS & FORNECEDORES =================
   async function carregarFornecedores() {
@@ -3352,8 +3679,7 @@
       const content = await page.getTextContent();
       lines.push(...groupPdfTextLines(content.items || []));
     }
-    return lines.join("
-");
+    return lines.join("\n");
   }
 
   function parseDateToInput(value) {
@@ -3513,8 +3839,7 @@
   }
 
   function getPdfInvoiceMeta(text) {
-    const lines = String(text || "").split(/\r?
-/).map(line => line.trim()).filter(Boolean);
+    const lines = String(text || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
     const cnpjMatch = text.match(/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}/);
     const numberMatch =
       text.match(/(?:N[ºo°]\s*|Numero\s*|Número\s*)(\d{3,})/i) ||
@@ -3539,8 +3864,7 @@
   function parsePdfInvoiceText(text) {
     const lines = String(text || "")
       .replace(/\u00a0/g, " ")
-      .split(/\r?
-/)
+      .split(/\r?\n/)
       .map(line => line.replace(/\s+/g, " ").trim())
       .filter(Boolean);
 
@@ -3884,9 +4208,7 @@
     if (!entries.length) return alert("Nenhuma compra filtrada para apagar.");
     const total = entries.reduce((acc, e) => acc + Number(e.total_value || 0), 0);
     const ok = confirm(
-      "Apagar " + entries.length + " compra(s) filtrada(s), totalizando " + fmt(total) + "?
-
-" +
+      "Apagar " + entries.length + " compra(s) filtrada(s), totalizando " + fmt(total) + "?\n\n" +
       "Use os filtros antes para manter apenas os registros novos da nota."
     );
     if (!ok) return;
@@ -4130,8 +4452,7 @@
 
   function formatRecipeTextForHtml(value, ordered = false) {
     const lines = String(value || "")
-      .split(/\r?
-/)
+      .split(/\r?\n/)
       .map(line => normalizeOrderedRecipeLine(line.trim(), ordered))
       .filter(Boolean);
 
@@ -5393,7 +5714,7 @@ async function salvarProducaoLote(){
   // INICIALIZAÇÃO AUTOMÁTICA DE ROTAS & NAVEGAÇÃO VISUAL DE ABAS
   document.addEventListener("DOMContentLoaded", () => {
     aplicarPermissoes();
-    abrirAba("aba-config");
+    abrirAba("aba-operacao");
   });
 
   document.addEventListener("click", (event) => {
