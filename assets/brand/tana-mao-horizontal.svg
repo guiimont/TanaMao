@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 132" role="img" aria-labelledby="title desc">
+  <title id="title">Tá na Mão!</title>
+  <desc id="desc">Alimentação Inteligente</desc>
+  <g transform="translate(4 14)">
+    <path d="M15 20 55 52 15 84" fill="none" stroke="#5D6D4D" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M70 20 111 52 70 84" fill="none" stroke="#5D6D4D" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="145" y="67" fill="#5D6D4D" font-family="Montserrat, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="-1.5">Tá na Mão!</text>
+  <text x="149" y="106" fill="#5D6D4D" font-family="Montserrat, Arial, sans-serif" font-size="29" font-weight="400" letter-spacing=".2">Alimentação Inteligente</text>
+</svg>
