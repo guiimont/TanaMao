@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Símbolo Tá na Mão!</title>
+  <rect width="128" height="128" rx="28" fill="#5D6D4D"/>
+  <path d="M26 37 52 64 26 91" fill="none" stroke="#F7EFE1" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M62 37 89 64 62 91" fill="none" stroke="#F7EFE1" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

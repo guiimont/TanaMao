@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tá na Mão! | Alimentação Inteligente</title>
+  <link rel="icon" href="/assets/brand/tana-mao-symbol.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,13 +79,10 @@
     }
 
     .brand-logo {
-      width: 44px;
-      height: 44px;
+      width: 250px;
+      height: auto;
       object-fit: contain;
-      border-radius: 12px;
-      background: var(--verde);
-      border: 1px solid rgba(45,82,53,0.25);
-      padding: 5px;
+      display: block;
     }
 
     .brand-name {
@@ -1408,7 +1406,7 @@
     /* Brand kit visual — superfícies verdes sobre base creme */
     body { background: #f7efe1; }
     .site-header { background: rgba(247,239,225,.94); border-bottom-color: rgba(93,109,77,.16); }
-    .brand-logo { background: var(--verde); border-color: rgba(61,73,51,.28); }
+    .brand-logo { background: transparent; border: 0; }
     .site-pill { color: #9f4d2c; background: rgba(225,126,79,.12); border-color: rgba(225,126,79,.24); }
     .hero,.section,.policy-card,.modal { background: #edf3e8; border-color: rgba(211,161,58,.42); }
     .guide-section,.policy-section,.diy-intro,.recipe-detail-section,.m-resumo { background: #e4ecde; }
@@ -1428,10 +1426,27 @@
     .cta-section { background: var(--verde-escuro); }
     .site-footer,footer { background: #303a29; }
     @media (max-width: 720px) {
-      .site-header-inner { justify-content:center; min-height:68px; position:relative; }
-      .brand-block { margin-inline:auto; position:relative; z-index:1; }
+      .site-header-inner {
+        align-items:center;
+        flex-direction:row;
+        justify-content:center;
+        min-height:68px;
+        padding-inline:64px;
+        position:relative;
+      }
+      .brand-block { margin:0; max-width:100%; position:relative; z-index:1; }
+      .brand-logo { width:min(220px, 100%); }
       .brand-subtitle,.site-pill { display:none; }
-      .site-nav { position:absolute; left:16px; right:auto; z-index:2; }
+      .site-nav {
+        align-items:center;
+        justify-content:center;
+        position:absolute;
+        left:16px;
+        top:50%;
+        width:40px;
+        transform:translateY(-50%);
+        z-index:2;
+      }
       .site-nav a:not([href="#resumo-lista"]) { display:none; }
       .site-nav a[href="#resumo-lista"] { width:40px; min-width:40px; padding:0; font-size:0; border:0; background:transparent; }
       .site-nav a[href="#resumo-lista"]::after { content:"☰"; font-size:1.25rem; color:var(--verde-escuro); }
@@ -1447,11 +1462,7 @@
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand-block" href="#topo" aria-label="Tá na Mão - início">
-      <img class="brand-logo" src="https://storage.googleapis.com/app-tess-ai-platform-assets-prod/assets/uploads/5681b1bf-2661-4360-9c01-6141cd6ff531.png" alt="Tá na Mão">
-      <span>
-        <span class="brand-name">Tá na Mão</span>
-        <span class="brand-subtitle" data-content="brandSubtitle">Alimentação inteligente sob encomenda</span>
-      </span>
+      <img class="brand-logo" src="/assets/brand/tana-mao-horizontal.svg" alt="Tá na Mão! — Alimentação Inteligente">
     </a>
     <nav class="site-nav" aria-label="Navegação principal">
       <span class="site-pill" data-content="headerBadge">Produção sob encomenda</span>
