@@ -342,3 +342,16 @@ body{background:radial-gradient(circle at 92% 3%,rgba(225,126,79,.1),transparent
 @media(max-width:1080px){.product-form-layout{grid-template-columns:minmax(0,1fr) 280px;gap:18px}.product-form-section,.product-publish-card{padding:20px!important}}
 @media(max-width:900px){.product-form-layout{grid-template-columns:1fr}.product-form-aside{position:static}.product-publish-card{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.product-publish-card>.product-section-heading,.product-publish-actions{grid-column:1/-1}.product-upload-zone{min-height:116px}}
 @media(max-width:620px){.product-form-section .form-grid.is-three,.product-publish-card{grid-template-columns:1fr}.product-section-heading{margin-bottom:18px}.product-form-section,.product-publish-card{padding:17px!important}.days-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.product-publish-card>.product-section-heading,.product-publish-actions{grid-column:auto}.product-accordion-action{display:none}}
+
+/* Estoque sob demanda — mantém alertas visíveis e recolhe a tabela extensa */
+.inventory-disclosure>summary small{display:block;margin-top:3px;color:var(--erp-muted);font-size:.72rem;font-weight:550}
+.inventory-disclosure-icon{display:grid;width:42px;height:42px;flex:0 0 42px;place-items:center;border-radius:12px;background:rgba(93,109,77,.11);font-size:1.15rem}
+.inventory-disclosure[open] .inventory-disclosure-action{background:rgba(93,109,77,.12)}
+.inventory-disclosure[open] .inventory-disclosure-action::before{content:"Ocultar "}
+.inventory-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.inventory-toolbar h3,.inventory-toolbar p{margin:0!important}
+.inventory-toolbar h3{color:var(--erp-green-dark)!important;font-size:1.05rem!important}
+.inventory-toolbar p{margin-top:3px!important;font-size:.78rem!important}
+.inventory-toolbar-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.inventory-disclosure .table-status{margin-bottom:10px}
+@media(max-width:760px){.inventory-disclosure-action{font-size:0}.inventory-disclosure-action::after{content:"Abrir";font-size:.72rem}.inventory-disclosure[open] .inventory-disclosure-action::before{content:none}.inventory-disclosure[open] .inventory-disclosure-action::after{content:"Fechar"}.inventory-toolbar{flex-direction:column}.inventory-toolbar-actions{width:100%;justify-content:flex-start}}

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/main.css?v=20260808-1">
-  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260808-1">
+  <link rel="stylesheet" href="/assets/css/erp-modern.css?v=20260808-2">
   <!-- Deve permanecer antes de qualquer script que faça chamadas à API. -->
   <script src="auth.js?v=20260807-1"></script>
   <script src="/assets/js/toast.js"></script>
@@ -1379,39 +1379,51 @@
       </div>
     </div>
 
-    <!-- TABELA PRINCIPAL DE INSUMOS DA PRODUÇÃO -->
-    <div class="admin-card">
-      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-        <div>
-          <h3 style="margin:0; font-size:1.15rem; color:var(--verde-dark);">Insumos & Matéria-Prima</h3>
-          <p class="muted" style="margin:2px 0 0 0; font-size:0.84rem;">Gerencie os estoques de ingredientes e embalagens das suas receitas.</p>
+    <!-- ESTOQUE COMPLETO (RECOLHIDO POR PADRÃO PARA REDUZIR RUÍDO VISUAL) -->
+    <details class="mailfy-accordion inventory-disclosure">
+      <summary>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="accordion-icon inventory-disclosure-icon" aria-hidden="true">📦</span>
+          <div>
+            <strong>Estoque de insumos</strong>
+            <small>Ingredientes, embalagens e níveis de reposição</small>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-secondary btn-sm" onclick="abrirModalFornecedor()">🤝 Cadastrar Fornecedor</button>
-          <button class="btn btn-gold btn-sm" onclick="abrirModalLancarCompra()">📦 Lançar Compra</button>
-          <button class="btn btn-primary btn-sm" onclick="abrirModalNovoInsumo()">+ Novo Insumo</button>
+        <span class="status-pill pill-info inventory-disclosure-action">Ver estoque</span>
+      </summary>
+      <div class="accordion-body">
+        <div class="inventory-toolbar">
+          <div>
+            <h3>Insumos &amp; Matéria-Prima</h3>
+            <p class="muted">Gerencie os estoques de ingredientes e embalagens das suas receitas.</p>
+          </div>
+          <div class="inventory-toolbar-actions">
+            <button class="btn btn-secondary btn-sm" onclick="abrirModalFornecedor()">🤝 Cadastrar Fornecedor</button>
+            <button class="btn btn-gold btn-sm" onclick="abrirModalLancarCompra()">📦 Lançar Compra</button>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalNovoInsumo()">+ Novo Insumo</button>
+          </div>
         </div>
-      </div>
 
-      <div class="table-status" id="insumos-status" style="margin-bottom:10px;">Carregando insumos...</div>
-      <div class="table-container">
-        <table class="mailfy-table">
-          <thead>
-            <tr>
-              <th>Insumo</th>
-              <th>Categoria</th>
-              <th>Fornecedor Padrão</th>
-              <th style="text-align:right;">Estoque Atual</th>
-              <th style="text-align:right;">Estoque Mínimo</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-insumos">
-            <tr><td colspan="6" style="text-align:center;">Carregando...</td></tr>
-          </tbody>
-        </table>
+        <div class="table-status" id="insumos-status">Carregando insumos...</div>
+        <div class="table-container">
+          <table class="mailfy-table">
+            <thead>
+              <tr>
+                <th>Insumo</th>
+                <th>Categoria</th>
+                <th>Fornecedor Padrão</th>
+                <th style="text-align:right;">Estoque Atual</th>
+                <th style="text-align:right;">Estoque Mínimo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-insumos">
+              <tr><td colspan="6" style="text-align:center;">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </details>
 
     <!-- IMPORTAR NOTA FISCAL (XML / PDF - RECOLHÍVEL) -->
     <details class="mailfy-accordion">
