@@ -808,6 +808,86 @@
     .cart-drawer-total { display: flex; justify-content: space-between; color: var(--verde-escuro); font-size: 1.08rem; font-weight: 800; }
     .cart-drawer-checkout { width: 100%; margin-top: 14px; }
 
+    .cart-drawer-actions { display: grid; gap: 9px; }
+    .cart-plan-status { margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(60,110,71,.08); color: var(--verde-escuro); font-size: .78rem; }
+    .cart-plan-status strong { display: block; margin-bottom: 2px; }
+    .cart-drawer-plan {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(60,110,71,.26);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--verde-escuro);
+      font: 800 .84rem "Poppins", sans-serif;
+      cursor: pointer;
+    }
+
+    .planner-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 52;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(27,48,32,.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: .22s ease;
+    }
+    .planner-overlay.on { opacity: 1; visibility: visible; }
+    .planner-panel {
+      width: min(920px, 100%);
+      max-height: min(880px, calc(100vh - 48px));
+      overflow: auto;
+      border: 1px solid rgba(93,109,77,.18);
+      border-radius: 26px;
+      background: #f7efe1;
+      box-shadow: 0 24px 70px rgba(27,48,32,.28);
+      transform: translateY(12px) scale(.985);
+      transition: .22s ease;
+    }
+    .planner-overlay.on .planner-panel { transform: none; }
+    .planner-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 24px;
+      border-bottom: 1px solid rgba(93,109,77,.16);
+      background: #edf3e8;
+    }
+    .planner-eyebrow { color: var(--dourado); font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .planner-head h2 { margin: 3px 0 4px; color: var(--verde-escuro); font-size: 1.35rem; }
+    .planner-head p { margin: 0; color: var(--muted); font-size: .86rem; }
+    .planner-close {
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(93,109,77,.18);
+      border-radius: 50%;
+      background: #f7faf4;
+      color: var(--verde-escuro);
+      font-size: 1.35rem;
+      cursor: pointer;
+    }
+    .planner-progress { padding: 18px 24px 8px; }
+    .planner-progress-row { display: flex; justify-content: space-between; gap: 14px; color: var(--verde-escuro); font-size: .88rem; font-weight: 800; }
+    .planner-track { height: 8px; margin-top: 9px; overflow: hidden; border-radius: 999px; background: rgba(93,109,77,.14); }
+    .planner-track span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--dourado); transition: width .2s ease; }
+    .planner-hint { display: block; margin-top: 8px; color: var(--muted); font-size: .79rem; }
+    .planner-days { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; padding: 16px 24px 22px; }
+    .planner-day { padding: 15px; border: 1px solid rgba(93,109,77,.16); border-radius: 17px; background: rgba(255,255,255,.5); }
+    .planner-day h3 { margin: 0 0 11px; color: var(--verde-escuro); font-size: .94rem; }
+    .planner-slot { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 9px; margin-top: 8px; }
+    .planner-slot label { color: var(--muted); font-size: .75rem; font-weight: 800; }
+    .planner-slot select { width: 100%; min-width: 0; height: 40px; padding: 0 34px 0 11px; border: 1px solid rgba(93,109,77,.2); border-radius: 11px; background: #fff; color: var(--verde-escuro); font: 600 .78rem "Poppins", sans-serif; }
+    .planner-footer { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 24px; border-top: 1px solid rgba(93,109,77,.16); background: #edf3e8; }
+    .planner-clear { border: 0; background: transparent; color: var(--muted); font: 700 .8rem "Poppins", sans-serif; cursor: pointer; }
+    .planner-done { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--verde-escuro); color: #fff; font: 800 .84rem "Poppins", sans-serif; cursor: pointer; }
+
     .details-purchase {
       display: flex;
       align-items: center;
@@ -1495,6 +1575,10 @@
       .details-purchase { align-items: stretch; flex-direction: column; }
       .details-purchase .qty-wrap { justify-content: center; }
       .cart-drawer { width: 100%; }
+      .planner-overlay { padding: 0; place-items: stretch; }
+      .planner-panel { width: 100%; max-height: 100vh; height: 100%; border: 0; border-radius: 0; }
+      .planner-head, .planner-progress, .planner-footer { padding-left: 16px; padding-right: 16px; }
+      .planner-days { grid-template-columns: 1fr; padding: 12px 16px 20px; }
     }
     /* Branding v4 — base verde contínua e acentos com função */
     body { background: #e8efe3; }
@@ -1607,6 +1691,29 @@
   </aside>
 </div>
 <div class="store-toast" id="store-toast" role="status" aria-live="polite"></div>
+
+<div class="planner-overlay" id="planner-overlay" onclick="fecharPlanejador(event)" aria-hidden="true">
+  <section class="planner-panel" role="dialog" aria-modal="true" aria-labelledby="planner-title">
+    <div class="planner-head">
+      <div>
+        <span class="planner-eyebrow">Sua rotina, no controle</span>
+        <h2 id="planner-title">Organize sua semana</h2>
+        <p>Distribua as refeições do carrinho entre almoço e jantar.</p>
+      </div>
+      <button class="planner-close" type="button" onclick="fecharPlanejador()" aria-label="Fechar planejador">×</button>
+    </div>
+    <div class="planner-progress">
+      <div class="planner-progress-row"><span id="planner-count">0 de 0 refeições planejadas</span><span id="planner-balance"></span></div>
+      <div class="planner-track" aria-hidden="true"><span id="planner-progress-bar"></span></div>
+      <span class="planner-hint" id="planner-hint">Escolha um produto em cada refeição que quiser organizar.</span>
+    </div>
+    <div class="planner-days" id="planner-days"></div>
+    <div class="planner-footer">
+      <button class="planner-clear" type="button" onclick="limparPlanejamento()">Limpar planejamento</button>
+      <button class="planner-done" type="button" onclick="concluirPlanejamento()">Salvar minha semana</button>
+    </div>
+  </section>
+</div>
 
 <div class="wrap">
 <section class="hero">
@@ -1833,6 +1940,9 @@
   <script>
     const BACKEND_URL = "https://tanamao-backend.onrender.com";
     const STORAGE_CART = "tanamao_cart_v1";
+    const STORAGE_WEEK_PLAN = "tanamao_week_plan_v1";
+    const PLANNER_DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+    const PLANNER_MEALS = [{ id: "lunch", label: "Almoço" }, { id: "dinner", label: "Jantar" }];
     const CART_DISCOUNT_RULES = {
       quantityTiers: [
         { min: 3, rate: 0.03 },
@@ -2107,6 +2217,157 @@
       } catch {
         return {};
       }
+    }
+
+    function carregarPlanejamento() {
+      try {
+        const raw = localStorage.getItem(STORAGE_WEEK_PLAN);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function salvarPlanejamento(plan) {
+      localStorage.setItem(STORAGE_WEEK_PLAN, JSON.stringify(plan));
+    }
+
+    function getPlannerKey(dayIndex, mealId) {
+      return `${dayIndex}-${mealId}`;
+    }
+
+    function getCartItemCount() {
+      return PRODS.reduce((total, p) => total + Number(qtds[p.id] || 0), 0);
+    }
+
+    function getValidWeekPlan() {
+      const plan = carregarPlanejamento();
+      const availableIds = new Set(PRODS.filter(p => (qtds[p.id] || 0) > 0).map(p => String(p.id)));
+      return Object.fromEntries(Object.entries(plan).filter(([, productId]) => availableIds.has(String(productId))));
+    }
+
+    function getPlanUsage(plan = getValidWeekPlan()) {
+      return Object.values(plan).reduce((usage, productId) => {
+        const id = String(productId);
+        usage[id] = (usage[id] || 0) + 1;
+        return usage;
+      }, {});
+    }
+
+    function renderPlanejador() {
+      const container = document.getElementById("planner-days");
+      if (!container) return;
+      const plan = getValidWeekPlan();
+      salvarPlanejamento(plan);
+      const products = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+      const options = products.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
+
+      container.innerHTML = PLANNER_DAYS.map((day, dayIndex) => `
+        <article class="planner-day">
+          <h3>${day}</h3>
+          ${PLANNER_MEALS.map(meal => {
+            const key = getPlannerKey(dayIndex, meal.id);
+            return `<div class="planner-slot">
+              <label for="plan-${key}">${meal.label}</label>
+              <select id="plan-${key}" onchange="atualizarSlotPlanejamento('${key}', this.value)">
+                <option value="">Sem planejar</option>
+                ${options}
+              </select>
+            </div>`;
+          }).join("")}
+        </article>`).join("");
+
+      Object.entries(plan).forEach(([key, productId]) => {
+        const select = document.getElementById(`plan-${key}`);
+        if (select) select.value = productId;
+      });
+      atualizarStatusPlanejamento();
+    }
+
+    function atualizarSlotPlanejamento(key, productId) {
+      const plan = getValidWeekPlan();
+      if (productId) plan[key] = productId;
+      else delete plan[key];
+      salvarPlanejamento(plan);
+      atualizarStatusPlanejamento();
+    }
+
+    function atualizarStatusPlanejamento() {
+      const plan = getValidWeekPlan();
+      const usage = getPlanUsage(plan);
+      const totalItems = getCartItemCount();
+      const planned = Object.keys(plan).length;
+      const exceeded = PRODS.filter(p => (usage[String(p.id)] || 0) > Number(qtds[p.id] || 0));
+      const count = document.getElementById("planner-count");
+      const balance = document.getElementById("planner-balance");
+      const hint = document.getElementById("planner-hint");
+      const bar = document.getElementById("planner-progress-bar");
+      if (count) count.textContent = `${planned} de ${totalItems} refeições planejadas`;
+      if (balance) balance.textContent = planned < totalItems ? `${totalItems - planned} disponíveis` : planned === totalItems ? "Semana fechada" : `${planned - totalItems} a mais`;
+      if (bar) bar.style.width = `${totalItems ? Math.min(100, (planned / totalItems) * 100) : 0}%`;
+      if (hint) {
+        hint.textContent = exceeded.length
+          ? `Ajuste ${exceeded.map(p => p.name).join(", ")}: há mais refeições planejadas do que unidades no carrinho.`
+          : planned === totalItems && totalItems > 0
+            ? "Tudo certo: todas as refeições do carrinho já têm lugar na semana."
+            : "Você não precisa preencher todos os dias. Organize apenas o que fizer sentido para sua rotina.";
+      }
+    }
+
+    function abrirPlanejador() {
+      if (!getCartItemCount()) {
+        mostrarFeedbackCarrinho("Adicione refeições ao carrinho antes de planejar a semana.");
+        return;
+      }
+      fecharCarrinho();
+      renderPlanejador();
+      const overlay = document.getElementById("planner-overlay");
+      overlay.classList.add("on");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => overlay.querySelector(".planner-close")?.focus(), 50);
+    }
+
+    function fecharPlanejador(event) {
+      const overlay = document.getElementById("planner-overlay");
+      if (!overlay || (event && event.target !== overlay)) return;
+      overlay.classList.remove("on");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      document.getElementById("cart-dock")?.focus();
+    }
+
+    function limparPlanejamento() {
+      salvarPlanejamento({});
+      renderPlanejador();
+    }
+
+    function concluirPlanejamento() {
+      const plan = getValidWeekPlan();
+      const usage = getPlanUsage(plan);
+      const exceeded = PRODS.filter(p => (usage[String(p.id)] || 0) > Number(qtds[p.id] || 0));
+      if (exceeded.length) {
+        atualizarStatusPlanejamento();
+        return;
+      }
+      fecharPlanejador();
+      mostrarFeedbackCarrinho(Object.keys(plan).length ? "Sua semana foi salva." : "Planejamento limpo.");
+      abrirCarrinho();
+    }
+
+    function getWeekPlanSummary() {
+      const plan = getValidWeekPlan();
+      const rows = [];
+      PLANNER_DAYS.forEach((day, dayIndex) => {
+        const meals = PLANNER_MEALS.map(meal => {
+          const productId = plan[getPlannerKey(dayIndex, meal.id)];
+          const product = PRODS.find(p => String(p.id) === String(productId));
+          return product ? `${meal.label}: ${product.name}` : null;
+        }).filter(Boolean);
+        if (meals.length) rows.push(`${day} — ${meals.join(" · ")}`);
+      });
+      return rows;
     }
 
     function salvarPagamento() {
@@ -2617,13 +2878,19 @@
           </div>
         </div>`).join("");
       const { sub, discount, total, discountHint } = calcTotal();
+      const plannedMeals = Object.keys(getValidWeekPlan()).length;
+      const totalMeals = getCartItemCount();
       footer.innerHTML = `
         <div class="cart-drawer-summary">
           <span>Subtotal: ${fmt(sub)}</span>
           ${discount > 0 ? `<span>Desconto: − ${fmt(discount)}</span>` : `<span>${escapeHtml(discountHint)}</span>`}
           <div class="cart-drawer-total"><span>Total</span><span>${fmt(total)}</span></div>
         </div>
-        <button class="btn-pedir cart-drawer-checkout" type="button" onclick="fecharCarrinho(); abrirModal()">Finalizar pedido</button>`;
+        ${plannedMeals ? `<div class="cart-plan-status"><strong>Semana organizada</strong>${plannedMeals} de ${totalMeals} refeições distribuídas.</div>` : ""}
+        <div class="cart-drawer-actions">
+          <button class="cart-drawer-plan" type="button" onclick="abrirPlanejador()">Organizar minha semana</button>
+          <button class="btn-pedir cart-drawer-checkout" type="button" onclick="fecharCarrinho(); abrirModal()">Finalizar pedido</button>
+        </div>`;
     }
 
     function abrirCarrinho() {
@@ -2653,7 +2920,12 @@
         return;
       }
       const detailsOverlay = document.getElementById("product-details-overlay");
-      if (detailsOverlay?.classList.contains("on")) fecharDetalhesProduto();
+      if (detailsOverlay?.classList.contains("on")) {
+        fecharDetalhesProduto();
+        return;
+      }
+      const plannerOverlay = document.getElementById("planner-overlay");
+      if (plannerOverlay?.classList.contains("on")) fecharPlanejador();
     });
 
     function selecionarPag() {
@@ -2786,6 +3058,12 @@
 
       r += `<br><strong>Pagamento: Mercado Pago</strong>`;
       r += `<br><span style="color:#777;">Você escolhe Pix, cartão ou outro meio disponível na próxima etapa.</span>`;
+
+      const weekPlanSummary = getWeekPlanSummary();
+      if (weekPlanSummary.length) {
+        r += `<br><br><strong>Minha semana</strong>`;
+        r += `<br><span style="color:#777;">${weekPlanSummary.map(escapeHtml).join("<br>")}</span>`;
+      }
 
       document.getElementById("m-resumo").innerHTML = r;
       document.getElementById("m-total").textContent = "Total: " + fmt(total);
