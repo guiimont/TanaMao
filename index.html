@@ -822,6 +822,43 @@
       cursor: pointer;
     }
 
+    .planner-primary-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      margin-top: 22px;
+      padding: 22px 24px;
+      border: 1px solid rgba(60,110,71,.18);
+      border-radius: 22px;
+      background: #edf3e8;
+      box-shadow: 0 12px 30px rgba(38,48,33,.08);
+    }
+    .planner-primary-card strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--verde-escuro);
+      font-size: 1.08rem;
+    }
+    .planner-primary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .planner-primary-action {
+      min-height: 48px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--dourado);
+      color: #fff;
+      font: 800 .88rem "Poppins", sans-serif;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(174,132,55,.2);
+    }
+
     .planner-overlay {
       position: fixed;
       inset: 0;
@@ -1657,6 +1694,8 @@
       .p-detail-btn { padding:5px 0; border:0; background:transparent!important; text-decoration:underline; text-underline-offset:3px; }
       .qty-wrap button { width:38px!important; height:38px!important; font-size:1.25rem!important; }
       .cart-dock { right:12px; left:12px; bottom:12px; justify-content:space-between; }
+      .planner-primary-card { grid-template-columns: 1fr; gap:16px; padding:19px; }
+      .planner-primary-action { width:100%; }
     }
   </style>
 </head>
@@ -1668,7 +1707,7 @@
     </a>
     <nav class="site-nav" aria-label="Navegação principal">
       <span class="site-pill" data-content="headerBadge">Produção sob encomenda</span>
-      <a href="#guia-semanal" data-content="weeklyGuideNav">Guia semanal</a>
+      <a href="#organizar-semana" onclick="abrirPlanejador(); return false;">Organizar semana</a>
       <a href="#cardapio">Cardápio</a>
       <a href="#resumo-lista">Pedido</a>
     </nav>
@@ -1698,7 +1737,7 @@
       <div>
         <span class="planner-eyebrow">Sua rotina, no controle</span>
         <h2 id="planner-title">Organize sua semana</h2>
-        <p>Distribua as refeições do carrinho entre almoço e jantar.</p>
+        <p>Escolha o que vai comer em cada dia. O pedido é montado automaticamente.</p>
       </div>
       <button class="planner-close" type="button" onclick="fecharPlanejador()" aria-label="Fechar planejador">×</button>
     </div>
@@ -1710,35 +1749,42 @@
     <div class="planner-days" id="planner-days"></div>
     <div class="planner-footer">
       <button class="planner-clear" type="button" onclick="limparPlanejamento()">Limpar planejamento</button>
-      <button class="planner-done" type="button" onclick="concluirPlanejamento()">Salvar minha semana</button>
+      <button class="planner-done" type="button" onclick="concluirPlanejamento()">Ver pedido da semana</button>
     </div>
   </section>
 </div>
 
 <div class="wrap">
-<section class="hero">
+    <section class="hero">
       <div class="tag" data-content="heroEyebrow">Alimentação inteligente para rotina corrida</div>
       <h1 data-content="heroTitle">Comida pronta, saudável e feita no tempo certo</h1>
       <p data-content="heroDescription">
-        Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos.
-        A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.
+        Organize almoços e jantares da semana, escolha as refeições e receba um pedido montado na quantidade certa.
+        Menos improviso para você comer bem mesmo nos dias corridos.
       </p>
+      <div class="planner-primary-card" id="organizar-semana">
+        <div>
+          <strong>Primeiro, organize sua semana</strong>
+          <p>Marque os dias em que precisa de almoço ou jantar e escolha as refeições. Nós montamos o pedido na quantidade certa.</p>
+        </div>
+        <button class="planner-primary-action" id="planner-primary-action" type="button" onclick="abrirPlanejador()">Organizar minha semana</button>
+      </div>
     </section>
 
     <div class="section">
       <span class="section-title" data-content="howItWorksTitle">Como funciona</span>
       <div class="intro-info">
         <div class="intro-card">
-          <strong data-content="step1Title">1. Escolha seus itens</strong>
-          <span data-content="step1Text">Monte seu pedido com produtos pensados para a rotina da semana.</span>
+          <strong data-content="step1Title">1. Marque seus dias</strong>
+          <span data-content="step1Text">Escolha quais almoços e jantares da semana precisam estar resolvidos.</span>
         </div>
         <div class="intro-card">
-          <strong data-content="step2Title">2. Agende sua encomenda</strong>
-          <span data-content="step2Text">Informe a data e a janela de retirada ou entrega no fechamento do pedido.</span>
+          <strong data-content="step2Title">2. Escolha as refeições</strong>
+          <span data-content="step2Text">Preencha os horários e deixe o sistema montar seu pedido automaticamente.</span>
         </div>
         <div class="intro-card">
-          <strong data-content="step3Title">3. Receba com previsibilidade</strong>
-          <span data-content="step3Text">Produtos preparados sob demanda para facilitar alimentação e treino.</span>
+          <strong data-content="step3Title">3. Agende e receba</strong>
+          <span data-content="step3Text">Confira as quantidades, escolha a entrega ou retirada e finalize.</span>
         </div>
       </div>
     </div>
@@ -1966,14 +2012,14 @@
       headerBadge: "Produção sob encomenda",
       heroEyebrow: "Alimentação inteligente para rotina corrida",
       heroTitle: "Comida pronta, saudável e feita no tempo certo",
-      heroDescription: "Escolha os produtos do cardápio fixo, agende a melhor data e finalize em poucos passos. A produção sob encomenda ajuda a entregar mais frescor, validade e previsibilidade.",
+      heroDescription: "Organize almoços e jantares da semana, escolha as refeições e receba um pedido montado na quantidade certa. Menos improviso para você comer bem mesmo nos dias corridos.",
       howItWorksTitle: "Como funciona",
-      step1Title: "1. Escolha seus itens",
-      step1Text: "Monte seu pedido com produtos pensados para a rotina da semana.",
-      step2Title: "2. Agende sua encomenda",
-      step2Text: "Informe a data e a janela de retirada ou entrega no fechamento do pedido.",
-      step3Title: "3. Receba com previsibilidade",
-      step3Text: "Produtos preparados sob demanda para facilitar alimentação e treino.",
+      step1Title: "1. Marque seus dias",
+      step1Text: "Escolha quais almoços e jantares da semana precisam estar resolvidos.",
+      step2Title: "2. Escolha as refeições",
+      step2Text: "Preencha os horários e deixe o sistema montar seu pedido automaticamente.",
+      step3Title: "3. Agende e receba",
+      step3Text: "Confira as quantidades, escolha a entrega ou retirada e finalize.",
       weeklyGuideNav: "Guia semanal",
       weeklyGuideTitle: "Guia da semana",
       weeklyGuideHeading: "A organização começa pelas escolhas no mercado",
@@ -2243,7 +2289,7 @@
 
     function getValidWeekPlan() {
       const plan = carregarPlanejamento();
-      const availableIds = new Set(PRODS.filter(p => (qtds[p.id] || 0) > 0).map(p => String(p.id)));
+      const availableIds = new Set(PRODS.map(p => String(p.id)));
       return Object.fromEntries(Object.entries(plan).filter(([, productId]) => availableIds.has(String(productId))));
     }
 
@@ -2260,7 +2306,7 @@
       if (!container) return;
       const plan = getValidWeekPlan();
       salvarPlanejamento(plan);
-      const products = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+      const products = PRODS;
       const options = products.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
 
       container.innerHTML = PLANNER_DAYS.map((day, dayIndex) => `
@@ -2290,6 +2336,14 @@
       if (productId) plan[key] = productId;
       else delete plan[key];
       salvarPlanejamento(plan);
+      const usage = getPlanUsage(plan);
+      PRODS.forEach(product => {
+        const plannedQuantity = Number(usage[String(product.id)] || 0);
+        if (plannedQuantity > Number(qtds[product.id] || 0)) qtds[product.id] = plannedQuantity;
+      });
+      salvarCarrinho();
+      renderProdutos();
+      atualizarResumo();
       atualizarStatusPlanejamento();
     }
 
@@ -2316,8 +2370,8 @@
     }
 
     function abrirPlanejador() {
-      if (!getCartItemCount()) {
-        mostrarFeedbackCarrinho("Adicione refeições ao carrinho antes de planejar a semana.");
+      if (!PRODS.length) {
+        mostrarFeedbackCarrinho("O cardápio ainda está carregando. Tente novamente em instantes.");
         return;
       }
       fecharCarrinho();
@@ -2335,7 +2389,7 @@
       overlay.classList.remove("on");
       overlay.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
-      document.getElementById("cart-dock")?.focus();
+      (document.getElementById("planner-primary-action") || document.getElementById("cart-dock"))?.focus();
     }
 
     function limparPlanejamento() {
