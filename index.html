@@ -735,6 +735,120 @@
       font-size: 1.05rem;
     }
 
+    .cart-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      justify-content: flex-end;
+      background: rgba(27, 48, 32, 0.42);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .22s ease, visibility .22s ease;
+    }
+
+    .cart-drawer-overlay.on {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .cart-drawer {
+      width: min(430px, 100%);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f7efe1;
+      box-shadow: -18px 0 48px rgba(27, 48, 32, .18);
+      transform: translateX(100%);
+      transition: transform .24s ease;
+    }
+
+    .cart-drawer-overlay.on .cart-drawer { transform: translateX(0); }
+
+    .cart-drawer-head,
+    .cart-drawer-footer {
+      padding: 20px;
+      background: #edf3e8;
+      border-color: rgba(93,109,77,.16);
+    }
+
+    .cart-drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid;
+    }
+
+    .cart-drawer-head h2 { margin: 0; color: var(--verde-escuro); font-size: 1.2rem; }
+    .cart-drawer-close {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(93,109,77,.18);
+      border-radius: 50%;
+      background: #f4f7f0;
+      color: var(--verde-escuro);
+      font-size: 1.35rem;
+      cursor: pointer;
+    }
+
+    .cart-drawer-list { flex: 1; overflow: auto; padding: 12px 20px; }
+    .cart-drawer-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(93,109,77,.14);
+    }
+    .cart-drawer-item strong { display: block; color: var(--verde-escuro); font-size: .92rem; }
+    .cart-drawer-item small { color: var(--muted); }
+    .cart-drawer-item .qty-wrap { gap: 7px; }
+    .cart-drawer-item .qty-wrap button { width: 30px; height: 30px; }
+    .cart-drawer-footer { border-top: 1px solid; }
+    .cart-drawer-summary { display: grid; gap: 5px; margin-bottom: 14px; color: var(--muted); font-size: .88rem; }
+    .cart-drawer-total { display: flex; justify-content: space-between; color: var(--verde-escuro); font-size: 1.08rem; font-weight: 800; }
+    .cart-drawer-checkout { width: 100%; margin-top: 14px; }
+
+    .details-purchase {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--borda);
+    }
+
+    .details-add-button {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--dourado);
+      color: #fff;
+      font: 800 .88rem "Poppins", sans-serif;
+      cursor: pointer;
+    }
+
+    .store-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 84px;
+      z-index: 60;
+      max-width: calc(100% - 32px);
+      padding: 11px 16px;
+      border-radius: 999px;
+      background: var(--verde-escuro);
+      color: #fff;
+      box-shadow: 0 10px 28px rgba(27,48,32,.24);
+      font-size: .86rem;
+      font-weight: 700;
+      opacity: 0;
+      transform: translate(-50%, 10px);
+      pointer-events: none;
+      transition: .2s ease;
+    }
+    .store-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
     .details-modal {
       max-width: 540px;
     }
@@ -1377,6 +1491,10 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .details-purchase { align-items: stretch; flex-direction: column; }
+      .details-purchase .qty-wrap { justify-content: center; }
+      .cart-drawer { width: 100%; }
     }
     /* Branding v4 — base verde contínua e acentos com função */
     body { background: #e8efe3; }
@@ -1473,10 +1591,22 @@
   </div>
 </header>
 
-<button class="cart-dock" id="cart-dock" type="button" onclick="document.getElementById('resumo-lista').scrollIntoView({behavior:'smooth',block:'center'})" aria-label="Ver resumo do pedido" aria-live="polite">
+<button class="cart-dock" id="cart-dock" type="button" onclick="abrirCarrinho()" aria-label="Abrir carrinho" aria-live="polite">
   <span><strong id="cart-dock-count">0 itens</strong><br><span id="cart-dock-total">R$ 0,00</span></span>
   <span class="cart-dock-icon" aria-hidden="true">→</span>
 </button>
+
+<div class="cart-drawer-overlay" id="cart-drawer-overlay" onclick="fecharCarrinho(event)" aria-hidden="true">
+  <aside class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-drawer-title">
+    <div class="cart-drawer-head">
+      <h2 id="cart-drawer-title">Seu carrinho</h2>
+      <button class="cart-drawer-close" type="button" onclick="fecharCarrinho()" aria-label="Fechar carrinho">×</button>
+    </div>
+    <div class="cart-drawer-list" id="cart-drawer-list"></div>
+    <div class="cart-drawer-footer" id="cart-drawer-footer"></div>
+  </aside>
+</div>
+<div class="store-toast" id="store-toast" role="status" aria-live="polite"></div>
 
 <div class="wrap">
 <section class="hero">
@@ -2347,6 +2477,15 @@
           </div>
         </div>
         <div class="details-list">${renderProductDetails(p)}</div>
+        ${isSellableProduct(p) ? `
+          <div class="details-purchase">
+            <div class="qty-wrap" aria-label="Quantidade de ${escapeHtml(p.name || "produto")}">
+              <button type="button" onclick="qty('${escapeHtml(p.id)}', -1)" aria-label="Diminuir quantidade">−</button>
+              <span class="qty-num" id="detail-qtd-${escapeHtml(p.id)}">${qtds[p.id] || 0}</span>
+              <button type="button" onclick="qty('${escapeHtml(p.id)}', 1)" aria-label="Aumentar quantidade">+</button>
+            </div>
+            <button class="details-add-button" type="button" onclick="adicionarPeloDetalhe('${escapeHtml(p.id)}')">Adicionar ao carrinho</button>
+          </div>` : ""}
       `;
       overlay.classList.add("on");
     }
@@ -2433,9 +2572,89 @@
       qtds[id] = Math.max(0, (qtds[id] || 0) + d);
       const el = document.getElementById("qtd-" + id);
       if (el) el.textContent = qtds[id];
+      const detailEl = document.getElementById("detail-qtd-" + id);
+      if (detailEl) detailEl.textContent = qtds[id];
       salvarCarrinho();
       atualizarResumo();
+      renderCarrinhoLateral();
     }
+
+    let storeToastTimer;
+
+    function mostrarFeedbackCarrinho(message) {
+      const toast = document.getElementById("store-toast");
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add("on");
+      clearTimeout(storeToastTimer);
+      storeToastTimer = setTimeout(() => toast.classList.remove("on"), 2200);
+    }
+
+    function adicionarPeloDetalhe(id) {
+      const p = PRODS.find(item => String(item.id) === String(id));
+      if (!p) return;
+      qty(id, 1);
+      mostrarFeedbackCarrinho(`${p.name} foi adicionado ao carrinho.`);
+    }
+
+    function renderCarrinhoLateral() {
+      const list = document.getElementById("cart-drawer-list");
+      const footer = document.getElementById("cart-drawer-footer");
+      if (!list || !footer) return;
+      const ativos = PRODS.filter(p => (qtds[p.id] || 0) > 0);
+      if (!ativos.length) {
+        list.innerHTML = '<span class="r-vazio">Seu carrinho está vazio.</span>';
+        footer.innerHTML = '';
+        return;
+      }
+      list.innerHTML = ativos.map(p => `
+        <div class="cart-drawer-item">
+          <div><strong>${escapeHtml(p.name)}</strong><small>${fmt(Number(p.price || 0))} cada</small></div>
+          <div class="qty-wrap">
+            <button type="button" onclick="qty('${escapeHtml(p.id)}', -1)" aria-label="Remover uma unidade de ${escapeHtml(p.name)}">−</button>
+            <span class="qty-num">${qtds[p.id]}</span>
+            <button type="button" onclick="qty('${escapeHtml(p.id)}', 1)" aria-label="Adicionar uma unidade de ${escapeHtml(p.name)}">+</button>
+          </div>
+        </div>`).join("");
+      const { sub, discount, total, discountHint } = calcTotal();
+      footer.innerHTML = `
+        <div class="cart-drawer-summary">
+          <span>Subtotal: ${fmt(sub)}</span>
+          ${discount > 0 ? `<span>Desconto: − ${fmt(discount)}</span>` : `<span>${escapeHtml(discountHint)}</span>`}
+          <div class="cart-drawer-total"><span>Total</span><span>${fmt(total)}</span></div>
+        </div>
+        <button class="btn-pedir cart-drawer-checkout" type="button" onclick="fecharCarrinho(); abrirModal()">Finalizar pedido</button>`;
+    }
+
+    function abrirCarrinho() {
+      const overlay = document.getElementById("cart-drawer-overlay");
+      if (!overlay) return;
+      renderCarrinhoLateral();
+      overlay.classList.add("on");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => overlay.querySelector(".cart-drawer-close")?.focus(), 50);
+    }
+
+    function fecharCarrinho(event) {
+      const overlay = document.getElementById("cart-drawer-overlay");
+      if (!overlay || (event && event.target !== overlay)) return;
+      overlay.classList.remove("on");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      document.getElementById("cart-dock")?.focus();
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      const cartOverlay = document.getElementById("cart-drawer-overlay");
+      if (cartOverlay?.classList.contains("on")) {
+        fecharCarrinho();
+        return;
+      }
+      const detailsOverlay = document.getElementById("product-details-overlay");
+      if (detailsOverlay?.classList.contains("on")) fecharDetalhesProduto();
+    });
 
     function selecionarPag() {
       pagSel = CHECKOUT_PAYMENT_METHOD;
