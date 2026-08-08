@@ -15,6 +15,7 @@
       --verde: #5d6d4d;
       --verde-escuro: #3d4933;
       --dourado: #e17e4f;
+      --ouro-linha: #d3a13a;
       --fundo: #f7efe1;
       --texto: #243126;
       --muted: #6f7b72;
@@ -1404,24 +1405,33 @@
       background: #e0eadb;
     }
 
-    /* Brand kit visual — preserva fluxos e regras existentes */
-    body { background: linear-gradient(180deg,#fbf5ea 0%,#f7efe1 72%,#efe6d7 100%); }
+    /* Brand kit visual — superfícies verdes sobre base creme */
+    body { background: #f7efe1; }
     .site-header { background: rgba(247,239,225,.94); border-bottom-color: rgba(93,109,77,.16); }
     .brand-logo { background: var(--verde); border-color: rgba(61,73,51,.28); }
     .site-pill { color: #9f4d2c; background: rgba(225,126,79,.12); border-color: rgba(225,126,79,.24); }
-    .hero,.section,.policy-card,.modal { background: #fffaf2; }
-    .intro-card,.guide-card,.guide-panel,.product,.recipe-detail-section,.policy-item,.pag-item,.usage-icon-item,.menu-tab,.detail-row,.m-resumo,.modal input { background: #fffdf8; border-color: rgba(93,109,77,.16); }
-    .guide-section,.policy-section,.diy-intro,.recipe-detail-section { background: #efe6d7; }
+    .hero,.section,.policy-card,.modal { background: #edf3e8; border-color: rgba(211,161,58,.42); }
+    .guide-section,.policy-section,.diy-intro,.recipe-detail-section,.m-resumo { background: #e4ecde; }
+    .intro-card,.guide-card,.guide-panel,.product,.policy-item,.pag-item,.usage-icon-item,.menu-tab,.detail-row,.modal input {
+      background: #f4f7f0;
+      border-color: rgba(211,161,58,.42);
+    }
+    .intro-card:nth-child(even),.guide-card:nth-child(even),.product:nth-child(even),.policy-item:nth-child(even) {
+      background: #eaf1e5;
+      border-color: rgba(211,161,58,.48);
+    }
+    .section-title { color: #7c745f; }
+    .intro-card + .intro-card,.product + .product { border-top-color: rgba(211,161,58,.32); }
     .p-preco,.details-price { color: #bd5f37; }
     .qty-wrap button:last-child { background: var(--dourado)!important; color:#fff!important; border-color:var(--dourado)!important; box-shadow:0 5px 14px rgba(225,126,79,.24); }
     .qty-wrap button:first-child { background:#edf1e7!important; color:var(--verde-escuro)!important; border-color:#d8e0d0!important; }
     .cta-section { background: var(--verde-escuro); }
     .site-footer,footer { background: #303a29; }
     @media (max-width: 720px) {
-      .site-header-inner { justify-content:center; min-height:68px; }
-      .brand-block { margin-inline:auto; }
+      .site-header-inner { justify-content:center; min-height:68px; position:relative; }
+      .brand-block { margin-inline:auto; position:relative; z-index:1; }
       .brand-subtitle,.site-pill { display:none; }
-      .site-nav { position:absolute; right:10px; }
+      .site-nav { position:absolute; left:16px; right:auto; z-index:2; }
       .site-nav a:not([href="#resumo-lista"]) { display:none; }
       .site-nav a[href="#resumo-lista"] { width:40px; min-width:40px; padding:0; font-size:0; border:0; background:transparent; }
       .site-nav a[href="#resumo-lista"]::after { content:"☰"; font-size:1.25rem; color:var(--verde-escuro); }
