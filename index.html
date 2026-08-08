@@ -7,15 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/main.css?v=20260807-4">
+  <link rel="stylesheet" href="/assets/css/main.css?v=20260808-1">
   <script src="auth.js"></script>
   <script src="/assets/js/toast.js"></script>
   <style>
     :root {
-      --verde: #3c6e47;
-      --verde-escuro: #2d5235;
-      --dourado: #c9a86a;
-      --fundo: #f8f7f3;
+      --verde: #5d6d4d;
+      --verde-escuro: #3d4933;
+      --dourado: #e17e4f;
+      --fundo: #f7efe1;
       --texto: #243126;
       --muted: #6f7b72;
       --borda: #e9e5dc;
@@ -703,6 +703,39 @@
       background: #eef6ef;
     }
 
+    .cart-dock {
+      position: fixed;
+      right: max(16px, calc((100vw - 920px) / 2));
+      bottom: 18px;
+      z-index: 24;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+      padding: 8px 10px 8px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--verde-escuro);
+      color: #fff;
+      box-shadow: 0 14px 34px rgba(38,48,33,.28);
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .cart-dock.on { display: inline-flex; }
+    .cart-dock strong { color: #fff; }
+    .cart-dock span { color: rgba(255,255,255,.76); font-size: .76rem; }
+    .cart-dock-icon {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--dourado);
+      font-size: 1.05rem;
+    }
+
     .details-modal {
       max-width: 540px;
     }
@@ -1330,7 +1363,10 @@
       }
 
       .qty-wrap {
-        align-self: flex-end;
+        align-self: stretch;
+        justify-content: flex-end;
+        border-top: 1px solid var(--borda);
+        padding-top: 10px;
       }
 
       .p-card-actions {
@@ -1367,6 +1403,34 @@
     .guide-tags span, .usage-chip, .p-detail-btn, .recipe-badge, #area-logado {
       background: #e0eadb;
     }
+
+    /* Brand kit visual — preserva fluxos e regras existentes */
+    body { background: linear-gradient(180deg,#fbf5ea 0%,#f7efe1 72%,#efe6d7 100%); }
+    .site-header { background: rgba(247,239,225,.94); border-bottom-color: rgba(93,109,77,.16); }
+    .brand-logo { background: var(--verde); border-color: rgba(61,73,51,.28); }
+    .site-pill { color: #9f4d2c; background: rgba(225,126,79,.12); border-color: rgba(225,126,79,.24); }
+    .hero,.section,.policy-card,.modal { background: #fffaf2; }
+    .intro-card,.guide-card,.guide-panel,.product,.recipe-detail-section,.policy-item,.pag-item,.usage-icon-item,.menu-tab,.detail-row,.m-resumo,.modal input { background: #fffdf8; border-color: rgba(93,109,77,.16); }
+    .guide-section,.policy-section,.diy-intro,.recipe-detail-section { background: #efe6d7; }
+    .p-preco,.details-price { color: #bd5f37; }
+    .qty-wrap button:last-child { background: var(--dourado)!important; color:#fff!important; border-color:var(--dourado)!important; box-shadow:0 5px 14px rgba(225,126,79,.24); }
+    .qty-wrap button:first-child { background:#edf1e7!important; color:var(--verde-escuro)!important; border-color:#d8e0d0!important; }
+    .cta-section { background: var(--verde-escuro); }
+    .site-footer,footer { background: #303a29; }
+    @media (max-width: 720px) {
+      .site-header-inner { justify-content:center; min-height:68px; }
+      .brand-block { margin-inline:auto; }
+      .brand-subtitle,.site-pill { display:none; }
+      .site-nav { position:absolute; right:10px; }
+      .site-nav a:not([href="#resumo-lista"]) { display:none; }
+      .site-nav a[href="#resumo-lista"] { width:40px; min-width:40px; padding:0; font-size:0; border:0; background:transparent; }
+      .site-nav a[href="#resumo-lista"]::after { content:"☰"; font-size:1.25rem; color:var(--verde-escuro); }
+      .product { padding:10px; }
+      .product img { width:104px; height:104px; }
+      .p-detail-btn { padding:5px 0; border:0; background:transparent!important; text-decoration:underline; text-underline-offset:3px; }
+      .qty-wrap button { width:38px!important; height:38px!important; font-size:1.25rem!important; }
+      .cart-dock { right:12px; left:12px; bottom:12px; justify-content:space-between; }
+    }
   </style>
 </head>
 <body id="topo">
@@ -1387,6 +1451,11 @@
     </nav>
   </div>
 </header>
+
+<button class="cart-dock" id="cart-dock" type="button" onclick="document.getElementById('resumo-lista').scrollIntoView({behavior:'smooth',block:'center'})" aria-label="Ver resumo do pedido" aria-live="polite">
+  <span><strong id="cart-dock-count">0 itens</strong><br><span id="cart-dock-total">R$ 0,00</span></span>
+  <span class="cart-dock-icon" aria-hidden="true">→</span>
+</button>
 
 <div class="wrap">
 <section class="hero">
@@ -2408,10 +2477,12 @@
       if (!ativos.length) {
         rl.innerHTML = '<span class="r-vazio">Nenhum item selecionado ainda.</span>';
         rt.style.display = "none";
+        const dock = document.getElementById("cart-dock");
+        if (dock) dock.classList.remove("on");
         return;
       }
 
-      const { sub, descRate, discount, total, quantityRate, diversityRate, discountHint } = calcTotal();
+      const { sub, descRate, discount, total, totalItems, quantityRate, diversityRate, discountHint } = calcTotal();
 
       let html = ativos.map(p =>
         `<div>${p.name} × ${qtds[p.id]} = ${fmt(qtds[p.id] * Number(p.price || 0))}</div>`
@@ -2431,6 +2502,14 @@
       rl.innerHTML = html;
       rt.style.display = "block";
       rt.textContent = "Total a pagar: " + fmt(total);
+      const dock = document.getElementById("cart-dock");
+      const dockCount = document.getElementById("cart-dock-count");
+      const dockTotal = document.getElementById("cart-dock-total");
+      if (dock && dockCount && dockTotal) {
+        dockCount.textContent = `${totalItems} ${totalItems === 1 ? "item" : "itens"}`;
+        dockTotal.textContent = fmt(total);
+        dock.classList.add("on");
+      }
     }
 
     function configurarDataMinimaEntrega() {
